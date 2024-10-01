@@ -1,7 +1,5 @@
 import React from "react";
-import { ICart, ICartDetail } from "../../types/cart.type";
-import { ICategory, sampleCategories } from "../../types/category";
-import { convertMoney } from "../../utils";
+import { ICartDetail } from "../../types/cart.type";
 import { Add, Remove } from "@mui/icons-material";
 
 

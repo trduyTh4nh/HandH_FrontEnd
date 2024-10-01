@@ -24,7 +24,6 @@ import Received from "./components/cpn_history/Received";
 import Canceled from "./components/cpn_history/Canceled";
 import Product from "./components/pages/Product";
 import CartPage from "./components/pages/Cart";
-import { ReactComponentElement, ReactNode } from "react";
 
 const AdminRoute: React.FC = () => {
   return (

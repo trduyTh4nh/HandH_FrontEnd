@@ -1,13 +1,13 @@
 import { NavLink, useNavigate } from "react-router-dom";
 import "../../styles/styles.css";
 
-import React, { useEffect, useRef } from "react";
+import React from "react";
 import HeaderComponentSearch from "../widget/headerComponentSearch";
 // import {
 //     Menu,Badge
 // } from "@mui/icons-material";
 import { Menu, Close } from "@mui/icons-material";
-import { useSpring, animated, useTransition } from "react-spring";
+import { animated, useTransition } from "react-spring";
 import { ICategory, sampleCategories } from "../../types/category";
 import boxCategory from "../widget/boxCategory.widget";
 import PopupComponent from "../widget/popUpComponent";

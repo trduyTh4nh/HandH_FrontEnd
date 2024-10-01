@@ -1,6 +1,3 @@
-import { useContext } from "react";
-import { ImageModelContext } from "../../providers/Providers";
-
 type PropImgs = {
   imgList: Array<{ img?: string; desc?: string }>;
 };
