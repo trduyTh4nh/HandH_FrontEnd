@@ -50,7 +50,7 @@ const Home: React.FC = () => {
       </div>
 
       <div className="home-branch h-10 mt-20 mb-4 w-full">
-        <SplideComponent></SplideComponent>
+        {/* <SplideComponent></SplideComponent> */}
       </div>
 
       <div className="home-new-product  mt-4 w-full flex flex-col justify-center">
