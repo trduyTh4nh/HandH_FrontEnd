@@ -1,5 +1,3 @@
-"use client";
-
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -22,7 +20,11 @@ import {
 } from "lucide-react";
 import { motion } from "framer-motion";
 
-export default function Dashboard() {
+// export default function Dashboard() {
+
+// }
+
+const Dashboard: React.FC = () => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [darkMode, setDarkMode] = useState(false);
 
@@ -280,18 +282,20 @@ export default function Dashboard() {
             <CardContent>
               <Table>
                 <TableHeader>
-                  <TableHead className="text-gray-600 dark:text-gray-300">
-                    Sản phẩm
-                  </TableHead>
-                  <TableHead className="text-gray-600 dark:text-gray-300">
-                    Loại sản phẩm
-                  </TableHead>
-                  <TableHead className="text-gray-600 dark:text-gray-300">
-                    Giá
-                  </TableHead>
-                  <TableHead className="text-gray-600 dark:text-gray-300">
-                    Doanh thu
-                  </TableHead>
+                  <TableRow>
+                    <TableHead className="text-gray-600 dark:text-gray-300">
+                      Sản phẩm
+                    </TableHead>
+                    <TableHead className="text-gray-600 dark:text-gray-300">
+                      Loại sản phẩm
+                    </TableHead>
+                    <TableHead className="text-gray-600 dark:text-gray-300">
+                      Giá
+                    </TableHead>
+                    <TableHead className="text-gray-600 dark:text-gray-300">
+                      Doanh thu
+                    </TableHead>
+                  </TableRow>
                 </TableHeader>
                 <TableBody>
                   {[
@@ -337,4 +341,6 @@ export default function Dashboard() {
       </main>
     </div>
   );
-}
+};
+
+export default Dashboard;

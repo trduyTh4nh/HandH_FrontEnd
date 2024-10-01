@@ -2,11 +2,11 @@ import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import "./App.css";
 import Navbar from "./components/layout/NavBar";
 import SideBar from "./components/layout/SideBar"; // Chỉ sử dụng cho Admin
-import Dashboard from "./page/Dashboard";
-import ProductPage from "./page/ProductPage";
-import OrderPage from "./page/OrderPage";
-import CustomerPage from "./page/CustomerPage";
-import FinancePage from "./page/FinancePage"; // Đã sửa lỗi chính tả
+import Dashboard from "./AdminPage/Dashboard";
+import ProductPage from "./AdminPage/ProductPage";
+import OrderPage from "./AdminPage/OrderPage";
+import CustomerPage from "./AdminPage/CustomerPage";
+import FinancePage from "./AdminPage/FinancePage"; // Đã sửa lỗi chính tả
 import Home from "./components/pages/Home";
 import Shop from "./components/pages/Shop";
 import PurchaseOrder from "./components/pages/PurchaseOrder";
