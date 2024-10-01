@@ -1,6 +1,5 @@
 import React, { useEffect } from "react";
 import "../../styles/home.css";
-import SplideComponent from "../widget/splide.widget";
 import ProductItem from "../widget/productItem.widget";
 import { IProduct, products } from "../../types/product.type";
 import CarouselBanner from "../widget/carouselBanner.widget";
