@@ -12,6 +12,7 @@ import { ICategory, sampleCategories } from "../../types/category";
 import boxCategory from "../widget/boxCategory.widget";
 import PopupComponent from "../widget/popUpComponent";
 import PopupRegister from "../widget/popUpRegister";
+import PopupAdmin from "../widget/popUpAdmin";
 // import { duration } from "@mui/material";
 
 const Navbar: React.FC = () => {
@@ -29,6 +30,9 @@ const Navbar: React.FC = () => {
 
   const [login, setLogin] = React.useState(false);
   const [register, setRegister] = React.useState(false);
+  const[admin,setAdmin]=React.useState(false);
+  const[message,setMessage]=React.useState(false);
+
 
   function handleChange() {
     setLogin(false);
@@ -36,6 +40,24 @@ const Navbar: React.FC = () => {
   function handleChangeRe() {
     setRegister(false);
   }
+  function handleChangeAd(){
+    setAdmin(false);
+  }
+
+  function handleChangeMess(){
+    setMessage(false);
+  }
+
+  function switchToRegister() {
+    setLogin(false);
+    setRegister(true); 
+  }
+
+  function switchToLogin(){
+    setLogin(true);
+    setRegister(false);
+  }
+
 
   // </div>
 
@@ -149,10 +171,12 @@ const Navbar: React.FC = () => {
           </div>
         </div>
       </div>
-      {login && <PopupComponent handleChange={handleChange}></PopupComponent>}
+      {login && <PopupComponent handleChange={handleChange} switchToRegister={switchToRegister}></PopupComponent>}
       {register && (
-        <PopupRegister handleChange={handleChangeRe}></PopupRegister>
+        <PopupRegister handleChange={handleChangeRe}  switchToLogin={switchToLogin}></PopupRegister>
       )}
+      {admin&&(<PopupAdmin handleChangeAd={handleChangeAd} ></PopupAdmin>)}
+
       {transitions(
         (style, isOpen) =>
           isOpen && (
