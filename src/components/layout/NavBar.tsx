@@ -49,8 +49,8 @@ const Navbar: React.FC = () => {
           <div className="flex-shrink-0 flex items-center">
             <NavLink to="/">
               <img
-                className="h-8 w-auto"
-                src="\src\assets\image\logo_header.png"
+                className="w-auto h-12"
+                src="\src\assets\image\logo_header.svg"
                 alt="Logo"
               />
             </NavLink>
