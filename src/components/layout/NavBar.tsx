@@ -42,7 +42,7 @@ const Navbar: React.FC = () => {
   return (
     <nav
       id="nav-main"
-      className=" bg-white fixed w-full top-0 z-10 rounded-b-3xl shadow-md"
+      className=" bg-white fixed w-full top-0 z-30 rounded-b-3xl shadow-md"
     >
       <div className="flex mx-auto px-20 py-4 justify-between items-center">
         <div className="flex justify-start gap-4">

@@ -7,7 +7,11 @@ export default {
   ],
   theme: {
   	extend: {
+		fontFamily: {
+			'roboto-serif': 'Roboto Serif, serif',
+		},
   		colors: {
+			'white-transparent': '#ffffff8c',
   			'black-transclusent': '#000000',
   			white: '#fff',
   			gray: {
