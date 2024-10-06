@@ -5,7 +5,7 @@ function Footer() {
   return (
     <div className="px-20 py-4 bg-primary flex flex-col gap-2">
       <div className="w-full flex justify-between">
-        <img src="/logo_long.png" className="h-8" />
+        <img src="/logo_header.svg" className="h-12" />
         <div className="flex gap-6">
           <a>
             <img src="/facebook_logo.png" className="w-6 h-6 object-cover" />
