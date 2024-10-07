@@ -8,7 +8,8 @@ class API {
   private axiosInstance: AxiosInstance;
 
   constructor() {
-    const url = process.env.API_URL;
+    const url = import.meta.env.VITE_API_URL;
+    console.log(url)
     this.axiosInstance = axios.create({
       baseURL: url,
       headers: {
