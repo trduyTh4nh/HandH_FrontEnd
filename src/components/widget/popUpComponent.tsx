@@ -1,6 +1,6 @@
 import { Close } from "@mui/icons-material";
 
-function PopupComponent({ handleChange }: any) {
+function PopupComponent({ handleChange,switchToRegister }: any) {
   return (
     <div className="overlay">
 
@@ -23,11 +23,14 @@ function PopupComponent({ handleChange }: any) {
       />
 
       <button className="btn-continute">Tiếp tục</button>
-      <h2>Hoặc</h2>
-      <button className="btn-continute-with-google">Tiếp tục với Google</button>
+      <h3 className="or-text">Hoặc</h3>
+      <button className="btn-continute-with-google">
+        <img className="h-8 w-auto" src="\src\assets\image\logo_google.png"
+                alt="Logo"/>
+        Tiếp tục với Google</button>
       <div className="bottom-popup-login">
         <h4>Chưa có tài khoản?</h4>
-        <h4 className="text-color-secondnary" id="text-register">
+        <h4 onClick={switchToRegister} className="text-color-secondnary" id="text-register">
           Đăng ký
         </h4>
       </div>
