@@ -32,10 +32,14 @@ const Navbar: React.FC = () => {
   const [register, setRegister] = React.useState(false);
   const[admin,setAdmin]=React.useState(false);
   const[message,setMessage]=React.useState(false);
+  const [user, setUser] = React.useState(null)
 
+  function handleChange(isLogin: boolean) {
+    if(isLogin){
 
-  function handleChange() {
+    }
     setLogin(false);
+
   }
   function handleChangeRe() {
     setRegister(false);
@@ -171,7 +175,10 @@ const Navbar: React.FC = () => {
           </div>
         </div>
       </div>
-      {login && <PopupComponent handleChange={handleChange} switchToRegister={switchToRegister}></PopupComponent>}
+      {login && <PopupComponent handleChange={(e) => {
+        console.log(e);
+        handleChange(e);
+      }} switchToRegister={switchToRegister}></PopupComponent>}
       {register && (
         <PopupRegister handleChange={handleChangeRe}  switchToLogin={switchToLogin}></PopupRegister>
       )}
