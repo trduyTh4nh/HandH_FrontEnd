@@ -25,5 +25,4 @@ dist-ssr
 
 # TUYỆT MẬT 🤫
 .env
-
 src/components/pages/Test.tsx

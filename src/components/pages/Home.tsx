@@ -142,6 +142,10 @@ const Home: React.FC = () => {
             </DialogContent>
           </Dialog>
         </div>
+        <h2 className="text-center">Sự kiện nổi bật</h2>
+        <div className="banner-event p-8 w-full flex justify-center">
+          <CarouselBanner></CarouselBanner>
+        </div>
         <h2 className="text-center">Liên hệ với chúng tôi</h2>
         <div className="flex gap-8 w-full justify-center">
           <Contacts

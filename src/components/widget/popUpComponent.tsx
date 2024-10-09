@@ -49,7 +49,7 @@ function PopupComponent({ handleChange, switchToRegister }: any) {
       localStorage.setItem("user", JSON.stringify(response.metadata.user));
       //@ts-ignore
       toast({title: `Chào mừng, ${response.metadata.user.name}`, description: "Bạn đã đăng nhập thành công!"});
-      handleChange();
+      handleChange(true);
     } catch (error) {
       const e = error as AxiosError;
       const response = e.response;
@@ -64,7 +64,7 @@ function PopupComponent({ handleChange, switchToRegister }: any) {
     <div className="overlay">
       <div className="popup-login">
         <div className="btn-close">
-          <Close onClick={handleChange}></Close>
+          <Close onClick={() => {handleChange()}}></Close>
         </div>
         <h1 style={{ fontWeight: "bold" }}>Đăng nhập</h1>
         <Form {...form}>
