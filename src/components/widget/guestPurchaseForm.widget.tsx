@@ -101,7 +101,7 @@ export default function GuestPurchaseForm(props: GuestPurchaseFormProps) {
               render={({ field }) => (
                 <FormItem className="flex-1">
                   <FormControl>
-                    <Input placeholder="Họ" {...field} />
+                    <Input placeholder="Họ (Bắt buộc)" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -113,7 +113,7 @@ export default function GuestPurchaseForm(props: GuestPurchaseFormProps) {
               render={({ field }) => (
                 <FormItem className="flex-1">
                   <FormControl>
-                    <Input placeholder="Tên" {...field} />
+                    <Input placeholder="Tên (Bắt buộc)" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -138,7 +138,7 @@ export default function GuestPurchaseForm(props: GuestPurchaseFormProps) {
             render={({ field }) => (
               <FormItem className="flex-1">
                 <FormControl>
-                  <Input placeholder="Số điện thoại" {...field} />
+                  <Input placeholder="Số điện thoại (Bắt buộc)" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -150,7 +150,7 @@ export default function GuestPurchaseForm(props: GuestPurchaseFormProps) {
             render={({ field }) => (
               <FormItem className="flex-1">
                 <FormControl>
-                  <Input placeholder="Địa chỉ" {...field} />
+                  <Input placeholder="Địa chỉ (Bắt buộc)" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -173,7 +173,7 @@ export default function GuestPurchaseForm(props: GuestPurchaseFormProps) {
                       <SelectTrigger>
                         <SelectValue
                           placeholder={
-                            districts.length == 0 ? "Đang tải..." : `Quận/Huyện`
+                            districts.length == 0 ? "Đang tải..." : `Quận/Huyện (Bắt buộc)`
                           }
                         ></SelectValue>
                       </SelectTrigger>
@@ -197,7 +197,7 @@ export default function GuestPurchaseForm(props: GuestPurchaseFormProps) {
                   <FormControl>
                     <Select disabled={wards.length == 0} onValueChange={field.onChange}>
                       <SelectTrigger>
-                        <SelectValue placeholder="Phường/Xã"></SelectValue>
+                        <SelectValue placeholder="Phường/Xã (Bắt buộc)"></SelectValue>
                       </SelectTrigger>
                       <SelectContent>
                         {wards.map((e) => (
