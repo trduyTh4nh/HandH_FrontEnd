@@ -8,7 +8,8 @@ class API {
   private axiosInstance: AxiosInstance;
 
   constructor() {
-    const url = `http://localhost:8888/v1/api/`;
+    const url = import.meta.env.VITE_API_URL;
+    console.log(url)
     this.axiosInstance = axios.create({
       baseURL: url,
       headers: {
@@ -18,13 +19,12 @@ class API {
 
     this.axiosInstance.interceptors.request.use(
       (config: InternalAxiosRequestConfig) => {
-        // const token = localStorage.getItem("token");
-        // if (token) {
-        //   config.headers.authorization = `Bearer ${token}`;
-        //   console.log("HEADER config: ", config.headers);
-        // }
-        config.headers.authorization =
-          "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjoiNjZiNzdjZmY4NDhlYjkzOWRiMTVjYzY2IiwiZW1haWwiOiJkdXl0aGFuaEBnbWFpbC5jb20iLCJpYXQiOjE3Mjc3ODIzMzQsImV4cCI6MTcyNzk1NTEzNH0.0X0hjsrb-c_koVal0mX-xYYLMGCdBXE1Ev8U1_ZoYc0";
+        const token = localStorage.getItem("token");
+        if (token) {
+          config.headers.authorization = `Bearer ${token}`;
+          console.log("HEADER config: ", config.headers);
+        }
+        // TODO: cứng. sau khi t làm xong login thì lấy token từ localStorage ra.
         config.headers["x-client-id"] = "66b77cff848eb939db15cc66";
 
         console.log("HEADER config: ", config.headers);

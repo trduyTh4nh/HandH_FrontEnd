@@ -22,3 +22,7 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# TUYỆT MẬT 🤫
+.env
+src/components/pages/Test.tsx
