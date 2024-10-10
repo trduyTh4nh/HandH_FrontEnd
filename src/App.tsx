@@ -28,6 +28,8 @@ import PurchaseLayout from "./components/pages/purchase/PurchaseLayout";
 import PurchaseReview from "./components/pages/purchase/PurchaseReview";
 import PurchaseChoose from "./components/pages/purchase/PurchaseChoose";
 import { Toaster } from "./components/ui/toaster";
+import BannerPage from "./AdminPage/BannerPage";
+import CategoryPage from "./AdminPage/CategoryPage";
 const AdminRoute: React.FC = () => {
   return (
     <div className="wrap-route flex">
@@ -38,6 +40,8 @@ const AdminRoute: React.FC = () => {
         <Route path="/ordersManage" element={<OrderPage />} />
         <Route path="/customersManage" element={<CustomerPage />} />
         <Route path="/financeManage" element={<FinancePage />} />
+        <Route path="/bannerManage" element={<BannerPage />} />
+        <Route path="/categoryManage" element={<CategoryPage />} />
       </Routes>
     </div>
   );
