@@ -24,7 +24,6 @@ import Received from "../components/cpn_history/Received";
 import Canceled from "../components/cpn_history/Canceled";
 import Product from "../components/pages/Product";
 import CartPage from "../components/pages/Cart";
-import OverviewPage from "@/AdminPage/OverviewPage";
 import PurchaseLayout from "../components/pages/purchase/PurchaseLayout";
 import PurchaseReview from "../components/pages/purchase/PurchaseReview";
 import PurchaseChoose from "../components/pages/purchase/PurchaseChoose";
