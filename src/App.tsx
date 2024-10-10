@@ -9,7 +9,7 @@ import CustomerPage from "./AdminPage/CustomerPage";
 import FinancePage from "./AdminPage/FinancePage"; // Đã sửa lỗi chính tả
 import Home from "./components/pages/Home";
 import Shop from "./components/pages/Shop";
-import PurchaseOrder from "./components/pages/PurchaseOrder";
+import PurchaseOrder from "./components/pages/Blog";
 import Management from "./components/pages/Management";
 import { Account } from "./components/widget/Account";
 import { ManagerAccount } from "./components/pages/ManagerAccount";
@@ -29,6 +29,7 @@ import PurchaseReview from "./components/pages/purchase/PurchaseReview";
 import PurchaseChoose from "./components/pages/purchase/PurchaseChoose";
 import { Toaster } from "./components/ui/toaster";
 import Test from "./components/pages/Test";
+import Blog from "./components/pages/Blog";
 const AdminRoute: React.FC = () => {
   return (
     <div className="wrap-route flex">
@@ -53,7 +54,7 @@ const UserRoute: React.FC = () => {
         {/* {navbar} */}
         <Route path="/" element={<Home />} />
         <Route path="/shop" element={<Shop />} />
-        <Route path="/purchaseOrder" element={<PurchaseOrder />} />
+        <Route path="/blog" element={<Blog />} />
         <Route path="/management" element={<Management />} />
         <Route path="/managerAccount" element={<ManagerAccount />}>
           <Route index element={<Account />} />

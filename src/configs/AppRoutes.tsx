@@ -9,7 +9,7 @@ import CustomerPage from "../AdminPage/CustomerPage";
 import FinancePage from "../AdminPage/FinancePage"; // Đã sửa lỗi chính tả
 import Home from "../components/pages/Home";
 import Shop from "../components/pages/Shop";
-import PurchaseOrder from "../components/pages/PurchaseOrder";
+import PurchaseOrder from "../components/pages/Blog";
 import Management from "../components/pages/Management";
 import { Account } from "../components/widget/Account";
 import { ManagerAccount } from "../components/pages/ManagerAccount";

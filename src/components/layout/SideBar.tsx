@@ -3,6 +3,7 @@ import { Link, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   BarChart3Icon,
+  Calendar,
   DollarSignIcon,
   LogOutIcon,
   ShirtIcon,
@@ -56,10 +57,16 @@ const SideBar = () => {
                   icon: DollarSignIcon,
                 },
                 {
+                  name: "Sự kiện",
+                  path: "/admin/bannerManage",
+                  icon: Calendar,
+                },
+                {
                   name: "Đăng xuất",
                   path: "/admin/logout",
                   icon: LogOutIcon,
                 },
+                
               ].map((item) => (
                 <Link to={item.path} key={item.name} className="w-full">
                   <Button
