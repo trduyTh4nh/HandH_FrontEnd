@@ -36,7 +36,9 @@ const Navbar: React.FC = () => {
 
   function handleChange(isLogin: boolean) {
     if(isLogin){
-
+      const lsUser = localStorage.getItem("user");
+      const user = JSON.parse(lsUser as string);
+      setUser(user);
     }
     setLogin(false);
 
@@ -96,10 +98,10 @@ const Navbar: React.FC = () => {
                 Cửa Hàng
               </NavLink>
               <NavLink
-                to="/purchaseOrder"
+                to="/blog"
                 className="text-title-nav hover:underline hover:text-black hover:bg-gray-100 transition-all duration-800 px-3 py-2 rounded-md font-medium"
               >
-                Đơn mua
+                Hoạt động
               </NavLink>
             </div>
           </div>
