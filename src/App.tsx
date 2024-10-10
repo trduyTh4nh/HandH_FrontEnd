@@ -9,7 +9,7 @@ import CustomerPage from "./AdminPage/CustomerPage";
 import FinancePage from "./AdminPage/FinancePage"; // Đã sửa lỗi chính tả
 import Home from "./components/pages/Home";
 import Shop from "./components/pages/Shop";
-import PurchaseOrder from "./components/pages/PurchaseOrder";
+import PurchaseOrder from "./components/pages/Blog";
 import Management from "./components/pages/Management";
 import { Account } from "./components/widget/Account";
 import { ManagerAccount } from "./components/pages/ManagerAccount";
@@ -28,7 +28,10 @@ import PurchaseLayout from "./components/pages/purchase/PurchaseLayout";
 import PurchaseReview from "./components/pages/purchase/PurchaseReview";
 import PurchaseChoose from "./components/pages/purchase/PurchaseChoose";
 import { Toaster } from "./components/ui/toaster";
+import BannerPage from "./AdminPage/BannerPage";
+import CategoryPage from "./AdminPage/CategoryPage";
 import Test from "./components/pages/Test";
+import Blog from "./components/pages/Blog";
 const AdminRoute: React.FC = () => {
   return (
     <div className="wrap-route flex">
@@ -39,6 +42,8 @@ const AdminRoute: React.FC = () => {
         <Route path="/ordersManage" element={<OrderPage />} />
         <Route path="/customersManage" element={<CustomerPage />} />
         <Route path="/financeManage" element={<FinancePage />} />
+        <Route path="/bannerManage" element={<BannerPage />} />
+        <Route path="/categoryManage" element={<CategoryPage />} />
       </Routes>
     </div>
   );
@@ -53,7 +58,7 @@ const UserRoute: React.FC = () => {
         {/* {navbar} */}
         <Route path="/" element={<Home />} />
         <Route path="/shop" element={<Shop />} />
-        <Route path="/purchaseOrder" element={<PurchaseOrder />} />
+        <Route path="/blog" element={<Blog />} />
         <Route path="/management" element={<Management />} />
         <Route path="/managerAccount" element={<ManagerAccount />}>
           <Route index element={<Account />} />
@@ -78,7 +83,7 @@ const UserRoute: React.FC = () => {
           <Route path="/payment/process" element={<PurchaseChoose />} />
           <Route path="/payment/status" element={<PurchaseChoose />} />
         </Route>
-        <Route path="/test" element={<Test/>}/>
+        <Route path="/test" element={<Test />} />
       </Routes>
     </div>
   );
