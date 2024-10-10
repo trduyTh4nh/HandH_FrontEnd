@@ -30,6 +30,7 @@ import PurchaseChoose from "./components/pages/purchase/PurchaseChoose";
 import { Toaster } from "./components/ui/toaster";
 import BannerPage from "./AdminPage/BannerPage";
 import CategoryPage from "./AdminPage/CategoryPage";
+import Test from "./components/pages/Test";
 const AdminRoute: React.FC = () => {
   return (
     <div className="wrap-route flex">
@@ -81,6 +82,7 @@ const UserRoute: React.FC = () => {
           <Route path="/payment/process" element={<PurchaseChoose />} />
           <Route path="/payment/status" element={<PurchaseChoose />} />
         </Route>
+        <Route path="/test" element={<Test />} />
       </Routes>
     </div>
   );
