@@ -9,7 +9,7 @@ import CustomerPage from "../AdminPage/CustomerPage";
 import FinancePage from "../AdminPage/FinancePage"; // Đã sửa lỗi chính tả
 import Home from "../components/pages/Home";
 import Shop from "../components/pages/Shop";
-import PurchaseOrder from "../components/pages/PurchaseOrder";
+import PurchaseOrder from "../components/pages/Blog";
 import Management from "../components/pages/Management";
 import { Account } from "../components/widget/Account";
 import { ManagerAccount } from "../components/pages/ManagerAccount";
@@ -24,10 +24,11 @@ import Received from "../components/cpn_history/Received";
 import Canceled from "../components/cpn_history/Canceled";
 import Product from "../components/pages/Product";
 import CartPage from "../components/pages/Cart";
-import OverviewPage from "@/AdminPage/OverviewPage";
 import PurchaseLayout from "../components/pages/purchase/PurchaseLayout";
 import PurchaseReview from "../components/pages/purchase/PurchaseReview";
 import PurchaseChoose from "../components/pages/purchase/PurchaseChoose";
+import BannerPage from "@/AdminPage/BannerPage";
+import CategoryPage from "@/AdminPage/CategoryPage";
 const AdminRoute: React.FC = () => {
   return (
     <div className="wrap-route flex">
@@ -38,6 +39,8 @@ const AdminRoute: React.FC = () => {
         <Route path="/orders" element={<OrderPage />} />
         <Route path="/customers" element={<CustomerPage />} />
         <Route path="/finance" element={<FinancePage />} />
+        <Route path="/banner" element={<BannerPage></BannerPage>} />
+        <Route path="/category" element={<CategoryPage></CategoryPage>} />
       </Routes>
     </div>
   );
