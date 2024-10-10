@@ -27,6 +27,8 @@ import CartPage from "../components/pages/Cart";
 import PurchaseLayout from "../components/pages/purchase/PurchaseLayout";
 import PurchaseReview from "../components/pages/purchase/PurchaseReview";
 import PurchaseChoose from "../components/pages/purchase/PurchaseChoose";
+import BannerPage from "@/AdminPage/BannerPage";
+import CategoryPage from "@/AdminPage/CategoryPage";
 const AdminRoute: React.FC = () => {
   return (
     <div className="wrap-route flex">
@@ -37,6 +39,8 @@ const AdminRoute: React.FC = () => {
         <Route path="/orders" element={<OrderPage />} />
         <Route path="/customers" element={<CustomerPage />} />
         <Route path="/finance" element={<FinancePage />} />
+        <Route path="/banner" element={<BannerPage></BannerPage>} />
+        <Route path="/category" element={<CategoryPage></CategoryPage>} />
       </Routes>
     </div>
   );

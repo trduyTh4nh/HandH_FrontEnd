@@ -3,8 +3,11 @@ import { Link, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   BarChart3Icon,
+  CopyIcon,
   DollarSignIcon,
   LogOutIcon,
+  Megaphone,
+  MegaphoneIcon,
   ShirtIcon,
   ShoppingBagIcon,
   UsersIcon,
@@ -28,10 +31,14 @@ const SideBar = () => {
           transition={{ type: "spring", stiffness: 300, damping: 30 }}
           className="w-64 bg-white dark:bg-gray-800 p-6 shadow-md sticky"
         >
-          <div className="wrap-side-nav fixed w-48">
-            <h1 className="text-2xl font-bold mb-6 text-gray-800 dark:text-white">
-              HandH
-            </h1>
+          <div className="wrap-side-nav fixed w-48 ">
+            <div className="wrap-logo p-2">
+              <img
+                className="w-auto h-12"
+                src="\src\assets\image\logo_header.svg"
+                alt="Logo"
+              />
+            </div>
             <nav>
               {[
                 { name: "Tổng quan", path: "/admin", icon: BarChart3Icon },
@@ -54,6 +61,16 @@ const SideBar = () => {
                   name: "Tài chính",
                   path: "/admin/financeManage",
                   icon: DollarSignIcon,
+                },
+                {
+                  name: "Biển quảng cáo",
+                  path: "/admin/bannerManage",
+                  icon: MegaphoneIcon,
+                },
+                {
+                  name: "Loại sản phẩm",
+                  path: "/admin/categoryManage",
+                  icon: CopyIcon,
                 },
                 {
                   name: "Đăng xuất",
