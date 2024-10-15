@@ -18,10 +18,11 @@ import { Loader, Loader2 } from "lucide-react";
 import { CircularProgress } from "@mui/material";
 import { useToast } from "@/hooks/use-toast";
 import { title } from "process";
+import { DialogClose } from "../ui/dialog";
 
 function PopupComponent({ handleChange, switchToRegister }: any) {
   const [loading, setLoading] = useState(false);
-  const {toast} = useToast();
+  const { toast } = useToast();
   const loginSchema = z
     .object({
       email: z
@@ -40,37 +41,54 @@ function PopupComponent({ handleChange, switchToRegister }: any) {
     setLoading(true);
     console.log(data);
     const api = new API();
-    try{
-      const response = await api.post("access/login", {"email": data.email, "password": data.password});
+    try {
+      const response = await api.post("access/login", {
+        email: data.email,
+        password: data.password,
+      });
       console.log(response);
       //@ts-ignore
       localStorage.setItem("token", response.metadata.tokens.accessToken);
       //@ts-ignore
       localStorage.setItem("user", JSON.stringify(response.metadata.user));
       //@ts-ignore
-      toast({title: `Chào mừng, ${response.metadata.user.name}`, description: "Bạn đã đăng nhập thành công!"});
+      toast({
+        //@ts-ignore
+        title: `Chào mừng, ${response.metadata.user.name}`,
+        description: "Bạn đã đăng nhập thành công!",
+      });
       handleChange(true);
     } catch (error) {
       const e = error as AxiosError;
       const response = e.response;
       if (response?.status === 401 || response?.status === 400) {
-        form.setError("password", {message: "Email hoặc mật khẩu không đúng"});
+        form.setError("password", {
+          message: "Email hoặc mật khẩu không đúng",
+        });
       }
       console.log(response);
     }
     setLoading(false);
   }
   return (
-    <div className="overlay">
-      <div className="popup-login">
-        <div className="btn-close">
-          <Close onClick={() => {handleChange()}}></Close>
-        </div>
-        <h1 style={{ fontWeight: "bold" }}>Đăng nhập</h1>
+    <div className="flex gap-4 items-center w-full">
+      <div className="flex-1 h-full">
+        <img
+          src="src/assets/image/imglogin.jpg"
+          alt="login"
+          className="w-full rounded-2xl object-contain h-full"
+        />
+      </div>
+      <div className="flex flex-col items-center gap-4 w-1/2">
+        <img src="src/assets/image/logo_header.svg" />
+        <h2 style={{ fontWeight: "bold" }}>Đăng nhập</h2>
+        <p className="text-center">
+          Chào mừng quay lại, hãy tiếp tục mua sắm với chúng tôi nào.
+        </p>
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(handleLogin)}
-            className="w-[85%] flex flex-col gap-2"
+            className="w-full flex flex-col gap-2"
           >
             <FormField
               name="email"
@@ -80,7 +98,6 @@ function PopupComponent({ handleChange, switchToRegister }: any) {
                   <FormControl>
                     <Input
                       {...field}
-                      className="bg-primary-grey w-full"
                       type="text"
                       placeholder="Email"
                       name="emailText"
@@ -99,7 +116,6 @@ function PopupComponent({ handleChange, switchToRegister }: any) {
                   <FormControl>
                     <Input
                       {...field}
-                      className="bg-primary-grey"
                       type="password"
                       placeholder="Mật khẩu"
                       name="passText"
@@ -110,21 +126,14 @@ function PopupComponent({ handleChange, switchToRegister }: any) {
                 </FormItem>
               )}
             />
-            <Button type="submit" disabled={loading}>{loading ? <Loader className="animate-spin"/> : "Tiếp theo"}</Button>
+            <Button type="submit" disabled={loading}>
+              {loading ? <Loader className="animate-spin" /> : "Tiếp theo"}
+            </Button>
           </form>
-        </Form> 
-
-        <h3 className="or-text">Hoặc</h3>
-        <button className="btn-continute-with-google">
-          <img
-            className="h-8 w-auto"
-            src="\src\assets\image\logo_google.png"
-            alt="Logo"
-          />
-          Tiếp tục với Google
-        </button>
+        </Form>
         <div className="bottom-popup-login">
           <h4>Chưa có tài khoản?</h4>
+
           <h4
             onClick={switchToRegister}
             className="text-color-secondnary"

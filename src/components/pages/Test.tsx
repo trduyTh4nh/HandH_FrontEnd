@@ -9,6 +9,9 @@ export default function Test(){
         const ls = localStorage.getItem(localStorageKey);
         setLocalStorageValue(ls || 'Không tìm thấy');
     }
+    function handleWipeLocalStorage(){
+        localStorage.removeItem(localStorageKey);
+    }
     return (
         <div className="px-20 py-8">
             <h1>Trang dành cho nhà phát triển</h1>
@@ -17,6 +20,7 @@ export default function Test(){
             <h2>LocalStorage</h2>
             <Input placeholder="Nhập key" value={localStorageKey} className="w-1/2" onChange={(e) => {setLocalStorageKey(e.target.value)}}></Input>
             <Button className="mt-4" onClick={handleSaveLocalStorage}>Lấy</Button>
+            <Button className="mt-4" onClick={handleWipeLocalStorage}>Thanh Tẩy</Button>
             <p>Kết quả: {localStorageValue}</p>
         </div>
     )

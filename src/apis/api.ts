@@ -21,11 +21,15 @@ class API {
       (config: InternalAxiosRequestConfig) => {
         const token = localStorage.getItem("token");
         if (token) {
-          config.headers.authorization = `Bearer ${token}`;
+          config.headers.authorization = `${token}`;
           console.log("HEADER config: ", config.headers);
         }
+        const user = localStorage.getItem("user");
+        if(user) {
+          const userObj = JSON.parse(user);
+          config.headers["x-client-id"] = userObj._id;
+        }
         // TODO: cứng. sau khi t làm xong login thì lấy token từ localStorage ra.
-        config.headers["x-client-id"] = "66b77cff848eb939db15cc66";
 
         console.log("HEADER config: ", config.headers);
         return config;
@@ -52,6 +56,10 @@ class API {
 
   public async post<T>(url: string, data?: object): Promise<T> {
     const response = await this.axiosInstance.post<T>(url, data);
+    return response.data;
+  }
+  public async delete<T>(url: string): Promise<T> {
+    const response = await this.axiosInstance.delete<T>(url);
     return response.data;
   }
 }

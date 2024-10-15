@@ -13,6 +13,12 @@ import boxCategory from "../widget/boxCategory.widget";
 import PopupComponent from "../widget/popUpComponent";
 import PopupRegister from "../widget/popUpRegister";
 import PopupAdmin from "../widget/popUpAdmin";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTrigger,
+} from "../ui/dialog";
 // import { duration } from "@mui/material";
 
 const Navbar: React.FC = () => {
@@ -30,40 +36,38 @@ const Navbar: React.FC = () => {
 
   const [login, setLogin] = React.useState(false);
   const [register, setRegister] = React.useState(false);
-  const[admin,setAdmin]=React.useState(false);
-  const[message,setMessage]=React.useState(false);
-  const [user, setUser] = React.useState(null)
+  const [admin, setAdmin] = React.useState(false);
+  const [message, setMessage] = React.useState(false);
+  const [user, setUser] = React.useState(null);
 
   function handleChange(isLogin: boolean) {
-    if(isLogin){
+    if (isLogin) {
       const lsUser = localStorage.getItem("user");
       const user = JSON.parse(lsUser as string);
       setUser(user);
     }
     setLogin(false);
-
   }
   function handleChangeRe() {
     setRegister(false);
   }
-  function handleChangeAd(){
+  function handleChangeAd() {
     setAdmin(false);
   }
 
-  function handleChangeMess(){
+  function handleChangeMess() {
     setMessage(false);
   }
 
   function switchToRegister() {
     setLogin(false);
-    setRegister(true); 
+    setRegister(true);
   }
 
-  function switchToLogin(){
+  function switchToLogin() {
     setLogin(true);
     setRegister(false);
   }
-
 
   // </div>
 
@@ -159,32 +163,59 @@ const Navbar: React.FC = () => {
               Xin chào, User!
             </NavLink>
             <div>
-              <input
-                onClick={() => setLogin(!login)}
-                className="font-bold underline  hover:text-black hover:bg-gray-100 transition-all duration-800 ease-linear hover:cursor-pointer px-4 py-3 rounded-2xl"
-                type="button"
-                value="Đăng nhập"
-              />
+              <Dialog
+                open={login}
+                onOpenChange={(o) => {
+                  setLogin(o);
+                }}
+              >
+                <DialogTrigger asChild>
+                  <input
+                    className="font-bold underline  hover:text-black hover:bg-gray-100 transition-all duration-800 ease-linear hover:cursor-pointer px-4 py-3 rounded-2xl"
+                    type="button"
+                    value="Đăng nhập"
+                  />
+                </DialogTrigger>
+                <DialogContent className="min-w-[45%]">
+                  <PopupComponent
+                    handleChange={(e) => {
+                      console.log(e);
+                      handleChange(e);
+                    }}
+                    switchToRegister={switchToRegister}
+                  ></PopupComponent>
+                </DialogContent>
+              </Dialog>
             </div>
             <div>
-              <input
-                onClick={() => setRegister(!register)}
-                className="font-bold underline  hover:text-black hover:bg-gray-100 transition-all duration-800 ease-linear hover:cursor-pointer px-4 py-3 rounded-2xl"
-                type="button"
-                value="Đăng kí"
-              />
+              <Dialog
+                open={register}
+                onOpenChange={(o) => {
+                  setRegister(o);
+                }}
+                
+              >
+                <DialogTrigger>
+                  <input
+                    onClick={() => setRegister(!register)}
+                    className="font-bold underline  hover:text-black hover:bg-gray-100 transition-all duration-800 ease-linear hover:cursor-pointer px-4 py-3 rounded-2xl"
+                    type="button"
+                    value="Đăng kí"
+                  />
+                </DialogTrigger>
+                <DialogContent className="min-w-[45%]">
+                  <PopupRegister
+                    handleChange={handleChangeRe}
+                    switchToLogin={switchToLogin}
+                  ></PopupRegister>
+                </DialogContent>
+              </Dialog>
             </div>
           </div>
         </div>
       </div>
-      {login && <PopupComponent handleChange={(e) => {
-        console.log(e);
-        handleChange(e);
-      }} switchToRegister={switchToRegister}></PopupComponent>}
-      {register && (
-        <PopupRegister handleChange={handleChangeRe}  switchToLogin={switchToLogin}></PopupRegister>
-      )}
-      {admin&&(<PopupAdmin handleChangeAd={handleChangeAd} ></PopupAdmin>)}
+
+      {admin && <PopupAdmin handleChangeAd={handleChangeAd}></PopupAdmin>}
 
       {transitions(
         (style, isOpen) =>
