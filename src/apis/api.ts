@@ -24,9 +24,17 @@ class API {
           config.headers.authorization = `${token}`;
           console.log("HEADER config: ", config.headers);
         }
+        const user = localStorage.getItem("user");
+        if(user) {
+          const userObj = JSON.parse(user);
+          config.headers["x-client-id"] = userObj._id;
+        }
         // TODO: cứng. sau khi t làm xong login thì lấy token từ localStorage ra.
-        config.headers["x-client-id"] = "6700ef13c199e28a3dcfe5f4";
-        config.headers["Access-Control-Allow-Origin"] = "*"
+// <<<<<<< duy
+//         config.headers["x-client-id"] = "6700ef13c199e28a3dcfe5f4";
+//         config.headers["Access-Control-Allow-Origin"] = "*"
+// =======
+// >>>>>>> quang
 
         console.log("HEADER config: ", config.headers);
         return config;
@@ -53,6 +61,10 @@ class API {
 
   public async post<T>(url: string, data?: object): Promise<T> {
     const response = await this.axiosInstance.post<T>(url, data);
+    return response.data;
+  }
+  public async delete<T>(url: string): Promise<T> {
+    const response = await this.axiosInstance.delete<T>(url);
     return response.data;
   }
 }
