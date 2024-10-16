@@ -30,6 +30,11 @@ class API {
           config.headers["x-client-id"] = userObj._id;
         }
         // TODO: cứng. sau khi t làm xong login thì lấy token từ localStorage ra.
+// <<<<<<< duy
+//         config.headers["x-client-id"] = "6700ef13c199e28a3dcfe5f4";
+//         config.headers["Access-Control-Allow-Origin"] = "*"
+// =======
+// >>>>>>> quang
 
         console.log("HEADER config: ", config.headers);
         return config;

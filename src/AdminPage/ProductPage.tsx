@@ -534,7 +534,7 @@ const ProductPage: React.FC = () => {
           </DialogContent>
         </Dialog>
       </div>
-
+                    
       <Card>
         <CardContent>
           {loading ? (
