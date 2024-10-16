@@ -23,6 +23,7 @@ import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { Plus, Pencil, Trash2, Eye, EyeOff } from "lucide-react";
 import { IBanner } from "@/types/banner.type";
+import HomeBanner from "@/components/widget/homeBanner";
 
 const initialBanners: IBanner[] = [
   {
@@ -106,11 +107,8 @@ const BannerPage: React.FC = () => {
                 .filter((banner) => banner.type === "main")
                 .map((banner) => (
                   <div key={banner.id} className="space-y-4">
-                    <img
-                      src={banner.imageUrl}
-                      alt={banner.title}
-                      className=""
-                    />
+                    <p>Xem trước banner</p>
+                    <HomeBanner image={banner.imageUrl} title={banner.title} description={banner.title} link={banner.link} button="Mua ngay"/>
                     <div className="flex justify-between items-center">
                       <h3 className="text-lg font-semibold">{banner.title}</h3>
                       <div className="flex space-x-2">
@@ -121,7 +119,7 @@ const BannerPage: React.FC = () => {
                               size="sm"
                               onClick={() => setEditingBanner(banner)}
                             >
-                              <Pencil className="h-4 w-4 mr-1" />
+                              <Pencil className="h-4 w-4 mr-1"/>
                               Edit
                             </Button>
                           </DialogTrigger>

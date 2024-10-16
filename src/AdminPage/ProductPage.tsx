@@ -8,14 +8,20 @@ import {
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
+  DialogClose,
   DialogContent,
+  DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
 import {
+  CircleX,
   Eye,
   EyeOff,
+  Loader,
+  Loader2,
   MoreHorizontalIcon,
   Pencil,
   Plus,
@@ -36,6 +42,15 @@ import {
 import { TableBody } from "@mui/material";
 import { Switch } from "@/components/ui/switch";
 import { convertMoney } from "@/utils";
+import { deleteProduct, getProduct } from "@/apis/products/product-repo";
+import { AxiosError } from "axios";
+import {
+  Accordion,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import { AccordionContent } from "@radix-ui/react-accordion";
+import errorIndexes from "@/utils/errorKey";
 
 const ProductPage: React.FC = () => {
   const [product, setProduct] = React.useState([]);
@@ -53,50 +68,25 @@ const ProductPage: React.FC = () => {
 
   //   fetchProduct();
   // }, []);
-
-  const [products, setProducts] = React.useState<IProduct[]>([
-    {
-      product_name: "Classic T-Shirt",
-      product_thumb: "/images/classic-tshirt.jpg",
-      product_description: "A comfortable, classic fit t-shirt.",
-      product_price: 19.99,
-      product_slug: "classic-tshirt",
-      product_rating: 4.5,
-      isDraft: false,
-      isPublished: true,
-      product_category: "Tops",
-      product_color: [
-        { color_code: "#000000", color_price: 0, color_isPicked: true },
-        { color_code: "#FFFFFF", color_price: 0, color_isPicked: false },
-      ],
-      product_size: [
-        { size_name: "S", size_price: 0, size_isPicked: true },
-        { size_name: "M", size_price: 0, size_isPicked: true },
-        { size_name: "L", size_price: 2, size_isPicked: true },
-      ],
-    },
-    {
-      product_name: "Slim Fit Jeans",
-      product_thumb: "/images/slim-fit-jeans.jpg",
-      product_description: "Modern slim fit jeans for a stylish look.",
-      product_price: 49.99,
-      product_slug: "slim-fit-jeans",
-      product_rating: 4.2,
-      isDraft: true,
-      isPublished: false,
-      product_category: "Bottoms",
-      product_color: [
-        { color_code: "#000080", color_price: 0, color_isPicked: true },
-        { color_code: "#1E90FF", color_price: 2, color_isPicked: true },
-      ],
-      product_size: [
-        { size_name: "30", size_price: 0, size_isPicked: true },
-        { size_name: "32", size_price: 0, size_isPicked: true },
-        { size_name: "34", size_price: 2, size_isPicked: true },
-      ],
-    },
-  ]);
-
+  const [loading, setLoading] = React.useState(false);
+  const [error, setError] = React.useState<AxiosError>(null);
+  const [isEditing, setEditing] = React.useState(false);
+  async function fetch() {
+    setLoading(true);
+    const data = await getProduct();
+    if (data instanceof AxiosError) {
+      console.log(data.message);
+      setError(data);
+    } else {
+      console.log(data);
+      setProducts(data.metadata);
+    }
+    setLoading(false);
+  }
+  useEffect(() => {
+    fetch();
+  }, []);
+  const [products, setProducts] = React.useState([]);
   const [editingProduct, setEditingProduct] = React.useState<IProduct | null>(
     null
   );
@@ -116,6 +106,7 @@ const ProductPage: React.FC = () => {
   const [isAddProductOpen, setIsAddProductOpen] = React.useState(false);
 
   const handleEdit = (product: IProduct) => {
+    setEditing(true);
     setEditingProduct({ ...product });
   };
 
@@ -130,8 +121,14 @@ const ProductPage: React.FC = () => {
     }
   };
 
-  const handleRemove = (productSlug: string) => {
-    setProducts(products.filter((p) => p.product_slug !== productSlug));
+  const handleRemove = async (productSlug: string) => {
+    const data = await deleteProduct(productSlug);
+    if (data instanceof AxiosError) {
+      console.log(data);
+      setError(data);
+      return;
+    }
+    setProducts(products.filter((p) => p._id !== productSlug));
   };
 
   const handleTogglePublish = (productSlug: string) => {
@@ -275,6 +272,46 @@ const ProductPage: React.FC = () => {
         <h2 className="text-3xl font-bold tracking-tight">
           Danh sách sản phẩm
         </h2>
+
+        <Dialog
+          open={error != null}
+          onOpenChange={(o) => {
+            setError(null);
+          }}
+        >
+          <DialogContent className="bg-red-50 border-red-400">
+            <DialogTitle className="flex gap-4 items-center text-red-400">
+              <CircleX />
+              Lỗi {error ? error.status || "bất định" : "🙂"}
+            </DialogTitle>
+            <DialogDescription>
+              {error
+                ? //@ts-ignore
+                  errorIndexes[error.response.data.message] ||
+                  "Lỗi bất định hoặc lỗi do máy chủ, vui lòng thử lại sau."
+                : ""}
+            </DialogDescription>
+            <Accordion type="single" collapsible className="w-full">
+              <AccordionItem value="0">
+                <AccordionTrigger>Xem chi tiết</AccordionTrigger>
+                <AccordionContent>
+                  <p>Stack trace</p>
+                  <p>
+                    {error
+                      ? //@ts-ignore
+                        error.response.data.stack || "Không tìm thấy chi tiết"
+                      : "Ai biết đâu, tự nhiên bật dialog này lên?"}
+                  </p>
+                </AccordionContent>
+              </AccordionItem>
+            </Accordion>
+            <DialogFooter>
+              <DialogClose>
+                <Button variant="destructive">OK</Button>
+              </DialogClose>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
         <Dialog open={isAddProductOpen} onOpenChange={setIsAddProductOpen}>
           <DialogTrigger asChild>
             <Button>
@@ -500,97 +537,131 @@ const ProductPage: React.FC = () => {
 
       <Card>
         <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Hình ảnh</TableHead>
-                <TableHead>Tên</TableHead>
-                <TableHead>Giá</TableHead>
-                <TableHead>Loại</TableHead>
-                <TableHead>Trạng thái</TableHead>
-                <TableHead>Hành động</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {products.map((product) => (
-                <TableRow key={product.product_slug}>
-                  <TableCell>
-                    <img
-                      className="w-20 h-20 rounded-md object-contain"
-                      src={product.product_thumb}
-                      alt=""
-                    />
-                  </TableCell>
-                  <TableCell>{product.product_name}</TableCell>
-                  <TableCell>{convertMoney(product.product_price)}</TableCell>
-                  <TableCell>{product.product_category}</TableCell>
-                  <TableCell>
-                    {product.isPublished ? "Published" : "Draft"}
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex space-x-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handleEdit(product)}
-                      >
-                        <Pencil className="h-4 w-4 mr-1" />
-                        Chỉnh sửa
-                      </Button>
-                      {/* New button  */}
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handleEdit(product)}
-                      >
-                        <MoreHorizontalIcon className="h-4 w-4 mr-1" />
-                        Chi tiết
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handleRemove(product.product_slug!)}
-                      >
-                        <Trash2 className="h-4 w-4 mr-1" />
-                        Xóa
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() =>
-                          handleTogglePublish(product.product_slug!)
-                        }
-                      >
-                        {product.isPublished ? (
-                          <>
-                            <EyeOff className="h-4 w-4 mr-1" />
-                            Không hiển thị
-                          </>
-                        ) : (
-                          <>
-                            <Eye className="h-4 w-4 mr-1" />
-                            Hiển thị
-                          </>
-                        )}
-                      </Button>
-                    </div>
-                  </TableCell>
+          {loading ? (
+            <div className="flex justify-center items-center w-full pt-4 gap-4">
+              <Loader className="animate-spin" />
+              <p>Đang tải...</p>
+            </div>
+          ) : (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Hình ảnh</TableHead>
+                  <TableHead>Tên</TableHead>
+                  <TableHead>Giá</TableHead>
+                  <TableHead>Loại</TableHead>
+                  <TableHead>Trạng thái</TableHead>
+                  <TableHead>Hành động</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {products.map((product) => (
+                  <TableRow key={product.product_slug}>
+                    <TableCell>
+                      <img
+                        className="w-20 h-20 rounded-md object-contain"
+                        src={product.product_thumb}
+                        alt=""
+                      />
+                    </TableCell>
+                    <TableCell>{product.product_name}</TableCell>
+                    <TableCell>{convertMoney(product.product_price)}</TableCell>
+                    <TableCell>{product.product_category}</TableCell>
+                    <TableCell>
+                      {product.isPublished ? "Published" : "Draft"}
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex space-x-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleEdit(product)}
+                        >
+                          <Pencil className="h-4 w-4 mr-1" />
+                          Chỉnh sửa
+                        </Button>
+                        {/* New button  */}
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleEdit(product)}
+                        >
+                          <MoreHorizontalIcon className="h-4 w-4 mr-1" />
+                          Chi tiết
+                        </Button>
+                        <Dialog>
+                          <DialogTrigger asChild>
+                            <Button variant="outline" size="sm">
+                              <Trash2 className="h-4 w-4 mr-1" />
+                              Xóa
+                            </Button>
+                          </DialogTrigger>
+                          <DialogContent>
+                            <DialogHeader>
+                              <DialogTitle>
+                                Bạn có chắc chắn muốn xóa sản phẩm này không?
+                              </DialogTitle>
+                            </DialogHeader>
+                            <DialogDescription>
+                              <p>
+                                Hành động này không thể hoàn tác, nếu bạn muốn
+                                ẩn sản phẩm, vui lòng chọn nút "Hiển thị"
+                              </p>
+                            </DialogDescription>
+                            <DialogFooter>
+                              <DialogClose>
+                                <Button variant="secondary">Huỷ</Button>
+                              </DialogClose>
+                              <DialogClose>
+                                <Button
+                                  onClick={() => handleRemove(product._id!)}
+                                >
+                                  Xóa
+                                </Button>
+                              </DialogClose>
+                            </DialogFooter>
+                          </DialogContent>
+                        </Dialog>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() =>
+                            handleTogglePublish(product.product_slug!)
+                          }
+                        >
+                          {product.isPublished ? (
+                            <>
+                              <EyeOff className="h-4 w-4 mr-1" />
+                              Không hiển thị
+                            </>
+                          ) : (
+                            <>
+                              <Eye className="h-4 w-4 mr-1" />
+                              Hiển thị
+                            </>
+                          )}
+                        </Button>
+                      </div>
+                    </TableCell>
+                    
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          )}
         </CardContent>
       </Card>
-
       {editingProduct && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Chỉnh sửa</CardTitle>
-          </CardHeader>
-          <CardContent>
+        <Dialog open={isEditing} onOpenChange={(o) => {setEditing(o)}}>
+          <DialogHeader>
+            <DialogTitle>Chỉnh sửa</DialogTitle>
+          </DialogHeader>
+          <DialogContent className="min-w-[75%]">
             <form className="space-y-4">
               <div>
-                <Label htmlFor="product_name">Tên sản phẩm</Label>
+                <Label htmlFor="product_name">
+                  Tên sản phẩm
+                </Label>
                 <Input
                   id="product_name"
                   name="product_name"
@@ -599,7 +670,9 @@ const ProductPage: React.FC = () => {
                 />
               </div>
               <div>
-                <Label htmlFor="product_description">Mô tả sản phẩm</Label>
+                <Label htmlFor="product_description">
+                  Mô tả sản phẩm
+                </Label>
                 <Textarea
                   id="product_description"
                   name="product_description"
@@ -608,7 +681,9 @@ const ProductPage: React.FC = () => {
                 />
               </div>
               <div>
-                <Label htmlFor="product_price">Giá sản phẩm</Label>
+                <Label htmlFor="product_price">
+                  Giá sản phẩm
+                </Label>
                 <Input
                   id="product_price"
                   name="product_price"
@@ -618,7 +693,9 @@ const ProductPage: React.FC = () => {
                 />
               </div>
               <div>
-                <Label htmlFor="product_category">Loại sản phẩm</Label>
+                <Label htmlFor="product_category">
+                  Loại sản phẩm
+                </Label>
                 <Input
                   id="product_category"
                   name="product_category"
@@ -641,7 +718,10 @@ const ProductPage: React.FC = () => {
                 <Label htmlFor="isPublished">Published</Label>
               </div>
               <div className="grid grid-cols-1 items-center gap-4">
-                <Label htmlFor="new-product-image" className="text-left">
+                <Label
+                  htmlFor="new-product-image"
+                  className="text-left"
+                >
                   Hình ảnh
                 </Label>
                 <div className="flex items-center gap-2">
@@ -652,7 +732,10 @@ const ProductPage: React.FC = () => {
                     onChange={handleImageUploadEdit}
                     className="hidden"
                   />
-                  <Label htmlFor="new-product-image" className="cursor-pointer">
+                  <Label
+                    htmlFor="new-product-image"
+                    className="cursor-pointer"
+                  >
                     <div className="flex items-center gap-2 px-4 py-2 bg-secondary text-secondary-foreground hover:bg-secondary/80 rounded-md">
                       <Upload className="h-4 w-4" />
                       Đăng tải hình ảnh
@@ -669,8 +752,8 @@ const ProductPage: React.FC = () => {
               </div>
               <Button onClick={handleSave}>Lưu sản phẩm</Button>
             </form>
-          </CardContent>
-        </Card>
+          </DialogContent>
+        </Dialog>
       )}
     </div>
   );
