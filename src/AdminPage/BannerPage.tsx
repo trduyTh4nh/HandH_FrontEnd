@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -53,10 +53,31 @@ const initialBanners: IBanner[] = [
   },
 ];
 
+import { getAllBanner } from "@/apis/banner/banner-repo";
+import { AxiosError } from "axios";
+
 const BannerPage: React.FC = () => {
   const [banners, setBanners] = useState<IBanner[]>(initialBanners);
   const [editingBanner, setEditingBanner] = useState<IBanner | null>(null);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [error, setError] = React.useState<AxiosError>(null);
+  const [loading, setLoading] = React.useState(false);
+  const [banner, setBanner] = React.useState([]);
+
+  async function fetch() {
+    const data = await getAllBanner();
+    if (data instanceof AxiosError) {
+      console.log("Data: ", data.message);
+      setError(data);
+    } else {
+      setBanner(data.metadata);
+      console.log("Banner: ", data.metadata);
+    }
+  }
+
+  useEffect(() => {
+    fetch();
+  }, []);
 
   // Omit là tạo banner không cần tạo id vì id được random cái này làm cứng nên trước mắt là vậy sau này, sẽ dùng id của mongo
   const handleAddBanner = (newBanner: Omit<IBanner, "id">) => {
@@ -108,7 +129,13 @@ const BannerPage: React.FC = () => {
                 .map((banner) => (
                   <div key={banner.id} className="space-y-4">
                     <p>Xem trước banner</p>
-                    <HomeBanner image={banner.imageUrl} title={banner.title} description={banner.title} link={banner.link} button="Mua ngay"/>
+                    <HomeBanner
+                      image={banner.imageUrl}
+                      title={banner.title}
+                      description={banner.title}
+                      link={banner.link}
+                      button="Mua ngay"
+                    />
                     <div className="flex justify-between items-center">
                       <h3 className="text-lg font-semibold">{banner.title}</h3>
                       <div className="flex space-x-2">
@@ -119,7 +146,7 @@ const BannerPage: React.FC = () => {
                               size="sm"
                               onClick={() => setEditingBanner(banner)}
                             >
-                              <Pencil className="h-4 w-4 mr-1"/>
+                              <Pencil className="h-4 w-4 mr-1" />
                               Edit
                             </Button>
                           </DialogTrigger>
@@ -188,13 +215,12 @@ const BannerPage: React.FC = () => {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {banners
-                    .filter((banner) => banner.type === "sub")
-                    .map((banner) => (
+                  {banner ? (
+                    banner.map((banner) => (
                       <TableRow key={banner.id}>
                         <TableCell>
                           <img
-                            src={banner.imageUrl}
+                            src={banner.url}
                             alt={banner.title}
                             className="w-20 h-auto"
                           />
@@ -255,7 +281,10 @@ const BannerPage: React.FC = () => {
                           </div>
                         </TableCell>
                       </TableRow>
-                    ))}
+                    ))
+                  ) : (
+                    <h1>Loading....</h1>
+                  )}
                 </TableBody>
               </Table>
             </CardContent>

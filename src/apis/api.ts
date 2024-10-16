@@ -9,7 +9,7 @@ class API {
 
   constructor() {
     const url = import.meta.env.VITE_API_URL;
-    console.log(url)
+    console.log(url);
     this.axiosInstance = axios.create({
       baseURL: url,
       headers: {
@@ -25,7 +25,7 @@ class API {
           console.log("HEADER config: ", config.headers);
         }
         const user = localStorage.getItem("user");
-        if(user) {
+        if (user) {
           const userObj = JSON.parse(user);
           config.headers["x-client-id"] = userObj._id;
         }
@@ -60,6 +60,10 @@ class API {
   }
   public async delete<T>(url: string): Promise<T> {
     const response = await this.axiosInstance.delete<T>(url);
+    return response.data;
+  }
+  public async put<T>(url: string): Promise<T> {
+    const response = await this.axiosInstance.put<T>(url);
     return response.data;
   }
 }
