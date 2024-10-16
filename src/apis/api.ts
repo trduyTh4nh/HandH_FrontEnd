@@ -21,11 +21,12 @@ class API {
       (config: InternalAxiosRequestConfig) => {
         const token = localStorage.getItem("token");
         if (token) {
-          config.headers.authorization = `Bearer ${token}`;
+          config.headers.authorization = `${token}`;
           console.log("HEADER config: ", config.headers);
         }
         // TODO: cứng. sau khi t làm xong login thì lấy token từ localStorage ra.
-        config.headers["x-client-id"] = "66b77cff848eb939db15cc66";
+        config.headers["x-client-id"] = "6700ef13c199e28a3dcfe5f4";
+        config.headers["Access-Control-Allow-Origin"] = "*"
 
         console.log("HEADER config: ", config.headers);
         return config;

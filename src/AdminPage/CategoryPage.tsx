@@ -1,10 +1,6 @@
-import {
-  IColorcateVariation,
-  Icate,
-  ISizecateVarication,
-} from "@/types/cate.type";
+
 import { Button } from "@/components/ui/button";
-import CateRepo from "@/apis/cate/cate-repo";
+import {getCate,addCate} from "@/apis/cate/cate-repo"
 import {
   Dialog,
   DialogContent,
@@ -33,10 +29,10 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { TableBody } from "@mui/material";
-import { Switch } from "@/components/ui/switch";
 import { convertMoney } from "@/utils";
 import React, { useEffect, useState } from "react";
 import { ICategory } from "@/types/category";
+import { AxiosError } from "axios";
 
 
 
@@ -46,40 +42,7 @@ const CategoryPage: React.FC = () => {
   const [editingCate, setEditingCate] = React.useState<ICategory | null>(
     null
   );
-  const[cates,setCate]=React.useState<ICategory[]>([
-    //   {
-    //     category_name: 'Áo đầm',
-    //     category_description: 'Latest gadgets and electronics.',
-    //     cagtegory_image: 'https://png.pngtree.com/png-clipart/20231005/original/pngtree-red-dress-for-party-png-image_13123155.png',
-    //     category_total: 150,
-    //     createdAt:"2024-10-06T03:23:54.240Z",
-    //     updatedAt:"2024-10-06T03:23:54.240Z"
-    // },
-    // {
-    //     category_name: 'Áo',
-    //     category_description: 'A wide range of books from various genres.',
-    //     cagtegory_image: 'https://hoaigiangshop.com/wp-content/uploads/2023/08/trang-phuc-hoi-giao-nu-dubai-1.jpg',
-    //     category_total: 200,
-    //      createdAt:"2024-10-06T03:23:54.240Z",
-    //     updatedAt:"2024-10-06T03:23:54.240Z"
-    // },
-    // {
-    //     category_name: 'Quần',
-    //     category_description: 'Trendy and fashionable clothing items.',
-    //     cagtegory_image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT0LnxlU-YBDF8N6oFYq3sg3M0rOUQjGnzTMg&s',
-    //     category_total: 300,
-    //      createdAt:"2024-10-06T03:23:54.240Z",
-    //     updatedAt:"2024-10-06T03:23:54.240Z"
-    // },
-    // {
-    //     category_name: 'Áo khoác',
-    //     category_description: 'Trendy and fashionable clothing items.',
-    //     cagtegory_image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRIHcG9x7MHG3vv9LOGzXonQj-oHjHW2jCAZw&s',
-    //     category_total: 300,
-    //      createdAt:"2024-10-06T03:23:54.240Z",
-    //     updatedAt:"2024-10-06T03:23:54.240Z"
-    // }
-  ])
+  const[cates,setCate]=React.useState<ICategory[]>([])
 
   
   const [newCate, setNewcate] = React.useState<ICategory>({
@@ -91,6 +54,10 @@ const CategoryPage: React.FC = () => {
     updatedAt:""
     
   });
+
+  const handleEdit = (cate: ICategory) => {
+    setEditingCate({ ...cate });
+  };
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
     isNewCate: boolean = false
@@ -128,41 +95,92 @@ const CategoryPage: React.FC = () => {
     }
   };
 
-  const cateRepo = new CateRepo();
-  const fetchCates = async () => {
-    const response = await cateRepo.getCate(); // Gọi API qua CateRepo
-    console.log(response);
-  };
 
-  useEffect(() => {
-    const fetchCates = async () => {
-      const response = await cateRepo.getCate(); // Gọi API qua CateRepo
-      console.log(response);
-    };
-  });
+  async function  fetchCate() {
+    const data=await getCate();
+    if(data instanceof AxiosError){
+      console.log(data.message);
+      
+    }else{
+      console.log(data);
+      setCate(data.metadata);
+    }
+    
+  }
+  useEffect(()=>{
+    fetchCate();
+  },[])
   
   const handleRemove = (cateName: string) => {
     setCate(cates.filter((p) => p.category_name !== cateName));
   };
-  const handleAddcate = () => {
+  const handleSave=()=>{
+    if(editingCate){
+      setCate(
+        cates.map((c)=>c.category_name===editingCate.category_name?editingCate:c)
+      ),
+      setEditingCate(null)
+    }
+  }
+
+  const handleImageUploadEdit = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setEditingCate((prev) => ({
+          ...prev,
+          cagtegory_image: reader.result as string,
+        }));
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+  const handleAddcate = async() => {
     const productSlug =
       newCate.category_name?.toLowerCase().replace(/ /g, "-") || "";
     const CateToAdd = {
       ...newCate,
       product_slug: productSlug,
     };
-    setCate((prev) => [...prev, CateToAdd]);
-    setNewcate({
-      category_name: "",
-      category_description: "",
-      cagtegory_image: "",
-      category_total: 0,
-      createdAt: "",
-      updatedAt: "",
-      
-    });
-    setIsAddCateOpen(false);
+    const result=await addCate(CateToAdd);
+    if(result instanceof AxiosError){
+      console.log(result.message)
+    }
+    else{
+      setCate((prev) => [...prev, CateToAdd]);
+      setNewcate({
+        category_name: "",
+        category_description: "",
+        cagtegory_image: "",
+        category_total: 0,
+        createdAt: "",
+        updatedAt: "",
+        
+      });
+      setIsAddCateOpen(false);
+    }
   };
+  // const handleAddcate = () => {
+  //   const productSlug =
+  //     newCate.category_name?.toLowerCase().replace(/ /g, "-") || "";
+  //   const CateToAdd = {
+  //     ...newCate,
+  //     product_slug: productSlug,
+  //   };
+  
+  //     setCate((prev) => [...prev, CateToAdd]);
+  //     setNewcate({
+  //       category_name: "",
+  //       category_description: "",
+  //       cagtegory_image: "",
+  //       category_total: 0,
+  //       createdAt: "",
+  //       updatedAt: "",
+        
+  //     });
+  //     setIsAddCateOpen(false);
+  // };
 
   return (
     <div className="space-y-6 w-full p-8 h-screen">
@@ -190,7 +208,7 @@ const CategoryPage: React.FC = () => {
                   <Input
                     className="w-full"
                     id="new-cate-name"
-                    name="cate_name"
+                    name="category_name"
                     value={newCate.category_name}
                     onChange={(e) => handleInputChange(e, true)}
                   />
@@ -204,7 +222,7 @@ const CategoryPage: React.FC = () => {
                   </Label>
                   <Textarea
                     id="new-cate-description"
-                    name="cate_description"
+                    name="category_description"
                     value={newCate.category_description}
                     onChange={(e) => handleInputChange(e, true)}
                   />
@@ -215,7 +233,7 @@ const CategoryPage: React.FC = () => {
                   </Label>
                   <Input
                     id="new-cate-price"
-                    name="cate_price"
+                    name="category_total"
                     type="number"
                     value={newCate.category_total}
                     onChange={(e) => handleInputChange(e, true)}
@@ -298,7 +316,7 @@ const CategoryPage: React.FC = () => {
                       <Button
                         variant="outline"
                         size="sm"
-                        // onClick={() => handleEdit(cate)}
+                        onClick={() => handleEdit(category)}
                       >
                         <Pencil className="h-4 w-4 mr-1" />
                         Chỉnh sửa
@@ -307,7 +325,7 @@ const CategoryPage: React.FC = () => {
                       <Button
                         variant="outline"
                         size="sm"
-                        // onClick={() => handleEdit(cate)}
+                        onClick={() => handleEdit(category)}
                       >
                         <MoreHorizontalIcon className="h-4 w-4 mr-1" />
                         Chi tiết
@@ -325,13 +343,73 @@ const CategoryPage: React.FC = () => {
 
                 </TableRow>))
               }
-
             </TableBody>
-            
           </Table>
         </CardContent>
-
       </Card>
+      {editingCate&&(
+        <Card>
+            <CardHeader>
+              <CardTitle>Chỉnh sửa</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <form className="space-y-4">
+                <div>
+                  <Label htmlFor="">Tên loại</Label>
+                  <Input
+                  id="cate_name"
+                  name="cate_name"
+                  value={editingCate.category_name}
+                  onChange={handleInputChange}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="">Mô tả</Label>
+                  <Input
+                  id="cate_description"
+                  name="cate_description"
+                  value={editingCate.category_description}
+                  onChange={handleInputChange}
+                  />
+                </div><div>
+                  <Label htmlFor="">Giá</Label>
+                  <Input
+                  id="cate_price"
+                  name="cate_price"
+                  value={editingCate.category_total}
+                  onChange={handleInputChange}
+                  />
+                </div>
+                <div className="grid grid-cols-1 items-center gap-4">
+                  <Label htmlFor="new-cate-image" className="text-left">
+                    Hình ảnh
+                  </Label>
+                  <div  className="flex items-center gap-2">
+
+                    <Input  id="new-cate-image"
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageUploadEdit}
+                    className="hidden"/>
+                    <Label  htmlFor="new-cate-image" className="cursor-pointer">
+                    <div className="flex items-center gap-2 px-4 py-2 bg-secondary text-secondary-foreground hover:bg-secondary/80 rounded-md">
+                      <Upload className="h-4 w-4" />
+                      Đăng tải hình ảnh
+                    </div>
+                    </Label>
+                    {editingCate.cagtegory_image&&(
+                      <img src={editingCate.cagtegory_image}
+                       alt="Product"
+                      className="w-16 h-16 object-cover rounded"
+                      />
+                    )}
+                  </div>
+                </div>
+                <Button onClick={handleSave}>Lưu sản phẩm</Button>
+              </form>
+            </CardContent>
+        </Card>
+      )}
     </div>
   );
 };
