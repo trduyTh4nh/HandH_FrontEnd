@@ -100,7 +100,7 @@ const CategoryPage: React.FC = () => {
     const data=await getCate();
     if(data instanceof AxiosError){
       console.log(data.message);
-      
+        
     }else{
       console.log(data);
       setCate(data.metadata);
