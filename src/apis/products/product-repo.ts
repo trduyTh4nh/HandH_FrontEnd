@@ -1,7 +1,7 @@
 import { AxiosError } from "axios";
 import API from "../api";
 
-const api = new API();
+const api = new API({ headerType: "json" });
 export async function getProduct() {
   try {
     const response = await api.get("product");
@@ -11,6 +11,7 @@ export async function getProduct() {
     return error;
   }
 }
+
 export async function deleteProduct(id) {
   try {
     const response = await api.delete(`product/deleteProduct/${id}`);
