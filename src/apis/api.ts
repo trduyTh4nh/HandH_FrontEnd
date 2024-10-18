@@ -7,14 +7,21 @@ import axios, {
 class API {
   private axiosInstance: AxiosInstance;
 
-  constructor() {
+  constructor({ headerType = "json" }: { headerType?: "json" | "formdata" }) {
     const url = import.meta.env.VITE_API_URL;
-    console.log(url)
+    console.log(url);
+
+    let headers = {
+      "Content-Type": "application/json",
+    };
+
+    if (headerType === "formdata") {
+      headers["Content-Type"] = "multipart/form-data";
+    }
+
     this.axiosInstance = axios.create({
       baseURL: url,
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: headers,
     });
 
     this.axiosInstance.interceptors.request.use(
@@ -22,21 +29,12 @@ class API {
         const token = localStorage.getItem("token");
         if (token) {
           config.headers.authorization = `${token}`;
-          console.log("HEADER config: ", config.headers);
         }
         const user = localStorage.getItem("user");
-        if(user) {
+        if (user) {
           const userObj = JSON.parse(user);
           config.headers["x-client-id"] = userObj._id;
         }
-        // TODO: cứng. sau khi t làm xong login thì lấy token từ localStorage ra.
-// <<<<<<< duy
-//         config.headers["x-client-id"] = "6700ef13c199e28a3dcfe5f4";
-//         config.headers["Access-Control-Allow-Origin"] = "*"
-// =======
-// >>>>>>> quang
-
-        console.log("HEADER config: ", config.headers);
         return config;
       },
       (error) => {
@@ -59,12 +57,24 @@ class API {
     return response.data;
   }
 
-  public async post<T>(url: string, data?: object): Promise<T> {
-    const response = await this.axiosInstance.post<T>(url, data);
+  public async post<T>(
+    url: string,
+    data?: object,
+    headersConfig?: { "Content-Type"?: string } // Optional headers config
+  ): Promise<T> {
+    const response = await this.axiosInstance.post<T>(url, data, {
+      headers: headersConfig,
+    });
     return response.data;
   }
+
   public async delete<T>(url: string): Promise<T> {
     const response = await this.axiosInstance.delete<T>(url);
+    return response.data;
+  }
+
+  public async put<T>(url: string): Promise<T> {
+    const response = await this.axiosInstance.put<T>(url);
     return response.data;
   }
 }
