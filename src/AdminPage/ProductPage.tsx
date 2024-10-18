@@ -26,6 +26,7 @@ import {
   Pencil,
   Plus,
   Trash2,
+  TriangleAlert,
   Upload,
 } from "lucide-react";
 import { Label } from "@/components/ui/label";
@@ -265,9 +266,15 @@ const ProductPage: React.FC = () => {
             setError(null);
           }}
         >
-          <DialogContent className="bg-red-50 border-red-400">
-            <DialogTitle className="flex gap-4 items-center text-red-400">
-              <CircleX />
+          <DialogContent className={`${ //@ts-ignore
+            error && errorIndexes[error.response.data.message] == null ? "border-red-400 bg-red-50" : ""}`}>
+            <DialogTitle className={`flex gap-4 items-center ${ //@ts-ignore
+              error && errorIndexes[error.response.data.message] == null ? "text-red-400" : "text-primary"}}`}>
+                {
+                  //@ts-ignore
+                  error && errorIndexes[error.response.data.message] == null ? <CircleX /> : <TriangleAlert/>
+                }
+              
               Lỗi {error ? error.status || "bất định" : "🙂"}
             </DialogTitle>
             <DialogDescription>
@@ -520,7 +527,7 @@ const ProductPage: React.FC = () => {
           </DialogContent>
         </Dialog>
       </div>
-
+                    
       <Card>
         <CardContent>
           {loading ? (
@@ -554,7 +561,7 @@ const ProductPage: React.FC = () => {
                     <TableCell>{convertMoney(product.product_price)}</TableCell>
                     <TableCell>{product.product_category}</TableCell>
                     <TableCell>
-                      {product.isPublished ? "Published" : "Draft"}
+                      {!product.isDraft ? "Published" : "Draft"}
                     </TableCell>
                     <TableCell>
                       <div className="flex space-x-2">
