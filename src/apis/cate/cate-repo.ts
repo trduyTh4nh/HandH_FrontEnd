@@ -3,7 +3,7 @@ import API from "../api";
 import { log } from "console";
 import { ICategory } from "@/types/category";
 
-const api = new API();
+const api = new API({headerType: "json"});
 
 //   async getCate() {
 //     try {

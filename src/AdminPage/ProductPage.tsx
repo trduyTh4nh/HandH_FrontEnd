@@ -26,6 +26,7 @@ import {
   Pencil,
   Plus,
   Trash2,
+  TriangleAlert,
   Upload,
 } from "lucide-react";
 import { Label } from "@/components/ui/label";
@@ -54,20 +55,6 @@ import errorIndexes from "@/utils/errorKey";
 
 const ProductPage: React.FC = () => {
   const [product, setProduct] = React.useState([]);
-  // useEffect(() => {
-  //   const api = new API();
-  //   const fetchProduct = async () => {
-  //     try {
-  //       const response: any = await api.get("product");
-  //       setProduct(response.metadata);
-  //       console.log(response.metadata);
-  //     } catch (error) {
-  //       console.error("Lỗi khi lấy sản phẩm:", error);
-  //     }
-  //   };
-
-  //   fetchProduct();
-  // }, []);
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState<AxiosError>(null);
   const [isEditing, setEditing] = React.useState(false);
@@ -279,9 +266,15 @@ const ProductPage: React.FC = () => {
             setError(null);
           }}
         >
-          <DialogContent className="bg-red-50 border-red-400">
-            <DialogTitle className="flex gap-4 items-center text-red-400">
-              <CircleX />
+          <DialogContent className={`${ //@ts-ignore
+            error && errorIndexes[error.response.data.message] == null ? "border-red-400 bg-red-50" : ""}`}>
+            <DialogTitle className={`flex gap-4 items-center ${ //@ts-ignore
+              error && errorIndexes[error.response.data.message] == null ? "text-red-400" : "text-primary"}}`}>
+                {
+                  //@ts-ignore
+                  error && errorIndexes[error.response.data.message] == null ? <CircleX /> : <TriangleAlert/>
+                }
+              
               Lỗi {error ? error.status || "bất định" : "🙂"}
             </DialogTitle>
             <DialogDescription>
@@ -568,7 +561,7 @@ const ProductPage: React.FC = () => {
                     <TableCell>{convertMoney(product.product_price)}</TableCell>
                     <TableCell>{product.product_category}</TableCell>
                     <TableCell>
-                      {product.isPublished ? "Published" : "Draft"}
+                      {!product.isDraft ? "Published" : "Draft"}
                     </TableCell>
                     <TableCell>
                       <div className="flex space-x-2">
@@ -643,7 +636,6 @@ const ProductPage: React.FC = () => {
                         </Button>
                       </div>
                     </TableCell>
-                    
                   </TableRow>
                 ))}
               </TableBody>
@@ -652,16 +644,19 @@ const ProductPage: React.FC = () => {
         </CardContent>
       </Card>
       {editingProduct && (
-        <Dialog open={isEditing} onOpenChange={(o) => {setEditing(o)}}>
+        <Dialog
+          open={isEditing}
+          onOpenChange={(o) => {
+            setEditing(o);
+          }}
+        >
           <DialogHeader>
             <DialogTitle>Chỉnh sửa</DialogTitle>
           </DialogHeader>
           <DialogContent className="min-w-[75%]">
             <form className="space-y-4">
               <div>
-                <Label htmlFor="product_name">
-                  Tên sản phẩm
-                </Label>
+                <Label htmlFor="product_name">Tên sản phẩm</Label>
                 <Input
                   id="product_name"
                   name="product_name"
@@ -670,9 +665,7 @@ const ProductPage: React.FC = () => {
                 />
               </div>
               <div>
-                <Label htmlFor="product_description">
-                  Mô tả sản phẩm
-                </Label>
+                <Label htmlFor="product_description">Mô tả sản phẩm</Label>
                 <Textarea
                   id="product_description"
                   name="product_description"
@@ -681,9 +674,7 @@ const ProductPage: React.FC = () => {
                 />
               </div>
               <div>
-                <Label htmlFor="product_price">
-                  Giá sản phẩm
-                </Label>
+                <Label htmlFor="product_price">Giá sản phẩm</Label>
                 <Input
                   id="product_price"
                   name="product_price"
@@ -693,9 +684,7 @@ const ProductPage: React.FC = () => {
                 />
               </div>
               <div>
-                <Label htmlFor="product_category">
-                  Loại sản phẩm
-                </Label>
+                <Label htmlFor="product_category">Loại sản phẩm</Label>
                 <Input
                   id="product_category"
                   name="product_category"
@@ -718,10 +707,7 @@ const ProductPage: React.FC = () => {
                 <Label htmlFor="isPublished">Published</Label>
               </div>
               <div className="grid grid-cols-1 items-center gap-4">
-                <Label
-                  htmlFor="new-product-image"
-                  className="text-left"
-                >
+                <Label htmlFor="new-product-image" className="text-left">
                   Hình ảnh
                 </Label>
                 <div className="flex items-center gap-2">
@@ -732,10 +718,7 @@ const ProductPage: React.FC = () => {
                     onChange={handleImageUploadEdit}
                     className="hidden"
                   />
-                  <Label
-                    htmlFor="new-product-image"
-                    className="cursor-pointer"
-                  >
+                  <Label htmlFor="new-product-image" className="cursor-pointer">
                     <div className="flex items-center gap-2 px-4 py-2 bg-secondary text-secondary-foreground hover:bg-secondary/80 rounded-md">
                       <Upload className="h-4 w-4" />
                       Đăng tải hình ảnh

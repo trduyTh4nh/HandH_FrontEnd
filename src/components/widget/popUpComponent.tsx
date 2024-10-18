@@ -40,7 +40,7 @@ function PopupComponent({ handleChange, switchToRegister }: any) {
   async function handleLogin(data: z.infer<typeof loginSchema>) {
     setLoading(true);
     console.log(data);
-    const api = new API();
+    const api = new API({ headerType: "json" });
     try {
       const response = await api.post("access/login", {
         email: data.email,
