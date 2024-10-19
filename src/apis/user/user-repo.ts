@@ -5,7 +5,7 @@ const api = new API({ headerType: "json" });
 async function login(data) {}
 export async function logout() {
     try {
-        await api.post("logout")
+        await api.post("access/logout")
     } catch (error) {
         const e = error as AxiosError
         return e

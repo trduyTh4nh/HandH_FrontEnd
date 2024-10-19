@@ -25,7 +25,6 @@ export async function getCate() {
   try{
     const response = await api.get("category");
     return response;
-
   }catch(error){
     const e=error as AxiosError;
     return error

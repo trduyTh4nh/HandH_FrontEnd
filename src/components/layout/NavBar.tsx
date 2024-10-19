@@ -32,7 +32,14 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
-import { ChevronRight, Heart, LogOut, ReceiptText, Shield, User } from "lucide-react";
+import {
+  ChevronRight,
+  Heart,
+  LogOut,
+  ReceiptText,
+  Shield,
+  User,
+} from "lucide-react";
 import { Button } from "../ui/button";
 import { logout } from "@/apis/user/user-repo";
 import { AxiosError } from "axios";
@@ -63,7 +70,7 @@ const Navbar: React.FC = () => {
     const user = JSON.parse(lsUser as string);
     setUser(user);
   }, []);
-  const {toast} = useToast()
+  const { toast } = useToast();
   function handleChange(isLogin: boolean) {
     if (isLogin) {
       const lsUser = localStorage.getItem("user");
@@ -73,12 +80,21 @@ const Navbar: React.FC = () => {
     setLogin(false);
   }
   async function logOut() {
-    try {
-      await logout()
-    } catch (error) {
-      const e = error as AxiosError
-      toast({title: `Lỗi ${e.code}`, description: e.stack})
+    const res = await logout();
+    if (res instanceof AxiosError) {
+      //@ts-ignore
+      if (res.response.data.message != "invalid signature") {
+        console.log(res);
+        toast({
+          title: `Lỗi ${res.code}`,
+          description: `Lỗi hệ thống: ${res.message}`,
+        });
+        return;
+      }
     }
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    setUser(null);
   }
   function handleChangeRe() {
     setRegister(false);
@@ -199,30 +215,42 @@ const Navbar: React.FC = () => {
                   <DropdownMenuLabel>Tuỳ chọn</DropdownMenuLabel>
                   <DropdownMenuSeparator />
                   <DropdownMenuGroup>
-                    <DropdownMenuItem className="flex gap-2" onClick={() => {
-                      navigate("/ManagerAccount")
-                    }}>
+                    <DropdownMenuItem
+                      className="flex gap-2"
+                      onClick={() => {
+                        navigate("/ManagerAccount");
+                      }}
+                    >
                       <User className="w-4 h-4" />
                       <p className="flex-1">Hồ sơ</p>
                       <ChevronRight className="w-4 h-4" />
                     </DropdownMenuItem>
-                    <DropdownMenuItem className="flex gap-2" onClick={() => {
-                      navigate("/ManagerAccount/favoriteProduct")
-                    }}>
+                    <DropdownMenuItem
+                      className="flex gap-2"
+                      onClick={() => {
+                        navigate("/ManagerAccount/favoriteProduct");
+                      }}
+                    >
                       <Heart className="w-4 h-4" />
                       <p className="flex-1">Sản phẩm yêu thích</p>
                       <ChevronRight className="w-4 h-4" />
                     </DropdownMenuItem>
-                    <DropdownMenuItem className="flex gap-2" onClick={() => {
-                      navigate("/ManagerAccount/paymentHistory")
-                    }}>
+                    <DropdownMenuItem
+                      className="flex gap-2"
+                      onClick={() => {
+                        navigate("/ManagerAccount/paymentHistory");
+                      }}
+                    >
                       <ReceiptText className="w-4 h-4" />
                       <p className="flex-1">Lịch sử mua hàng</p>
                       <ChevronRight className="w-4 h-4" />
                     </DropdownMenuItem>
-                    <DropdownMenuItem className="flex gap-2" onClick={() => {
-                      navigate("/admin")
-                    }}>
+                    <DropdownMenuItem
+                      className="flex gap-2"
+                      onClick={() => {
+                        navigate("/admin");
+                      }}
+                    >
                       <Shield className="w-4 h-4" />
                       <p className="flex-1">Quản lý</p>
                       <ChevronRight className="w-4 h-4" />
@@ -230,9 +258,12 @@ const Navbar: React.FC = () => {
                   </DropdownMenuGroup>
                   <DropdownMenuSeparator />
                   <DropdownMenuGroup>
-                    <DropdownMenuItem className="flex gap-2" onClick={() => {
-                      setShowLogoutConfirm(true)
-                    }}>
+                    <DropdownMenuItem
+                      className="flex gap-2"
+                      onClick={() => {
+                        setShowLogoutConfirm(true);
+                      }}
+                    >
                       <LogOut className="w-4 h-4" />
                       <p className="flex-1">Đăng xuất</p>
                       <ChevronRight className="w-4 h-4" />
@@ -241,26 +272,29 @@ const Navbar: React.FC = () => {
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : null}
-              <Dialog open={showLogoutConfirm} onOpenChange={(o) => {setShowLogoutConfirm(o)}}>
-                <DialogContent>
-                  <DialogHeader>
-                    <DialogTitle>
-                      Đăng xuất
-                    </DialogTitle>
-                  </DialogHeader>
-                  <DialogDescription>
-                    <p>Bạn có muốn đăng xuất khỏi tài khoản này?</p>
-                  </DialogDescription>
-                  <DialogFooter>
-                    <DialogClose>
-                      <Button variant="secondary">Huỷ</Button>
-                    </DialogClose>
-                    <DialogClose>
-                      <Button>Đồng ý</Button>
-                    </DialogClose>
-                  </DialogFooter>
-                </DialogContent>
-              </Dialog>
+            <Dialog
+              open={showLogoutConfirm}
+              onOpenChange={(o) => {
+                setShowLogoutConfirm(o);
+              }}
+            >
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Đăng xuất</DialogTitle>
+                </DialogHeader>
+                <DialogDescription>
+                  <p>Bạn có muốn đăng xuất khỏi tài khoản này?</p>
+                </DialogDescription>
+                <DialogFooter>
+                  <DialogClose>
+                    <Button variant="secondary">Huỷ</Button>
+                  </DialogClose>
+                  <DialogClose>
+                    <Button onClick={logOut}>Đồng ý</Button>
+                  </DialogClose>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
             {!user ? (
               <>
                 <div>
