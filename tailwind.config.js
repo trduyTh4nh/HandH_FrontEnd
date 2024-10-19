@@ -15,6 +15,7 @@ export default {
   			'black-transclusent': '#000000',
   			white: '#fff',
   			gray: {
+				'100': '#F0F0F0',
   				'200': '#DCDCDC',
   				'300': '#E8E8E8',
   				'400': 'rgba(0, 0, 0, 0.34)'
