@@ -61,8 +61,10 @@ import errorIndexes from "@/utils/errorKey";
 import ProductUploadForm from "@/components/widget/productUploadForm";
 import { Tooltip, TooltipContent, TooltipProvider } from "@/components/ui/tooltip";
 import { TooltipTrigger } from "@radix-ui/react-tooltip";
+import { useToast } from "@/hooks/use-toast";
 
 const ProductPage: React.FC = () => {
+  const {toast} = useToast()
   const [product, setProduct] = React.useState([]);
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState<AxiosError>(null);
@@ -118,12 +120,25 @@ const ProductPage: React.FC = () => {
   };
 
   const handleRemove = async (productSlug: string) => {
+    setProcess({
+      message: "Đang xoá sản phẩm",
+      isRunning: true
+    })
     const data = await deleteProduct(productSlug);
     if (data instanceof AxiosError) {
       console.log(data);
       setError(data);
+      setProcess({
+        message: "Đang xoá sản phẩm",
+        isRunning: false
+      })
       return;
     }
+    toast({title: "Xoá sản phẩm thành công", description: `Bạn đã xoá sản phẩm ${productSlug} thành công.`})
+    setProcess({
+      message: "Đang xoá sản phẩm",
+      isRunning: false
+    })
     setProducts(products.filter((p) => p._id !== productSlug));
   };
 
@@ -251,8 +266,8 @@ const ProductPage: React.FC = () => {
     isRunning: false,
   });
   async function uploadProduct(data: IProduct) {
+    const { product_thumb, ...rest } = data;
     try {
-      const { product_thumb, ...rest } = data;
       setProcess({
         message: "Đang đăng tải sản phẩm...",
         isRunning: true,
@@ -292,7 +307,21 @@ const ProductPage: React.FC = () => {
       });
     } catch (e) {
       console.error(e);
+      setProcess({
+        message: "Không có quá trình nào",
+        isRunning: false,
+      });
+      return;
     }
+    setIsAddProductOpen(false)
+    setProducts([
+      ...products,
+      {
+        ...rest,
+        product_thumb: URL.createObjectURL(product_thumb as File)
+      }
+    ])
+    toast({title: 'Đăng tải sản phẩm thành công', description: `Bạn đã đăng tải sản phẩm ${rest.product_name} thành công!`})
     setProcess({
       message: "Không có quá trình nào",
       isRunning: false,
@@ -344,19 +373,17 @@ const ProductPage: React.FC = () => {
                 //@ts-ignore
                 errorIndexes[error.response.data.message] == null ? (
                   <CircleX />
-                ) : (
-                  <TriangleAlert />
-                )
+                ) : null
               }
-              Lỗi {error ? error.status || "bất định" : "🙂"}
+              Lỗi
             </DialogTitle>
-            <DialogDescription>
+            <p className="font-bold">
               {error && error.response
                 ? //@ts-ignore
                   errorIndexes[error.response.data.message] ||
                   "Lỗi bất định hoặc lỗi do máy chủ, vui lòng thử lại sau."
                 : ""}
-            </DialogDescription>
+            </p>
             <Accordion type="single" collapsible className="w-full">
               <AccordionItem value="0">
                 <AccordionTrigger>Xem chi tiết</AccordionTrigger>

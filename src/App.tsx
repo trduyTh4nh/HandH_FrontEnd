@@ -32,19 +32,65 @@ import BannerPage from "./AdminPage/BannerPage";
 import CategoryPage from "./AdminPage/CategoryPage";
 import Test from "./components/pages/Test";
 import Blog from "./components/pages/Blog";
+import { useEffect, useState } from "react";
+import ErrorView from "./components/widget/Error.widget";
+import { Button } from "./components/ui/button";
+import { Link } from "react-router-dom";
+import { Dialog, DialogContent, DialogTrigger } from "./components/ui/dialog";
+import PopupComponent from "./components/widget/popUpComponent";
 const AdminRoute: React.FC = () => {
+  const user = localStorage.getItem("user");
+  const [isUserValid, setUserValid] = useState(false);
+  const [login, setLogin] = useState(false);
+  const [loginStatus, setLoginStatus] = useState(false)
+  useEffect(() => {
+    if (user) {
+      const userObj = JSON.parse(user);
+      setUserValid(
+        (userObj.role as string[]).find((e) => e == "3107").length > 0
+      );
+    } else {
+      setUserValid(false);
+    }
+  }, [loginStatus]);
   return (
     <div className="wrap-route flex">
-      <SideBar />
-      <Routes>
-        <Route path="/" element={<Dashboard />} />
-        <Route path="/productsManage" element={<ProductPage />} />
-        <Route path="/ordersManage" element={<OrderPage />} />
-        <Route path="/customersManage" element={<CustomerPage />} />
-        <Route path="/financeManage" element={<FinancePage />} />
-        <Route path="/bannerManage" element={<BannerPage />} />
-        <Route path="/categoryManage" element={<CategoryPage />} />
-      </Routes>
+      <SideBar userStatus={loginStatus} />
+      <Toaster/>
+      {isUserValid ? (
+        <Routes>
+          <Route path="/" element={<Dashboard />} />
+          <Route path="/productsManage" element={<ProductPage />} />
+          <Route path="/ordersManage" element={<OrderPage />} />
+          <Route path="/customersManage" element={<CustomerPage />} />
+          <Route path="/financeManage" element={<FinancePage />} />
+          <Route path="/bannerManage" element={<BannerPage />} />
+          <Route path="/categoryManage" element={<CategoryPage />} />
+        </Routes>
+      ) : (
+        <ErrorView
+          className="h-screen"
+          title="Bạn không có quyền truy cập vào trang này"
+          message="Vui lòng đăng nhập với tư cách là quản trị viên để có thể truy cập."
+          icon="notallowed"
+        >
+          <div className="flex gap-2">
+            <Link to={"/"}>
+              <Button>Quay lại</Button>
+            </Link>
+            <Dialog>
+              <DialogTrigger>
+                <Button variant="secondary">Đăng nhập</Button>
+              </DialogTrigger>
+              <DialogContent className="min-w-[45%]">
+                <PopupComponent handleChange={(e) => {
+                  window.location.reload()
+                }}/>
+              </DialogContent>
+            </Dialog>
+          </div>
+        </ErrorView>
+      )}
     </div>
   );
 };

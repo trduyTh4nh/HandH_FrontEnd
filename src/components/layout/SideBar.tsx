@@ -17,7 +17,10 @@ import {
 import { Button } from "@/components/ui/button";
 import { useEffect } from "react";
 import React from "react";
-const SideBar = () => {
+type SideBarProps = {
+  userStatus?: boolean
+}
+const SideBar = (props: SideBarProps) => {
   const location = useLocation();
 
   const activeTab = location.pathname;
@@ -29,7 +32,7 @@ const SideBar = () => {
       setSideBarOpen(false)
     }
     setUser(JSON.parse(tmp))
-  }, [])
+  }, [props.userStatus])  
   return (
     <AnimatePresence>
       {sidebarOpen && (
