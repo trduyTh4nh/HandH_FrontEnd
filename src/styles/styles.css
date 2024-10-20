@@ -77,6 +77,8 @@
 
 #text-register {
     font-weight: bold;
+    color: #FFC64E;
+    cursor: pointer;
 }
 
 .bg-button-primary {
@@ -153,12 +155,20 @@
 }
 
 .popup-login input::placeholder {
-    padding-left: 10pt;
+    color: black;
 }
 
-.popup-register input::placeholder {
-    padding-left: 10pt;
+.popup-register input::placeholder{
+    color:black;
 }
+.popup-login input {
+    padding: 10pt; /* Thêm padding */
+}
+
+.popup-register input {
+    padding: 10pt;
+}
+
 
 .bottom-popup-login {
     display: flex;
@@ -167,43 +177,64 @@
 }
 
 .popup-login input {
-    width: 85%;
+    width: 100%;
     height: 30pt;
-    border-radius: 10pt;
+    border-top-left-radius: 10pt;
+    border-top-right-radius: 10pt;
+    border-bottom: 2px solid #C5C5C5; 
+    outline: none;
 }
 
 .popup-register input {
     width: 85%;
     height: 30pt;
-    border-radius: 10pt;
+    border-top-left-radius: 10pt;
+    border-top-right-radius: 10pt;
+    border-bottom: 2px solid #C5C5C5; 
+    outline: none;
 }
 
 .btn-continute {
     width: 85%;
     background-color: #ffecc4;
     font-weight: bold;
-
+    font-size: 15pt;
     border-radius: 20pt;
+    height: 30pt;
+    display: flex;
+    justify-content: center; 
+    align-items: center;
+}
+.or-text{
+    font-size: 15pt;
 }
 
 .btn-continute-with-google {
     width: 85%;
-    background-color: #dddddd;
+    background-color: #F0F0F0;
     border-radius: 20pt;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .btn-close {
     text-align: end;
     width: 100%;
-    padding: 10pt;
+    /* padding: 10pt; */
+    margin-top: 10pt;
+    margin-right: 15pt;
+    cursor: pointer;
 }
 
 .overlay {
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
+    position: fixed; /* Ensure it's fixed to the viewport */
+    top: 0;          /* Start at the top */
+    left: 0;         /* Start at the left */
+    width: 100vw;    /* Cover the entire width */
+    height: 100vh;   /* Cover the entire height */
+    background-color: rgba(0, 0, 0, 0.7);
     z-index: 9999;
-    position: fixed;
 }
 
 .btn-continute-re {
@@ -211,6 +242,11 @@
     background-color: #ffecc4;
     font-weight: bold;
     border-radius: 20pt;
+    font-size: 15pt;
+    height: 30pt;
+    display: flex;
+    justify-content: center; 
+    align-items: center; 
 }
 
 .bottom-register {

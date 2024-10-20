@@ -8,57 +8,74 @@ import "react-responsive-carousel/lib/styles/carousel.min.css";
 import { ICategory, sampleCategories } from "../../types/category";
 import CategoryComponent from "../widget/categoryWidget";
 import Footer from "../widget/footer";
+import HomeBanner from "../widget/homeBanner";
+import HomeIntroduction from "../widget/homeIntroduction";
+import {
+  Call,
+  CallOutlined,
+  Diamond,
+  DiamondOutlined,
+  History,
+  StoreOutlined,
+} from "@mui/icons-material";
+import HomeCategory from "../widget/homeCategory.widget";
+import { Button } from "../ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "../ui/dialog";
+import { DialogDescription } from "@radix-ui/react-dialog";
+import { Link } from "react-router-dom";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "../ui/accordion";
+import Contacts from "../widget/contacts.widget";
 
 const Home: React.FC = () => {
   return (
-    <div id="" className="home-page flex flex-col gap-8">
-      <div className="home-banner ">
-        <div className="home-banner-wrap flex relative">
-          <div className="home-image-banner ">
-            <img className="h-full" src="\src\assets\image\banner.png" alt="" />
-          </div>
-          <div className="home-banner-opacity bg-white opacity-45 absolute w-full "></div>
-          <div className="home-text-banner flex flex-col gap-8 absolute  ">
-            <div className="home-banner-text flex gap-2 flex-col">
-              <div className="home-banner-text_bottom flex gap-4">
-                <p>SẢN PHẨM </p>
-                <p className="italic">Linen</p>
-              </div>
-              <p className="home-banner-text_quality">
-                CHẤT LƯỢNG NHẤT CHO MỌI NGƯỜI
-              </p>
-            </div>
-            <div className="home-banner-button flex gap-6">
-              <div className="banner-button_explore">
-                <input
-                  type="button"
-                  className="bg-white px-6 py-4 rounded-full font-bold hover:opacity-50 hover:cursor-pointer duration-700 ease-linear"
-                  value="Khám phá cửa hàng"
-                />
-              </div>
-              <div className="banner-button_contact">
-                <input
-                  type="button"
-                  className="bg-white px-6 py-4 rounded-full font-bold hover:opacity-50 hover:cursor-pointer duration-700 ease-linear"
-                  value="Liên hệ chúng tôi"
-                />
-              </div>
-            </div>
-          </div>
+    <div id="" className="home-page flex flex-col gap-8 w-full">
+      {/* redesign trang home */}
+      <HomeBanner
+        title="Lorem ipsum dolor sit"
+        description="Lorem ipsum dolor sit amet consectetur. Cras urna malesuada nunc eget id magna massa. Nec eget tristique vitae venenatis amet semper. Porta aliquam amet ligula vulputate. Sagittis tincidunt tortor quis pellentesque orci. Orci ac posuere aenean magna magna sed. Tincidunt id nulla nulla dictum ultrices. Suspendisse arcu vel cras lorem tempor."
+        image="/sample_image.jpg"
+        link=""
+        button=""
+      />
+      <div className="flex flex-col gap-8 px-20">
+        <h2 className="text-center">Tại sao chọn chúng tôi?</h2>
+        <div className="flex w-full gap-20">
+          <HomeIntroduction
+            className="flex-1"
+            icon={<DiamondOutlined fontSize="large" />}
+            title="Sản phẩm chất lượng"
+            description="Chúng tôi cung cấp sản phẩm chất lượng nhất, được may một cách kỹ lưỡng bởi những người thợ dày dặn kinh nghiệm."
+          />
+          <HomeIntroduction
+            className="flex-1"
+            icon={<History fontSize="large" />}
+            title="Kinh nghiệm và uy tín cao"
+            description="Xuất phát từ năm 1990, chúng tôi đã trở thành một nhà may được nhiều người, kể cả giới nghệ thuật yêu thích và tin tưởng.."
+          />
         </div>
-      </div>
-
-      <div className="home-branch h-10 mt-20 mb-4 w-full">
-        {/* <SplideComponent></SplideComponent> */}
-      </div>
-
-      <div className="home-new-product  mt-4 w-full flex flex-col justify-center">
-        <div className="home-new-product_title w-full text-center py-12">
-          <p className="">Hàng mới</p>
+        <h2 className="text-center">Bắt đầu mua sắm</h2>
+        <div className="flex gap-20">
+          {sampleCategories.map((category: ICategory) => (
+            <HomeCategory
+              className="flex-1"
+              name={category.category_name}
+              image={category.cagtegory_image}
+            />
+          ))}
         </div>
-
-        {/* Cái này phải đóng vào 1 component riêng do làm vội nên chưa  */}
-        <div className="home-new-list-product px-20 py-4 flex flex-wrap">
+        <h2 className="text-center">Hàng mới</h2>
+        <div className="home-new-list-product flex flex-wrap">
           {products.length > 0 ? (
             products.map((product: IProduct, index: number) => (
               <div className="wrap-product">
@@ -75,41 +92,99 @@ const Home: React.FC = () => {
             <p>Không có sản phẩm nào để hiển thị</p>
           )}
         </div>
-      </div>
-
-      <div className="event flex flex-col gap-4 py-4">
-        <div className="title-event">
-          <div className="home-new-product_title w-full text-center py-4">
-            <p className="">Các sự kiện nỗi bật</p>
-          </div>
-
-          <div className="banner-event p-8 w-full flex justify-center">
-            <CarouselBanner></CarouselBanner>
-          </div>
+        <div className="flex gap-4 w-full justify-center">
+          <Link to={"/shop"}>
+            <Button className="font-bold text-xl px-8">
+              Khám phá cửa hàng
+            </Button>
+          </Link>
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button variant="secondary" className="font-bold text-xl px-8">
+                Liên hệ chúng tôi qua Zalo
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-h-[100%] overflow-auto">
+              <DialogHeader>
+                <DialogTitle>Quét mã</DialogTitle>
+                <DialogDescription>
+                  Hãy quét mã này bằng ứng dụng Zalo trên điện thoại của bạn để
+                  chat với chúng tôi.
+                </DialogDescription>
+              </DialogHeader>
+              <Accordion type="single" collapsible>
+                <AccordionItem value="0">
+                  <AccordionTrigger>Cách quét mã</AccordionTrigger>
+                  <AccordionContent>
+                    <div className="flex flex-col gap-4">
+                      <p>
+                        Mở ứng dụng Zalo và ấn nút Mã QR ở gần góc trên bên phải
+                        của màn hình.
+                      </p>
+                      <img src="/zalo_tut.png" />
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+              </Accordion>
+              <img src="https://media.discordapp.net/attachments/716878834976161843/1292032540374466561/image.png?ex=67024292&is=6700f112&hm=ef9f817c86af463483c3d54041fe8dcdbe777a1cef5892f4ada6a05741d92f68&=&format=webp&quality=lossless&width=1044&height=1330" />
+              <div>
+                <h3 className="font-bold">Không thể quét mã?</h3>
+                <p>
+                  <span>
+                    <a href="https://zalo.me/0909893395">Truy cập link này</a>
+                  </span>{" "}
+                  Hoặc{" "}
+                  <span>
+                    <a href="tel:0909893395">Gọi điện trực tiếp</a>
+                  </span>
+                </p>
+              </div>
+            </DialogContent>
+          </Dialog>
+        </div>
+        <h2 className="text-center">Sự kiện nổi bật</h2>
+        <div className="banner-event p-8 w-full flex justify-center">
+          <CarouselBanner></CarouselBanner>
+        </div>
+        <h2 className="text-center">Liên hệ với chúng tôi</h2>
+        <div className="flex gap-8 w-full justify-center">
+          <Contacts
+            title="Số điện thoại / Zalo"
+            subtitle="0909893395"
+            url="tel:0909893395"
+            icon={<CallOutlined fontSize="large" />}
+          />
+          <Contacts
+            title="Facebook"
+            subtitle="Hanh Huynh"
+            url="https://www.facebook.com/profile.php?id=100005597715672"
+            icon={
+              <img
+                src="/Facebook_Logo_Primary.png"
+                className="h-[35px] w-[35px]"
+              />
+            }
+          />
+          <Contacts
+            title="Địa chỉ"
+            subtitle="K20, Cư Xã Vĩnh Hội, Phường 6, Quận 4, TP. Hồ Chí Minh, Việt Nam"
+            url="https://maps.app.goo.gl/s3e5Dzzh8ziZwAAaA"
+            icon={<StoreOutlined fontSize="large" />}
+          />
+        </div>
+        <div className="flex justify-center">
+          <iframe
+            src="https://www.google.com/maps/embed?pb=!1m17!1m12!1m3!1d1183.2701956956064!2d106.6994168288345!3d10.760924365071583!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m2!1m1!2s!5e1!3m2!1svi!2s!4v1728117283615!5m2!1svi!2s"
+            width="600"
+            height="450"
+            allowFullScreen
+            loading="lazy"
+            referrerPolicy="no-referrer-when-downgrade"
+            className="w-full"
+          ></iframe>
         </div>
       </div>
-
-      <div className="trend">
-        <div className="title-trend">
-          <div className="home-new-product_title w-full text-center pb-4">
-            <p className="">Xu hướng thời trang</p>
-          </div>
-
-          <div className="home-category flex w-full justify-center gap-24 items-center">
-            {sampleCategories.map((e: ICategory) => (
-              <CategoryComponent
-                category_name={e.category_name}
-                cagtegory_image={e.cagtegory_image}
-                category_description={e.category_description}
-                category_total={e.category_total}
-              ></CategoryComponent>
-            ))}
-          </div>
-        </div>
-        <div className="mt-16">
-          <Footer />
-        </div>
-      </div>
+      <Footer />
     </div>
   );
 };

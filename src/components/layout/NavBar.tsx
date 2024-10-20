@@ -12,6 +12,7 @@ import { ICategory, sampleCategories } from "../../types/category";
 import boxCategory from "../widget/boxCategory.widget";
 import PopupComponent from "../widget/popUpComponent";
 import PopupRegister from "../widget/popUpRegister";
+import PopupAdmin from "../widget/popUpAdmin";
 // import { duration } from "@mui/material";
 
 const Navbar: React.FC = () => {
@@ -29,28 +30,53 @@ const Navbar: React.FC = () => {
 
   const [login, setLogin] = React.useState(false);
   const [register, setRegister] = React.useState(false);
+  const[admin,setAdmin]=React.useState(false);
+  const[message,setMessage]=React.useState(false);
+  const [user, setUser] = React.useState(null)
 
-  function handleChange() {
+  function handleChange(isLogin: boolean) {
+    if(isLogin){
+
+    }
     setLogin(false);
+
   }
   function handleChangeRe() {
     setRegister(false);
   }
+  function handleChangeAd(){
+    setAdmin(false);
+  }
+
+  function handleChangeMess(){
+    setMessage(false);
+  }
+
+  function switchToRegister() {
+    setLogin(false);
+    setRegister(true); 
+  }
+
+  function switchToLogin(){
+    setLogin(true);
+    setRegister(false);
+  }
+
 
   // </div>
 
   return (
     <nav
       id="nav-main"
-      className=" bg-white fixed w-full top-0 z-10 rounded-b-3xl shadow-md"
+      className=" bg-white fixed w-full top-0 z-30 rounded-b-3xl shadow-md"
     >
       <div className="flex mx-auto px-20 py-4 justify-between items-center">
         <div className="flex justify-start gap-4">
           <div className="flex-shrink-0 flex items-center">
             <NavLink to="/">
               <img
-                className="h-8 w-auto"
-                src="\src\assets\image\logo_header.png"
+                className="w-auto h-12"
+                src="\src\assets\image\logo_header.svg"
                 alt="Logo"
               />
             </NavLink>
@@ -149,10 +175,15 @@ const Navbar: React.FC = () => {
           </div>
         </div>
       </div>
-      {login && <PopupComponent handleChange={handleChange}></PopupComponent>}
+      {login && <PopupComponent handleChange={(e) => {
+        console.log(e);
+        handleChange(e);
+      }} switchToRegister={switchToRegister}></PopupComponent>}
       {register && (
-        <PopupRegister handleChange={handleChangeRe}></PopupRegister>
+        <PopupRegister handleChange={handleChangeRe}  switchToLogin={switchToLogin}></PopupRegister>
       )}
+      {admin&&(<PopupAdmin handleChangeAd={handleChangeAd} ></PopupAdmin>)}
+
       {transitions(
         (style, isOpen) =>
           isOpen && (
