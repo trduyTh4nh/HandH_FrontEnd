@@ -3,7 +3,8 @@
 export interface IColorProductVariation {
     color_code: string,
     color_price: number,
-    color_isPicked: boolean
+    color_isPicked: boolean,
+    color_name?: string
 }
 
 export interface ISizeProductVarication {
@@ -14,9 +15,9 @@ export interface ISizeProductVarication {
 
 export interface IProduct {
     product_name?: string,
-    product_thumb?: string,
+    product_thumb?: string | File,
     product_description?: string,
-    product_price: number,
+    product_price?: number,
     product_slug?: string,
     product_rating?: number,
     product_variations?: any,

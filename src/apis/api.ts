@@ -35,7 +35,6 @@ class API {
           const userObj = JSON.parse(user);
           config.headers["x-client-id"] = userObj._id;
         }
-
         return config;
       },
       (error) => {

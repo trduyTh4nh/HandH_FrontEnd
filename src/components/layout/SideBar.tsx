@@ -11,17 +11,28 @@ import {
   MegaphoneIcon,
   ShirtIcon,
   ShoppingBagIcon,
+  Store,
   UsersIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useEffect } from "react";
 import React from "react";
-const SideBar = () => {
+type SideBarProps = {
+  userStatus?: boolean
+}
+const SideBar = (props: SideBarProps) => {
   const location = useLocation();
 
   const activeTab = location.pathname;
   const [sidebarOpen, setSideBarOpen] = React.useState(true);
-
+  const [user, setUser] = React.useState(null);
+  useEffect(() => {
+    const tmp = localStorage.getItem("user")
+    if(tmp == null){
+      setSideBarOpen(false)
+    }
+    setUser(JSON.parse(tmp))
+  }, [props.userStatus])  
   return (
     <AnimatePresence>
       {sidebarOpen && (
@@ -74,6 +85,11 @@ const SideBar = () => {
                   icon: CopyIcon,
                 },
                 {
+                  name: "Quay về trang chính",
+                  path: "/",
+                  icon: Store,
+                },
+                {
                   name: "Đăng xuất",
                   path: "/admin/logout",
                   icon: LogOutIcon,
@@ -90,6 +106,7 @@ const SideBar = () => {
                   </Button>
                 </Link>
               ))}
+
             </nav>
           </div>
         </motion.aside>
