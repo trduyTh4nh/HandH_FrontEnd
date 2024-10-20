@@ -9,7 +9,7 @@ import CustomerPage from "./AdminPage/CustomerPage";
 import FinancePage from "./AdminPage/FinancePage"; // Đã sửa lỗi chính tả
 import Home from "./components/pages/Home";
 import Shop from "./components/pages/Shop";
-import PurchaseOrder from "./components/pages/PurchaseOrder";
+import PurchaseOrder from "./components/pages/Blog";
 import Management from "./components/pages/Management";
 import { Account } from "./components/widget/Account";
 import { ManagerAccount } from "./components/pages/ManagerAccount";
@@ -28,18 +28,69 @@ import PurchaseLayout from "./components/pages/purchase/PurchaseLayout";
 import PurchaseReview from "./components/pages/purchase/PurchaseReview";
 import PurchaseChoose from "./components/pages/purchase/PurchaseChoose";
 import { Toaster } from "./components/ui/toaster";
+import BannerPage from "./AdminPage/BannerPage";
+import CategoryPage from "./AdminPage/CategoryPage";
 import Test from "./components/pages/Test";
+import Blog from "./components/pages/Blog";
+import { useEffect, useState } from "react";
+import ErrorView from "./components/widget/Error.widget";
+import { Button } from "./components/ui/button";
+import { Link } from "react-router-dom";
+import { Dialog, DialogContent, DialogTrigger } from "./components/ui/dialog";
+import PopupComponent from "./components/widget/popUpComponent";
 const AdminRoute: React.FC = () => {
+  const user = localStorage.getItem("user");
+  const [isUserValid, setUserValid] = useState(false);
+  const [login, setLogin] = useState(false);
+  const [loginStatus, setLoginStatus] = useState(false)
+  useEffect(() => {
+    if (user) {
+      const userObj = JSON.parse(user);
+      setUserValid(
+        (userObj.role as string[]).find((e) => e == "3107").length > 0
+      );
+    } else {
+      setUserValid(false);
+    }
+  }, [loginStatus]);
   return (
     <div className="wrap-route flex">
-      <SideBar />
-      <Routes>
-        <Route path="/" element={<Dashboard />} />
-        <Route path="/productsManage" element={<ProductPage />} />
-        <Route path="/ordersManage" element={<OrderPage />} />
-        <Route path="/customersManage" element={<CustomerPage />} />
-        <Route path="/financeManage" element={<FinancePage />} />
-      </Routes>
+      <SideBar userStatus={loginStatus} />
+      <Toaster/>
+      {isUserValid ? (
+        <Routes>
+          <Route path="/" element={<Dashboard />} />
+          <Route path="/productsManage" element={<ProductPage />} />
+          <Route path="/ordersManage" element={<OrderPage />} />
+          <Route path="/customersManage" element={<CustomerPage />} />
+          <Route path="/financeManage" element={<FinancePage />} />
+          <Route path="/bannerManage" element={<BannerPage />} />
+          <Route path="/categoryManage" element={<CategoryPage />} />
+        </Routes>
+      ) : (
+        <ErrorView
+          className="h-screen"
+          title="Bạn không có quyền truy cập vào trang này"
+          message="Vui lòng đăng nhập với tư cách là quản trị viên để có thể truy cập."
+          icon="notallowed"
+        >
+          <div className="flex gap-2">
+            <Link to={"/"}>
+              <Button>Quay lại</Button>
+            </Link>
+            <Dialog>
+              <DialogTrigger>
+                <Button variant="secondary">Đăng nhập</Button>
+              </DialogTrigger>
+              <DialogContent className="min-w-[45%]">
+                <PopupComponent handleChange={(e) => {
+                  window.location.reload()
+                }}/>
+              </DialogContent>
+            </Dialog>
+          </div>
+        </ErrorView>
+      )}
     </div>
   );
 };
@@ -53,7 +104,7 @@ const UserRoute: React.FC = () => {
         {/* {navbar} */}
         <Route path="/" element={<Home />} />
         <Route path="/shop" element={<Shop />} />
-        <Route path="/purchaseOrder" element={<PurchaseOrder />} />
+        <Route path="/blog" element={<Blog />} />
         <Route path="/management" element={<Management />} />
         <Route path="/managerAccount" element={<ManagerAccount />}>
           <Route index element={<Account />} />
@@ -78,7 +129,7 @@ const UserRoute: React.FC = () => {
           <Route path="/payment/process" element={<PurchaseChoose />} />
           <Route path="/payment/status" element={<PurchaseChoose />} />
         </Route>
-        <Route path="/test" element={<Test/>}/>
+        <Route path="/test" element={<Test />} />
       </Routes>
     </div>
   );

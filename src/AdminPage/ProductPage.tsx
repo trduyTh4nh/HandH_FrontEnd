@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import API from "../apis/api";
 import {
   IColorProductVariation,
@@ -8,18 +8,26 @@ import {
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
+  DialogClose,
   DialogContent,
+  DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
 import {
+  CircleX,
   Eye,
   EyeOff,
+  Info,
+  Loader,
+  Loader2,
   MoreHorizontalIcon,
   Pencil,
   Plus,
   Trash2,
+  TriangleAlert,
   Upload,
 } from "lucide-react";
 import { Label } from "@/components/ui/label";
@@ -36,67 +44,47 @@ import {
 import { TableBody } from "@mui/material";
 import { Switch } from "@/components/ui/switch";
 import { convertMoney } from "@/utils";
+import {
+  createProduct,
+  deleteProduct,
+  getProduct,
+  updateImageToProduct,
+} from "@/apis/products/product-repo";
+import { Axios, AxiosError } from "axios";
+import {
+  Accordion,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import { AccordionContent } from "@radix-ui/react-accordion";
+import errorIndexes from "@/utils/errorKey";
+import ProductUploadForm from "@/components/widget/productUploadForm";
+import { Tooltip, TooltipContent, TooltipProvider } from "@/components/ui/tooltip";
+import { TooltipTrigger } from "@radix-ui/react-tooltip";
+import { useToast } from "@/hooks/use-toast";
 
 const ProductPage: React.FC = () => {
+  const {toast} = useToast()
   const [product, setProduct] = React.useState([]);
-  // useEffect(() => {
-  //   const api = new API();
-  //   const fetchProduct = async () => {
-  //     try {
-  //       const response: any = await api.get("product");
-  //       setProduct(response.metadata);
-  //       console.log(response.metadata);
-  //     } catch (error) {
-  //       console.error("Lỗi khi lấy sản phẩm:", error);
-  //     }
-  //   };
-
-  //   fetchProduct();
-  // }, []);
-
-  const [products, setProducts] = React.useState<IProduct[]>([
-    {
-      product_name: "Classic T-Shirt",
-      product_thumb: "/images/classic-tshirt.jpg",
-      product_description: "A comfortable, classic fit t-shirt.",
-      product_price: 19.99,
-      product_slug: "classic-tshirt",
-      product_rating: 4.5,
-      isDraft: false,
-      isPublished: true,
-      product_category: "Tops",
-      product_color: [
-        { color_code: "#000000", color_price: 0, color_isPicked: true },
-        { color_code: "#FFFFFF", color_price: 0, color_isPicked: false },
-      ],
-      product_size: [
-        { size_name: "S", size_price: 0, size_isPicked: true },
-        { size_name: "M", size_price: 0, size_isPicked: true },
-        { size_name: "L", size_price: 2, size_isPicked: true },
-      ],
-    },
-    {
-      product_name: "Slim Fit Jeans",
-      product_thumb: "/images/slim-fit-jeans.jpg",
-      product_description: "Modern slim fit jeans for a stylish look.",
-      product_price: 49.99,
-      product_slug: "slim-fit-jeans",
-      product_rating: 4.2,
-      isDraft: true,
-      isPublished: false,
-      product_category: "Bottoms",
-      product_color: [
-        { color_code: "#000080", color_price: 0, color_isPicked: true },
-        { color_code: "#1E90FF", color_price: 2, color_isPicked: true },
-      ],
-      product_size: [
-        { size_name: "30", size_price: 0, size_isPicked: true },
-        { size_name: "32", size_price: 0, size_isPicked: true },
-        { size_name: "34", size_price: 2, size_isPicked: true },
-      ],
-    },
-  ]);
-
+  const [loading, setLoading] = React.useState(false);
+  const [error, setError] = React.useState<AxiosError>(null);
+  const [isEditing, setEditing] = React.useState(false);
+  async function fetch() {
+    setLoading(true);
+    const data = await getProduct();
+    if (data instanceof AxiosError) {
+      console.log(data.message);
+      setError(data);
+    } else {
+      console.log(data);
+      setProducts(data.metadata);
+    }
+    setLoading(false);
+  }
+  useEffect(() => {
+    fetch();
+  }, []);
+  const [products, setProducts] = React.useState([]);
   const [editingProduct, setEditingProduct] = React.useState<IProduct | null>(
     null
   );
@@ -116,6 +104,7 @@ const ProductPage: React.FC = () => {
   const [isAddProductOpen, setIsAddProductOpen] = React.useState(false);
 
   const handleEdit = (product: IProduct) => {
+    setEditing(true);
     setEditingProduct({ ...product });
   };
 
@@ -130,8 +119,27 @@ const ProductPage: React.FC = () => {
     }
   };
 
-  const handleRemove = (productSlug: string) => {
-    setProducts(products.filter((p) => p.product_slug !== productSlug));
+  const handleRemove = async (productSlug: string) => {
+    setProcess({
+      message: "Đang xoá sản phẩm",
+      isRunning: true
+    })
+    const data = await deleteProduct(productSlug);
+    if (data instanceof AxiosError) {
+      console.log(data);
+      setError(data);
+      setProcess({
+        message: "Đang xoá sản phẩm",
+        isRunning: false
+      })
+      return;
+    }
+    toast({title: "Xoá sản phẩm thành công", description: `Bạn đã xoá sản phẩm ${productSlug} thành công.`})
+    setProcess({
+      message: "Đang xoá sản phẩm",
+      isRunning: false
+    })
+    setProducts(products.filter((p) => p._id !== productSlug));
   };
 
   const handleTogglePublish = (productSlug: string) => {
@@ -240,21 +248,6 @@ const ProductPage: React.FC = () => {
       ],
     }));
   };
-
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setNewProduct((prev) => ({
-          ...prev,
-          product_thumb: reader.result as string,
-        }));
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
   const handleImageUploadEdit = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -268,326 +261,304 @@ const ProductPage: React.FC = () => {
       reader.readAsDataURL(file);
     }
   };
-
+  const [process, setProcess] = useState({
+    message: "Không có quá trình nào",
+    isRunning: false,
+  });
+  async function uploadProduct(data: IProduct) {
+    const { product_thumb, ...rest } = data;
+    try {
+      setProcess({
+        message: "Đang đăng tải sản phẩm...",
+        isRunning: true,
+      });
+      let id = "";
+      let res;
+      console.log({ ...rest, product_thumb: "/sample_image.jpg" });
+      res = await createProduct({
+        ...rest,
+        product_thumb: "/sample_image.jpg",
+      });
+      if (res instanceof AxiosError) {
+        setError(res);
+        setProcess({
+          message: "Đang đăng tải sản phẩm...",
+          isRunning: false,
+        });
+        return;
+      }
+      id = res.metadata._id;
+      setProcess({
+        message: "Đang đăng tải hình ảnh của sản phẩm...",
+        isRunning: true,
+      });
+      const res2 = await updateImageToProduct(id, product_thumb as File);
+      if (res2 instanceof AxiosError) {
+        setError(res);
+        setProcess({
+          message: "Đang đăng tải hình ảnh của sản phẩm...",
+          isRunning: false,
+        });
+        return;
+      }
+      setProcess({
+        message: "Đang đăng tải hình ảnh của sản phẩm...",
+        isRunning: false,
+      });
+    } catch (e) {
+      console.error(e);
+      setProcess({
+        message: "Không có quá trình nào",
+        isRunning: false,
+      });
+      return;
+    }
+    setIsAddProductOpen(false)
+    setProducts([
+      ...products,
+      {
+        ...rest,
+        product_thumb: URL.createObjectURL(product_thumb as File)
+      }
+    ])
+    toast({title: 'Đăng tải sản phẩm thành công', description: `Bạn đã đăng tải sản phẩm ${rest.product_name} thành công!`})
+    setProcess({
+      message: "Không có quá trình nào",
+      isRunning: false,
+    });
+  }
   return (
     <div className="space-y-6 w-full p-8 h-screen">
       <div className="flex justify-between items-center">
         <h2 className="text-3xl font-bold tracking-tight">
           Danh sách sản phẩm
         </h2>
+        <Dialog open={process.isRunning}>
+          <DialogContent className="max-w-max">
+            <div className="flex flex-col gap-2 justify-center items-center">
+              <Loader className="animate-spin" />
+              <p className="text-lg">{process.message}</p>
+            </div>
+          </DialogContent>
+        </Dialog>
+        <Dialog
+          open={error != null}
+          onOpenChange={(o) => {
+            setError(null);
+          }}
+        >
+          <DialogContent
+            className={`${
+              error &&
+              error.response &&
+              //@ts-ignore
+              errorIndexes[error.response.data.message] == null
+                ? "border-red-400 bg-red-50"
+                : ""
+            }`}
+          >
+            <DialogTitle
+              className={`flex gap-4 items-center ${
+                error &&
+                error.response &&
+                //@ts-ignore
+                errorIndexes[error.response.data.message] == null
+                  ? "text-red-400"
+                  : "text-primary"
+              }}`}
+            >
+              {
+                error &&
+                error.response.data &&
+                //@ts-ignore
+                errorIndexes[error.response.data.message] == null ? (
+                  <CircleX />
+                ) : null
+              }
+              Lỗi
+            </DialogTitle>
+            <p className="font-bold">
+              {error && error.response
+                ? //@ts-ignore
+                  errorIndexes[error.response.data.message] ||
+                  "Lỗi bất định hoặc lỗi do máy chủ, vui lòng thử lại sau."
+                : ""}
+            </p>
+            <Accordion type="single" collapsible className="w-full">
+              <AccordionItem value="0">
+                <AccordionTrigger>Xem chi tiết</AccordionTrigger>
+                <AccordionContent>
+                  <p>Stack trace</p>
+                  <p>
+                    {error && error.response
+                      ? //@ts-ignore
+                        error.response.data.stack || "Không tìm thấy chi tiết"
+                      : "Ai biết đâu, tự nhiên bật dialog này lên?"}
+                  </p>
+                </AccordionContent>
+              </AccordionItem>
+            </Accordion>
+            <DialogFooter>
+              <DialogClose>
+                <Button variant="destructive">OK</Button>
+              </DialogClose>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
         <Dialog open={isAddProductOpen} onOpenChange={setIsAddProductOpen}>
           <DialogTrigger asChild>
             <Button>
               <Plus className="mr-2 h-4 w-4" /> Thêm sản phẩm
             </Button>
           </DialogTrigger>
-          <DialogContent className="sm:max-w-[1000px]">
+          <DialogContent className="sm:max-w-[85%] max-h-full overflow-auto">
             <DialogHeader>
               <DialogTitle>Thêm sản phẩm mới</DialogTitle>
             </DialogHeader>
-            <div className="flex gap-8 px-4">
-              <div className="grid gap-4 py-4 max-h-[70vh]   flex-1 w-32 overflow-x-auto">
-                <div className="grid grid-cols-1 items-center">
-                  <Label htmlFor="new-product-name" className="text-left">
-                    Tên
-                  </Label>
-                  <Input
-                    className="w-full"
-                    id="new-product-name"
-                    name="product_name"
-                    value={newProduct.product_name}
-                    onChange={(e) => handleInputChange(e, true)}
-                  />
-                </div>
-                <div className="grid grid-cols-1 items-center">
-                  <Label
-                    htmlFor="new-product-description"
-                    className="text-left"
-                  >
-                    Mô tả
-                  </Label>
-                  <Textarea
-                    id="new-product-description"
-                    name="product_description"
-                    value={newProduct.product_description}
-                    onChange={(e) => handleInputChange(e, true)}
-                  />
-                </div>
-                <div className="grid grid-cols-1 items-center ">
-                  <Label htmlFor="new-product-price" className="text-left">
-                    Giá
-                  </Label>
-                  <Input
-                    id="new-product-price"
-                    name="product_price"
-                    type="number"
-                    value={newProduct.product_price}
-                    onChange={(e) => handleInputChange(e, true)}
-                  />
-                </div>
-                <div className="grid grid-cols-1 items-center ">
-                  <Label htmlFor="new-product-category" className="text-left">
-                    Loại
-                  </Label>
-                  <Input
-                    id="new-product-category"
-                    name="product_category"
-                    value={newProduct.product_category}
-                    onChange={(e) => handleInputChange(e, true)}
-                  />
-                </div>
-              </div>
-              {/*  */}
-              <div className="grid gap-4 py-4 max-h-[70vh]  flex-initial w-80 overflow-y-auto">
-                {" "}
-                <div className="grid grid-cols-1 items-center gap-4">
-                  <Label htmlFor="new-product-rating" className="text-left">
-                    Đánh giá
-                  </Label>
-                  <Input
-                    id="new-product-rating"
-                    name="product_rating"
-                    type="number"
-                    min="0"
-                    max="5"
-                    step="0.1"
-                    value={newProduct.product_rating}
-                    onChange={(e) => handleInputChange(e, true)}
-                  />
-                </div>
-                <div className="grid grid-cols-1 items-center gap-4">
-                  <Label htmlFor="new-product-image" className="text-left">
-                    Hình ảnh
-                  </Label>
-                  <div className="flex items-center gap-2">
-                    <Input
-                      id="new-product-image"
-                      type="file"
-                      accept="image/*"
-                      onChange={handleImageUpload}
-                      className="hidden"
-                    />
-                    <Label
-                      htmlFor="new-product-image"
-                      className="cursor-pointer"
-                    >
-                      <div className="flex items-center gap-2 px-4 py-2 bg-secondary text-secondary-foreground hover:bg-secondary/80 rounded-md">
-                        <Upload className="h-4 w-4" />
-                        Đăng tải hình ảnh
-                      </div>
-                    </Label>
-                    {newProduct.product_thumb && (
-                      <img
-                        src={newProduct.product_thumb}
-                        alt="Product"
-                        className="w-16 h-16 object-cover rounded"
-                      />
-                    )}
-                  </div>
-                </div>
-                <div className="grid grid-cols-1 items-center gap-4">
-                  <Label className="text-left">Màu</Label>
-                  <div>
-                    {newProduct.product_color?.map((color, index) => (
-                      <div key={index} className="flex items-center gap-2 mb-2">
-                        <Input
-                          type="color"
-                          value={color.color_code}
-                          onChange={(e) =>
-                            handleColorChange(
-                              index,
-                              "color_code",
-                              e.target.value
-                            )
-                          }
-                        />
-                        <Input
-                          type="number"
-                          value={color.color_price}
-                          onChange={(e) =>
-                            handleColorChange(
-                              index,
-                              "color_price",
-                              parseFloat(e.target.value)
-                            )
-                          }
-                          placeholder="Price"
-                        />
-                        <Switch
-                          checked={color.color_isPicked}
-                          onCheckedChange={(checked) =>
-                            handleColorChange(index, "color_isPicked", checked)
-                          }
-                        />
-                      </div>
-                    ))}
-                    <Button
-                      type="button"
-                      onClick={handleAddColor}
-                      variant="outline"
-                      size="sm"
-                    >
-                      Thêm màu
-                    </Button>
-                  </div>
-                </div>
-                <div className="grid grid-cols-1 items-center gap-4">
-                  <Label className="text-left">Kích cỡ</Label>
-                  <div>
-                    {newProduct.product_size?.map((size, index) => (
-                      <div key={index} className="flex items-center gap-2 mb-2">
-                        <Input
-                          value={size.size_name}
-                          onChange={(e) =>
-                            handleSizeChange(index, "size_name", e.target.value)
-                          }
-                          placeholder="Size"
-                        />
-                        <Input
-                          type="number"
-                          value={size.size_price}
-                          onChange={(e) =>
-                            handleSizeChange(
-                              index,
-                              "size_price",
-                              parseFloat(e.target.value)
-                            )
-                          }
-                          placeholder="Price"
-                        />
-                        <Switch
-                          checked={size.size_isPicked}
-                          onCheckedChange={(checked) =>
-                            handleSizeChange(index, "size_isPicked", checked)
-                          }
-                        />
-                      </div>
-                    ))}
-                    <Button
-                      type="button"
-                      onClick={handleAddSize}
-                      variant="outline"
-                      size="sm"
-                    >
-                      Thêm kích cỡ
-                    </Button>
-                  </div>
-                </div>
-                <div className="grid grid-cols-1 items-center gap-4">
-                  <Label htmlFor="new-product-draft" className="text-left">
-                    Draft
-                  </Label>
-                  <Switch
-                    id="new-product-draft"
-                    checked={newProduct.isDraft}
-                    onCheckedChange={(checked) =>
-                      setNewProduct((prev) => ({
-                        ...prev,
-                        isDraft: checked,
-                        isPublished: !checked,
-                      }))
-                    }
-                  />
-                </div>
-              </div>
-            </div>
-            <div className="flex justify-end">
-              <Button onClick={handleAddProduct}>Thêm sản phẩm</Button>
-            </div>
+            <ProductUploadForm onSubmit={uploadProduct} />
           </DialogContent>
         </Dialog>
       </div>
 
       <Card>
         <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Hình ảnh</TableHead>
-                <TableHead>Tên</TableHead>
-                <TableHead>Giá</TableHead>
-                <TableHead>Loại</TableHead>
-                <TableHead>Trạng thái</TableHead>
-                <TableHead>Hành động</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {products.map((product) => (
-                <TableRow key={product.product_slug}>
-                  <TableCell>
-                    <img
-                      className="w-20 h-20 rounded-md object-contain"
-                      src={product.product_thumb}
-                      alt=""
-                    />
-                  </TableCell>
-                  <TableCell>{product.product_name}</TableCell>
-                  <TableCell>{convertMoney(product.product_price)}</TableCell>
-                  <TableCell>{product.product_category}</TableCell>
-                  <TableCell>
-                    {product.isPublished ? "Published" : "Draft"}
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex space-x-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handleEdit(product)}
-                      >
-                        <Pencil className="h-4 w-4 mr-1" />
-                        Chỉnh sửa
-                      </Button>
-                      {/* New button  */}
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handleEdit(product)}
-                      >
-                        <MoreHorizontalIcon className="h-4 w-4 mr-1" />
-                        Chi tiết
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handleRemove(product.product_slug!)}
-                      >
-                        <Trash2 className="h-4 w-4 mr-1" />
-                        Xóa
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() =>
-                          handleTogglePublish(product.product_slug!)
-                        }
-                      >
-                        {product.isPublished ? (
-                          <>
-                            <EyeOff className="h-4 w-4 mr-1" />
-                            Không hiển thị
-                          </>
-                        ) : (
-                          <>
-                            <Eye className="h-4 w-4 mr-1" />
-                            Hiển thị
-                          </>
-                        )}
-                      </Button>
-                    </div>
-                  </TableCell>
+          {loading ? (
+            <div className="flex justify-center items-center w-full pt-4 gap-4">
+              <Loader className="animate-spin" />
+              <p>Đang tải...</p>
+            </div>
+          ) : (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Hình ảnh</TableHead>
+                  <TableHead>Tên</TableHead>
+                  <TableHead>Giá</TableHead>
+                  <TableHead>Loại</TableHead>
+                  <TableHead>Trạng thái</TableHead>
+                  <TableHead>Hành động</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {products.map((product) => (
+                  <TableRow key={product.product_slug}>
+                    <TableCell>
+                      <img
+                        className="w-20 h-20 rounded-md object-contain"
+                        src={product.product_thumb}
+                        alt=""
+                      />
+                    </TableCell>
+                    <TableCell>{product.product_name}</TableCell>
+                    <TableCell>{convertMoney(product.product_price)}</TableCell>
+                    <TableCell>{product.product_category}</TableCell>
+                    <TableCell>
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger>
+                            <div className="flex items-center gap-2">
+                              {!product.isDraft ? "Đang hiển thị" : "Đã ẩn"}
+                              <Info width={16} height={16} />
+                            </div>
+                          </TooltipTrigger>
+                          <TooltipContent className="max-w-44 bg-background shadow-lg">
+                            <b>Chế độ hiển thị</b>
+                            <p>Đây là trạng thái hiển thị sản phẩm của bạn trên trang của khách hàng, với trạng thái "Hiển thị" là sản phẩm đang được hiển thị trên cửa hàng và khách hàng có thể mua, "Đã ẩn" là ngược lại.</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex space-x-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleEdit(product)}
+                        >
+                          <Pencil className="h-4 w-4 mr-1" />
+                          Chỉnh sửa
+                        </Button>
+                        {/* New button  */}
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleEdit(product)}
+                        >
+                          <MoreHorizontalIcon className="h-4 w-4 mr-1" />
+                          Chi tiết
+                        </Button>
+                        <Dialog>
+                          <DialogTrigger asChild>
+                            <Button variant="outline" size="sm">
+                              <Trash2 className="h-4 w-4 mr-1" />
+                              Xóa
+                            </Button>
+                          </DialogTrigger>
+                          <DialogContent>
+                            <DialogHeader>
+                              <DialogTitle>
+                                Bạn có chắc chắn muốn xóa sản phẩm này không?
+                              </DialogTitle>
+                            </DialogHeader>
+                            <DialogDescription>
+                              <p>
+                                Hành động này không thể hoàn tác, nếu bạn muốn
+                                ẩn sản phẩm, vui lòng chọn nút "Hiển thị"
+                              </p>
+                            </DialogDescription>
+                            <DialogFooter>
+                              <DialogClose>
+                                <Button variant="secondary">Huỷ</Button>
+                              </DialogClose>
+                              <DialogClose>
+                                <Button
+                                  onClick={() => handleRemove(product._id!)}
+                                >
+                                  Xóa
+                                </Button>
+                              </DialogClose>
+                            </DialogFooter>
+                          </DialogContent>
+                        </Dialog>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() =>
+                            handleTogglePublish(product.product_slug!)
+                          }
+                        >
+                          {product.isPublished ? (
+                            <>
+                              <EyeOff className="h-4 w-4 mr-1" />
+                              Không hiển thị
+                            </>
+                          ) : (
+                            <>
+                              <Eye className="h-4 w-4 mr-1" />
+                              Hiển thị
+                            </>
+                          )}
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          )}
         </CardContent>
       </Card>
-
       {editingProduct && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Chỉnh sửa</CardTitle>
-          </CardHeader>
-          <CardContent>
+        <Dialog
+          open={isEditing}
+          onOpenChange={(o) => {
+            setEditing(o);
+          }}
+        >
+          <DialogHeader>
+            <DialogTitle>Chỉnh sửa</DialogTitle>
+          </DialogHeader>
+          <DialogContent className="min-w-[75%]">
             <form className="space-y-4">
               <div>
                 <Label htmlFor="product_name">Tên sản phẩm</Label>
@@ -660,7 +631,7 @@ const ProductPage: React.FC = () => {
                   </Label>
                   {editingProduct.product_thumb && (
                     <img
-                      src={editingProduct.product_thumb}
+                      src={editingProduct.product_thumb as string}
                       alt="Product"
                       className="w-16 h-16 object-cover rounded"
                     />
@@ -669,8 +640,8 @@ const ProductPage: React.FC = () => {
               </div>
               <Button onClick={handleSave}>Lưu sản phẩm</Button>
             </form>
-          </CardContent>
-        </Card>
+          </DialogContent>
+        </Dialog>
       )}
     </div>
   );

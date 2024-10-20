@@ -1,5 +1,4 @@
 import React from 'react'
-import '../../styles/styles.css'
 import '../../styles/managerAccount.css'
 import { NavLink, Outlet } from 'react-router-dom'
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
@@ -25,7 +24,7 @@ const navLinks = [
 ];
 export const ManagerAccount: React.FC = () => {
   return (
-    <div className='flex flex-grow mx-20'>
+    <div className='flex flex-grow flex-1 mx-20'>
       <div className='bg-[#FFF7E6] rounded-lg shadow-lg p-6 heght-div1 mt-7'>
         <div className="flex items-center gap-4 mb-8">
           <img
