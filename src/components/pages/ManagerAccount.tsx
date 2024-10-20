@@ -5,7 +5,7 @@ import { NavLink, Outlet } from 'react-router-dom'
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import ReceiptLongIcon from '@mui/icons-material/ReceiptLong';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
-
+import avt from '../../assets/image/rectangle.png';
 const navLinks = [
   {
     path: "account",
@@ -25,8 +25,19 @@ const navLinks = [
 ];
 export const ManagerAccount: React.FC = () => {
   return (
-    <div className='flex flex-grow'>
-      <div className='text-button-primary heght-div1'>
+    <div className='flex flex-grow mx-20'>
+      <div className='bg-[#FFF7E6] rounded-lg shadow-lg p-6 heght-div1 mt-7'>
+        <div className="flex items-center gap-4 mb-8">
+          <img
+            src={avt}
+            alt="Profile"
+            className="w-12 h-12 rounded-full"
+          />
+          <div>
+            <h3 className="text-lg font-bold">Tiêu Trí Quang</h3>
+            <p className="text-sm text-gray-500">Khách hàng</p>
+          </div>
+        </div>
         <ul className='nav__list text-color-primary'>
           {navLinks.map((item, index) => (
             <li className='ml-2 mr-8 nav__item' key={index}>
@@ -45,7 +56,9 @@ export const ManagerAccount: React.FC = () => {
           ))}
         </ul>
       </div>
-      <Outlet />
+      <div className="w-full">
+       <Outlet />
+      </div>
     </div>
   )
 }
