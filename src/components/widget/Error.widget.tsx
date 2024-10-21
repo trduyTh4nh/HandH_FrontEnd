@@ -1,5 +1,6 @@
 import {
   Ban,
+  Loader,
   LucideIcon,
   OctagonMinus,
   SearchX,
@@ -12,7 +13,7 @@ type ErrorIcons = typeof ShieldBan;
 type ErrorViewProps = {
   title: string;
   message: string;
-  icon: "error" | "warning" | "unauthorized" | "notfound" | "notallowed";
+  icon: "error" | "warning" | "unauthorized" | "notfound" | "notallowed" | "loading";
   children?: React.ReactNode;
   className?: string
 };
@@ -23,6 +24,7 @@ export default function ErrorView(props: ErrorViewProps) {
     unauthorized: <OctagonMinus width={64} height={64} />,
     notfound: <SearchX width={64} height={64} />,
     notallowed: <ShieldBan width={64} height={64} />,
+    loading: <Loader width={64} height={64} className="animate-spin"/>
   };
   return (
     <div className={`w-full flex flex-col items-center ${props.className}`}>
