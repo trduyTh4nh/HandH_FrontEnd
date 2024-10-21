@@ -12,10 +12,12 @@ import { Close } from "@mui/icons-material";
 import { useForm } from "react-hook-form";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
+import { Loader } from "lucide-react";
 type RegisterPersonalProps = {
-    onSubmit: (data: z.infer<typeof registerSchema>) => void;
-    defaultValue?: any;
-}
+  onSubmit: (data: z.infer<typeof registerSchema>) => void;
+  defaultValue?: any;
+  loading?: boolean;
+};
 const registerSchema = z
   .object({
     fullName: z
@@ -55,7 +57,7 @@ export default function RegisterPersonal(props: RegisterPersonalProps) {
   return (
     <>
       <p className="text-center">
-        Hãy nhập những thông tin cá nhân của bạn và ấn 'Tiếp tục'.
+        Hãy nhập những thông tin cá nhân của bạn và ấn 'Đăng ký'.
       </p>
       <Form {...form}>
         <form
@@ -158,7 +160,11 @@ export default function RegisterPersonal(props: RegisterPersonalProps) {
               </FormItem>
             )}
           />
-          <Button type="submit">Tiếp theo</Button>
+          <Button disabled={props.loading} type="submit">
+            { props.loading ? <Loader className="animate-spin"/> :
+            "Đăng ký"
+            }
+          </Button>
         </form>
       </Form>
     </>

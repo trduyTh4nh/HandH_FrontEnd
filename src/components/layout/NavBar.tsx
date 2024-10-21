@@ -82,6 +82,7 @@ const Navbar: React.FC = () => {
   async function logOut() {
     const res = await logout();
     if (res instanceof AxiosError) {
+      console.log(res)
       //@ts-ignore
       if (res.response.data.message != "invalid signature") {
         console.log(res);

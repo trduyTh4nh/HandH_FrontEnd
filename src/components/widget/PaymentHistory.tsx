@@ -4,7 +4,7 @@ import { Outlet } from 'react-router-dom';
 
 export const PaymentHistory: React.FC = () => {
   return (
-    <div className="height-div2 p-5 h-full HistoryDetail">
+    <div className=" p-5 h-full HistoryDetail">
       <div className="text-3xl font-normal">
         <h2 className="font-black font-sans">Lịch sử mua hàng</h2>
       </div>

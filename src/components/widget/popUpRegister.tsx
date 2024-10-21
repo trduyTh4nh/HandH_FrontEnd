@@ -15,14 +15,20 @@ import { Button } from "../ui/button";
 import RegisterPersonal from "./registerPersonal.widget";
 import { useState } from "react";
 import RegisterAddress from "./registerAddress.widget";
+import { register } from "@/apis/user/user-repo";
+import { AxiosError } from "axios";
+import { useToast } from "@/hooks/use-toast";
+import errorIndexes from "@/utils/errorKey";
 
 function PopupRegister({ handleChange, switchToLogin }: any) {
   const [registerData, setRegisterData] = useState({})
+  const [loading, setLoading] = useState(false)
   const steps = [
-    (<RegisterPersonal defaultValue={registerData} onSubmit={(data) => {
+    (<RegisterPersonal loading={loading} defaultValue={registerData} onSubmit={(data) => {
       finishStep(data, false)
     }}/>),
   ]
+  const {toast} = useToast()
   const [currentStep, setCurrentStep] = useState(0)
   function finishStep(data, back){
     setRegisterData({
@@ -40,7 +46,17 @@ function PopupRegister({ handleChange, switchToLogin }: any) {
     if(currentStep != steps.length - 1){
       setCurrentStep(currentStep + 1)
     } else {
-      // Call API to register
+      setLoading(true)
+      register(data).then(e => {
+        if(e instanceof AxiosError){
+          setLoading(false)
+          toast({title: "Đăng ký thất bại", description: errorIndexes[e.response.data.message] || "Lỗi bất định, vui lòng thử lại"})
+          return
+        }
+        setLoading(false)
+        toast({title: "Chào mừng bạn!", description: "Bạn đã đăng ký thành viên thành công!"})
+        handleChange()
+      })
     }
   }
   return (
