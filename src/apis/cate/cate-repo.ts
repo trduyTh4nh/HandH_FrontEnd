@@ -40,10 +40,7 @@ export async function addCate(newCategory:ICategory) {
   } catch (error) {
     const e = error as AxiosError;
     console.log(e)
-    return {
-      status: e.response?.status,
-      message: "Lỗi khi thêm danh mục sản phẩm",
-    };
+    return error;
   }
   
 }
