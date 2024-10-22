@@ -20,6 +20,7 @@ import {
   CircleX,
   Eye,
   EyeOff,
+  Image,
   Info,
   Loader,
   Loader2,
@@ -59,10 +60,16 @@ import {
 import { AccordionContent } from "@radix-ui/react-accordion";
 import errorIndexes from "@/utils/errorKey";
 import ProductUploadForm from "@/components/widget/productUploadForm";
-import { Tooltip, TooltipContent, TooltipProvider } from "@/components/ui/tooltip";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+} from "@/components/ui/tooltip";
 import { TooltipTrigger } from "@radix-ui/react-tooltip";
+import { useToast } from "@/hooks/use-toast";
 
 const ProductPage: React.FC = () => {
+  const { toast } = useToast();
   const [product, setProduct] = React.useState([]);
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState<AxiosError>(null);
@@ -118,12 +125,28 @@ const ProductPage: React.FC = () => {
   };
 
   const handleRemove = async (productSlug: string) => {
+    setProcess({
+      message: "Đang xoá sản phẩm",
+      isRunning: true,
+    });
     const data = await deleteProduct(productSlug);
     if (data instanceof AxiosError) {
       console.log(data);
       setError(data);
+      setProcess({
+        message: "Đang xoá sản phẩm",
+        isRunning: false,
+      });
       return;
     }
+    toast({
+      title: "Xoá sản phẩm thành công",
+      description: `Bạn đã xoá sản phẩm ${productSlug} thành công.`,
+    });
+    setProcess({
+      message: "Đang xoá sản phẩm",
+      isRunning: false,
+    });
     setProducts(products.filter((p) => p._id !== productSlug));
   };
 
@@ -251,8 +274,8 @@ const ProductPage: React.FC = () => {
     isRunning: false,
   });
   async function uploadProduct(data: IProduct) {
+    const { product_thumb, ...rest } = data;
     try {
-      const { product_thumb, ...rest } = data;
       setProcess({
         message: "Đang đăng tải sản phẩm...",
         isRunning: true,
@@ -292,7 +315,24 @@ const ProductPage: React.FC = () => {
       });
     } catch (e) {
       console.error(e);
+      setProcess({
+        message: "Không có quá trình nào",
+        isRunning: false,
+      });
+      return;
     }
+    setIsAddProductOpen(false);
+    setProducts([
+      ...products,
+      {
+        ...rest,
+        product_thumb: URL.createObjectURL(product_thumb as File),
+      },
+    ]);
+    toast({
+      title: "Đăng tải sản phẩm thành công",
+      description: `Bạn đã đăng tải sản phẩm ${rest.product_name} thành công!`,
+    });
     setProcess({
       message: "Không có quá trình nào",
       isRunning: false,
@@ -338,25 +378,21 @@ const ProductPage: React.FC = () => {
                   : "text-primary"
               }}`}
             >
-              {
-                error &&
-                error.response.data &&
-                //@ts-ignore
-                errorIndexes[error.response.data.message] == null ? (
-                  <CircleX />
-                ) : (
-                  <TriangleAlert />
-                )
-              }
-              Lỗi {error ? error.status || "bất định" : "🙂"}
+              {error &&
+              error.response.data &&
+              //@ts-ignore
+              errorIndexes[error.response.data.message] == null ? (
+                <CircleX />
+              ) : null}
+              Lỗi
             </DialogTitle>
-            <DialogDescription>
+            <p className="font-bold">
               {error && error.response
                 ? //@ts-ignore
                   errorIndexes[error.response.data.message] ||
                   "Lỗi bất định hoặc lỗi do máy chủ, vui lòng thử lại sau."
                 : ""}
-            </DialogDescription>
+            </p>
             <Accordion type="single" collapsible className="w-full">
               <AccordionItem value="0">
                 <AccordionTrigger>Xem chi tiết</AccordionTrigger>
@@ -416,11 +452,15 @@ const ProductPage: React.FC = () => {
                 {products.map((product) => (
                   <TableRow key={product.product_slug}>
                     <TableCell>
-                      <img
-                        className="w-20 h-20 rounded-md object-contain"
-                        src={product.product_thumb}
-                        alt=""
-                      />
+                      {!product.product_thumb || product.product_thumb == "" ? (
+                        <Image width={80} height={80} />
+                      ) : (
+                        <img
+                          className="w-20 h-20 rounded-md object-contain"
+                          src={product.product_thumb}
+                          alt=""
+                        />
+                      )}
                     </TableCell>
                     <TableCell>{product.product_name}</TableCell>
                     <TableCell>{convertMoney(product.product_price)}</TableCell>
@@ -436,7 +476,12 @@ const ProductPage: React.FC = () => {
                           </TooltipTrigger>
                           <TooltipContent className="max-w-44 bg-background shadow-lg">
                             <b>Chế độ hiển thị</b>
-                            <p>Đây là trạng thái hiển thị sản phẩm của bạn trên trang của khách hàng, với trạng thái "Hiển thị" là sản phẩm đang được hiển thị trên cửa hàng và khách hàng có thể mua, "Đã ẩn" là ngược lại.</p>
+                            <p>
+                              Đây là trạng thái hiển thị sản phẩm của bạn trên
+                              trang của khách hàng, với trạng thái "Hiển thị" là
+                              sản phẩm đang được hiển thị trên cửa hàng và khách
+                              hàng có thể mua, "Đã ẩn" là ngược lại.
+                            </p>
                           </TooltipContent>
                         </Tooltip>
                       </TooltipProvider>

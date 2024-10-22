@@ -1,100 +1,49 @@
-import React from 'react'
+import React from 'react';
 import {
-  BadgeOutlined, AttachEmailOutlined, CakeOutlined, CallOutlined, HttpsOutlined, ApartmentOutlined, SignpostOutlined, AddRoadOutlined, CodeOutlined
+  BadgeOutlined, CallOutlined, AttachEmailOutlined, CakeOutlined, LocationOnOutlined
 } from "@mui/icons-material";
+
 export const Account: React.FC = () => {
   return (
-    <div className='height-div2 h-full flex flex-row flex-wrap'>
-      <div className='bg-white p-10 w40per h-full'>
-        <div className="flex gap-3 text-center h-fit flex-wrap">
-          <img className="h-24 w-24 rounded-full object-cover" src="\src\assets\image\logo_header.png" alt="Logo" />
-          <div className="w-auto h-fit text-center">
-            <span className='w-full text-3xl font-bold'>Nguyen User</span>
-            <p className='w-full'>nguyenuser@gmail.com</p>
-          </div>
-        </div>
-        <div className="flex flex-col gap-8 pt-5">
-          <div className="flex flex-col gap-1">
-            <div className="flex gap-2">
-              <BadgeOutlined></BadgeOutlined>
-              <p>Họ và tên</p>
+    <div className="flex justify-center mt-7">
+      <div className="bg-white shadow-lg rounded-lg w-full max-w-3xl p-8">
+        <div className="flex flex-col items-center">
+          <img className="h-28 w-28 rounded-full object-cover mb-4" src="/src/assets/image/logo_header.png" alt="Profile" />
+          <button className="text-sm">Thay đổi ảnh đại diện</button>
+          <h1 className="text-2xl font-bold mt-4">Hồ sơ khách hàng</h1>
+          <div className="mt-6 w-full">
+            <div className="flex items-center gap-2 mb-4">
+              <BadgeOutlined className="text-gray-600" />
+              <p className="text-gray-600 font-bold">Họ tên:</p>
+              <p className="ml-auto">Tiêu Trí Quang</p>
             </div>
-            <input type="text" disabled value="Nguyen User" className="custom-input" />
-          </div>
-          <div className="flex flex-col gap-1">
-            <div className="flex gap-2">
-              <AttachEmailOutlined></AttachEmailOutlined>
-              <p>Email</p>
+            <div className="flex items-center gap-2 mb-4">
+              <CallOutlined className="text-gray-600" />
+              <p className="text-gray-600 font-bold">Số điện thoại:</p>
+              <p className="ml-auto">+84000 00 0000</p>
             </div>
-            <input type="email" disabled value="nguyenuser@gmail.com" className="custom-input" />
-          </div>
-          <div className="flex flex-col gap-1">
-            <div className="flex gap-2">
-              <CakeOutlined></CakeOutlined>
-              <p>Ngày sinh</p>
+            <div className="flex items-center gap-2 mb-4">
+              <AttachEmailOutlined className="text-gray-600" />
+              <p className="text-gray-600 font-bold">Email:</p>
+              <p className="ml-auto">quangrain2014@gmail.com</p>
             </div>
-            <input type="datetime" disabled value="02/09/2003" className="custom-input" />
-          </div>
-          <div className="flex flex-col gap-1">
-            <div className="flex gap-2">
-              <CallOutlined></CallOutlined>
-              <p>Số điện thoại</p>
+            <div className="flex items-center gap-2 mb-4">
+              <CakeOutlined className="text-gray-600" />
+              <p className="text-gray-600 font-bold">Ngày sinh:</p>
+              <p className="ml-auto">27/08/2003</p>
             </div>
-            <input type="number" disabled value="0828907967" className="custom-input" />
-          </div>
-          <div className="flex flex-col gap-1">
-            <div className="flex gap-2">
-              <HttpsOutlined></HttpsOutlined>
-              <p>Mật khẩu</p>
+            <div className="flex items-center gap-2 mb-4">
+              <LocationOnOutlined className="text-gray-600" />
+              <p className="text-gray-600 font-bold">Địa chỉ:</p>
+              <p className="ml-auto">00 Example Street, Phường 0, Quận 0, Tỉnh Example</p>
             </div>
-            <input type="password" disabled value="Nguyen User" className="custom-input" />
           </div>
-        </div>
-      </div>
-
-      <div className='text-button-primary w60per h-full p-10'>
-        <div className="flex flex-col gap-12 pt-5">
-          <div className="flex flex-col gap-1">
-            <div className="flex gap-2">
-              <ApartmentOutlined></ApartmentOutlined>
-              <p>Thành phố</p>
-            </div>
-            <select className="bg-white rounded-lg p-3.5 outline-none">
-              <option value="Nguyen User">Nguyen User</option>
-              <option value="Hanoi">Hà Nội</option>
-              <option value="Saigon">Sài Gòn</option>
-              <option value="Danang">Đà Nẵng</option>
-            </select>
+          <div className="flex w-full justify-between mt-6">
+            <button className="bg-gray-100 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-200">Chỉnh sửa hồ sơ</button>
+            <button className="bg-gray-100 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-200">Đổi mật khẩu</button>
           </div>
-          <div className="flex flex-col gap-1">
-            <div className="flex gap-2">
-              <SignpostOutlined></SignpostOutlined>
-              <p>Quận</p>
-            </div>
-            <select className="bg-white rounded-lg p-3.5 outline-none">
-              <option value="nguyenuser@gmail.com">nguyenuser@gmail.com</option>
-              <option value="district1">Quận 1</option>
-              <option value="district2">Quận 2</option>
-              <option value="district3">Quận 3</option>
-            </select>
-          </div>
-          <div className="flex flex-col gap-1 ">
-            <div className="flex gap-2">
-              <AddRoadOutlined></AddRoadOutlined>
-              <p>Tên đường</p>
-            </div>
-            <input type="text" className="bg-white rounded-lg p-3.5 outline-none" />
-          </div>
-          <div className="flex flex-col gap-1">
-            <div className="flex gap-2">
-              <CodeOutlined></CodeOutlined>
-              <p>Zip code</p>
-            </div>
-            <input type="text" className="bg-white rounded-lg p-3.5 outline-none" />
-          </div>
-          <button className=''>Chỉnh sửa thông tin cá nhân</button>
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
