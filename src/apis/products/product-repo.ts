@@ -4,6 +4,13 @@ import { IProduct } from "@/types/product.type";
 
 const api = new API({ headerType: "json" });
 const formApi = new API({headerType: "formdata"})
+export async function getNewestProduct(n: number) {
+  try {
+
+  } catch (e) {
+    const error = e as AxiosError
+  }
+}
 export async function getProduct() {
   try {
     const response = await api.get("product");

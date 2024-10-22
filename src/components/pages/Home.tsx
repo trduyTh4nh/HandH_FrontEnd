@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import "../../styles/home.css";
 import ProductItem from "../widget/productItem.widget";
 import { IProduct, products } from "../../types/product.type";
@@ -37,9 +37,21 @@ import {
   AccordionTrigger,
 } from "../ui/accordion";
 import Contacts from "../widget/contacts.widget";
+import { getCate } from "@/apis/cate/cate-repo";
 
 const Home: React.FC = () => {
-  
+  const [cateList, setCateList] = useState<ICategory[]>([])
+  async function getAllCate() {
+    try {
+      const res = await getCate()
+      setCateList(res.metadata)
+    } catch (e) {
+
+    }
+  }
+  useEffect(() => {
+    getAllCate()
+  }, [])
   return (
     <>
       <Helmet>
@@ -71,8 +83,8 @@ const Home: React.FC = () => {
             />
           </div>
           <h2 className="text-center">Bắt đầu mua sắm</h2>
-          <div className="flex gap-20">
-            {sampleCategories.map((category: ICategory) => (
+          <div className="grid grid-cols-4 gap-4">
+            {cateList.map((category: ICategory) => (
               <HomeCategory
                 className="flex-1"
                 name={category.category_name}
