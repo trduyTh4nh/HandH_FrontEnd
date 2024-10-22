@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import '../../styles/blog.css'
 import { SearchOutlined } from "@mui/icons-material";
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
@@ -7,10 +7,12 @@ import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import { NavLink } from "react-router-dom";
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import CircleIcon from '@mui/icons-material/Circle';
-import { colors } from "@mui/material";
 import ModeEditOutlineOutlinedIcon from '@mui/icons-material/ModeEditOutlineOutlined';
 import AdminPanelSettingsOutlinedIcon from '@mui/icons-material/AdminPanelSettingsOutlined';
-
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "../ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Input } from "../ui/input";
+import ModalImage from "react-modal-image";
 
 const navLinks = [
     {
@@ -32,6 +34,19 @@ const Blog: React.FC = () => {
             console.log(key)
         }
     }
+    const [isOpen, setIsOpen] = useState(false);
+    const [imageSrc, setImageSrc] = useState("");
+
+    const handleImageClick = (src) => {
+        setImageSrc(src);
+        setIsOpen(true);
+    };
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  const handleMenuToggle = () => {
+    setIsMenuOpen(isMenuOpen);
+  };
+    const [isAddBlogOpen, setIsAddBlogOpen] = React.useState(false);
     return (
         <>
            <div className="entire-page">
@@ -62,7 +77,7 @@ const Blog: React.FC = () => {
                
                          </div>
                          <div className="divider"></div>
-                            <ul className='nav__list text-color-primary'>
+                            {/* <ul className='nav__list text-color-primary'>
                             {navLinks.map((item, index) => (
                                 <li className='ml-2 mr-8 nav__item' key={index}>
                                 <NavLink
@@ -78,7 +93,45 @@ const Blog: React.FC = () => {
                                 </NavLink>
                                 </li>
                                 ))}
-                            </ul>
+                            </ul> */}
+                            <div className="container-left-item" >
+                                <Dialog open={isAddBlogOpen} onOpenChange ={setIsAddBlogOpen} >
+                                    <DialogTrigger asChild>
+                                        <div className="container-left-item-abc" >
+                                            <ModeEditOutlineOutlinedIcon />
+                                            <h3>Đăng bài</h3>
+                                        </div>
+
+                                    </DialogTrigger>
+                                    <DialogContent className="sm:max-w-[1000px]">
+                                        <DialogHeader>
+                                            <DialogTitle>
+                                                Thêm bài post
+                                            </DialogTitle>
+                                            <div  className="flex gap-8 px-4">
+                                                <div className="grid gap-4 py-4 max-h-[70vh]   flex-1 w-32 overflow-x-auto">
+                                                    <div className="grid grid-cols-1 items-center">
+                                                        <Label htmlFor="new-cate-name" className="text-left">
+                                                            Tiêu đề bài post
+                                                        </Label>
+                                                        <Input
+                                                            className="w-full"
+                                                                id="new-cate-name"
+                                                                name="category_name"
+                                                                
+                                                        />
+                                                    </div>
+                                                    {/* uploadiamge here */}
+                                                </div>
+                                            </div>
+                                        </DialogHeader>
+                                    </DialogContent>
+                                </Dialog>
+                                <div className="container-left-item-abc">
+                                <AdminPanelSettingsOutlinedIcon />
+                                <h3> Quản lý bài viết</h3>
+                                </div>
+                            </div>
                         </div>
                         
                     </div>
@@ -95,12 +148,19 @@ const Blog: React.FC = () => {
                                             <p style={{fontSize:16}}>10/10/2024</p>  
                                             <CircleIcon style={{color:"black",fontSize:6}}/>
                                             <p style={{fontSize:16}}>5:24</p>  
-
                                         </div>
                                     </div>
                                </div>
                                <div className="post-header-left">
-                                    <MoreHorizIcon />
+                               <MoreHorizIcon onClick={handleMenuToggle} style={{ cursor: 'pointer' }} />
+                                    {isMenuOpen && (
+                                        <div className="popup-menu">
+                                        <ul>
+                                            <li>Edit Post</li>
+                                            <li>Delete Post</li>
+                                        </ul>
+                                        </div>
+                                    )}
 
                                </div>
                             </div>
@@ -110,8 +170,16 @@ const Blog: React.FC = () => {
                                 </p>
                             </div>
                             <div className="post-image">
-                                <img src="https://cly.1cdn.vn/2022/05/10/anh-nen-avatar-dep_021652403.jpg"/>
+                                <ModalImage
+                                    small="https://cly.1cdn.vn/2022/05/10/anh-nen-avatar-dep_021652403.jpg"
+                                    large="https://cly.1cdn.vn/2022/05/10/anh-nen-avatar-dep_021652403.jpg"
+                                    alt="Post"
+                               />
+                                {/* <img src="https://cly.1cdn.vn/2022/05/10/anh-nen-avatar-dep_021652403.jpg"
+                                    
+                                /> */}
                             </div>
+                          
                             <div className="divider-post"></div>
                         </div>
                         <div className="post-container">
@@ -152,16 +220,24 @@ const Blog: React.FC = () => {
                     <div className="container-right">
                         <h3 style={{fontWeight:"bold", fontSize:24}}>Theo dõi cửa hàng trên</h3>
                         <div className="divider"></div>
+                        <a href="https://www.facebook.com/ntduy200503">
 
                         <div className="item-container-right">
                             <img className="cicrle-item" src="https://store-images.s-microsoft.com/image/apps.37935.9007199266245907.b029bd80-381a-4869-854f-bac6f359c5c9.91f8693c-c75b-4050-a796-63e1314d18c9" alt="facebook" />
                             <p>Facebook</p>
+                        
+                        
                         </div>
-                        <div className="item-container-right">
+                        </a>
+                            <a href="https://www.tiktok.com/@nguyenduy665" >
+                            <div className="item-container-right">
+
                             <img className="cicrle-item" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT2iFQ46LsrIPl7KiVrOMHavMz-zDJzLsre3w&s" alt="tiktok" />
                             <p>Tiktok</p>
+                            </div>
+                            </a>
+                         
                         </div>
-                    </div>
                  </div>
            </div>
            </div>
