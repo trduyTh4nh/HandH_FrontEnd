@@ -102,7 +102,7 @@ export default function ProductComponentShop({
       let sizedProducts =
         productData.length > 0 ? [...productData] : [...products];
       const filteredProducts = sizedProducts.filter((product) =>
-        product.product_size?.some((productSize) =>
+        product.product_sizes?.some((productSize) =>
           size.includes(productSize.size_name)
         )
       );
@@ -118,7 +118,7 @@ export default function ProductComponentShop({
     let coloredProducts = [...products];
     if (color) {
       const fliterColorProducts = coloredProducts.filter((product) =>
-        product.product_color?.some(
+        product.product_colors?.some(
           (prodColor) => color === prodColor.color_code
         )
       );

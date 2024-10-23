@@ -25,8 +25,8 @@ export interface IProduct {
     isPublished?: boolean,
     isModified?: (product_name: string) => boolean,
     product_category?: string;
-    product_color?: IColorProductVariation[],
-    product_size?: ISizeProductVarication[]
+    product_colors?: IColorProductVariation[],
+    product_sizes?: ISizeProductVarication[]
 
 }
 
@@ -47,11 +47,11 @@ export const productList: IProduct[] = [
         isDraft: false,
         isPublished: true,
         product_category: "Sportswear",
-        product_color: [
+        product_colors: [
             { color_code: "#FF5733", color_price: 10.00, color_isPicked: true },
             { color_code: "#3357FF", color_price: 12.00, color_isPicked: false }
         ],
-        product_size: [
+        product_sizes: [
             { size_name: "M", size_price: 5.00, size_isPicked: true },
             { size_name: "L", size_price: 7.00, size_isPicked: false }
         ]
@@ -68,11 +68,11 @@ export const productList: IProduct[] = [
         isDraft: false,
         isPublished: true,
         product_category: "Activewear",
-        product_color: [
+        product_colors: [
             { color_code: "#FFD1DC", color_price: 8.00, color_isPicked: true },
             { color_code: "#808080", color_price: 9.00, color_isPicked: false }
         ],
-        product_size: [
+        product_sizes: [
             { size_name: "S", size_price: 4.00, size_isPicked: true },
             { size_name: "M", size_price: 6.00, size_isPicked: false }
         ]
@@ -89,11 +89,11 @@ export const productList: IProduct[] = [
         isDraft: false,
         isPublished: true,
         product_category: "Casualwear",
-        product_color: [
+        product_colors: [
             { color_code: "#001F3F", color_price: 10.00, color_isPicked: true },
             { color_code: "#AAAAAA", color_price: 11.00, color_isPicked: false }
         ],
-        product_size: [
+        product_sizes: [
             { size_name: "L", size_price: 6.00, size_isPicked: true },
             { size_name: "3XL", size_price: 8.00, size_isPicked: false }
         ]
@@ -110,11 +110,11 @@ export const productList: IProduct[] = [
         isDraft: false,
         isPublished: true,
         product_category: "Electronics",
-        product_color: [
+        product_colors: [
             { color_code: "#FFD1DC", color_price: 0, color_isPicked: true },
             { color_code: "#FFFFFF", color_price: 0, color_isPicked: false }
         ],
-        product_size: [
+        product_sizes: [
             { size_name: "2XL", size_price: 8.00, size_isPicked: false }
         ]
     },
@@ -130,11 +130,11 @@ export const productList: IProduct[] = [
         isDraft: false,
         isPublished: true,
         product_category: "Electronics",
-        product_color: [
+        product_colors: [
             { color_code: "#FFD1DC", color_price: 0, color_isPicked: true },
             { color_code: "#FFFFFF", color_price: 0, color_isPicked: false }
         ],
-        product_size: [
+        product_sizes: [
             { size_name: "One Size", size_price: 0, size_isPicked: true }
         ]
     }
@@ -155,11 +155,11 @@ export const products: IProduct[] = [
         isPublished: true,
         isModified: (name: string) => name !== "Áo Thun Nam",
         product_category: "620c8b3f8b6e934f560e9e5b",
-        product_color: [
+        product_colors: [
             { color_code: "#8DB4D2", color_price: 0, color_isPicked: true },
             { color_code: "#FFFFFF", color_price: 0, color_isPicked: false }
         ],
-        product_size: [
+        product_sizes: [
             { size_name: "S", size_price: 4.00, size_isPicked: true },
             { size_name: "M", size_price: 6.00, size_isPicked: false }
         ]
@@ -177,11 +177,11 @@ export const products: IProduct[] = [
         isPublished: true,
         isModified: (name: string) => name !== "Giày Thể Thao",
         product_category: "620c8b3f8b6e934f560e9e5b",
-        product_color: [
+        product_colors: [
             { color_code: "#8DB4D2", color_price: 0, color_isPicked: true },
             { color_code: "#FFFFFF", color_price: 0, color_isPicked: false }
         ],
-        product_size: [
+        product_sizes: [
             { size_name: "S", size_price: 4.00, size_isPicked: true },
             { size_name: "M", size_price: 6.00, size_isPicked: false }
         ]
@@ -199,11 +199,11 @@ export const products: IProduct[] = [
         isPublished: true,
         isModified: (name: string) => name !== "Mũ Lưỡi Trai",
         product_category: "620c8b3f8b6e934f560e9e5b",
-        product_color: [
+        product_colors: [
             { color_code: "#8DB4D2", color_price: 0, color_isPicked: true },
             { color_code: "#FFFFFF", color_price: 0, color_isPicked: false }
         ],
-        product_size: [
+        product_sizes: [
             { size_name: "S", size_price: 4.00, size_isPicked: true },
             { size_name: "M", size_price: 6.00, size_isPicked: false }
         ]
@@ -221,11 +221,11 @@ export const products: IProduct[] = [
         isPublished: true,
         isModified: (name: string) => name !== "Kính Mát",
         product_category: "620c8b3f8b6e934f560e9e5b",
-        product_color: [
+        product_colors: [
             { color_code: "#000", color_price: 0, color_isPicked: true },
             { color_code: "#FFFFFF", color_price: 0, color_isPicked: false }
         ],
-        product_size: [
+        product_sizes: [
             { size_name: "S", size_price: 4.00, size_isPicked: true },
             { size_name: "M", size_price: 6.00, size_isPicked: false }
         ]
@@ -243,11 +243,11 @@ export const products: IProduct[] = [
         isPublished: true,
         isModified: (name: string) => name !== "Balo Laptop",
         product_category: "620c8b3f8b6e934f560e9e5b",
-        product_color: [
+        product_colors: [
             { color_code: "#000", color_price: 0, color_isPicked: true },
             { color_code: "#FFFFFF", color_price: 0, color_isPicked: false }
         ],
-        product_size: [
+        product_sizes: [
             { size_name: "S", size_price: 4.00, size_isPicked: true },
             { size_name: "M", size_price: 6.00, size_isPicked: false }
         ]
@@ -265,11 +265,11 @@ export const products: IProduct[] = [
         isPublished: true,
         isModified: (name: string) => name !== "Đồng Hồ Nam",
         product_category: "620c8b3f8b6e934f560e9e5b",
-        product_color: [
+        product_colors: [
             { color_code: "#000", color_price: 0, color_isPicked: true },
             { color_code: "#FFFFFF", color_price: 0, color_isPicked: false }
         ],
-        product_size: [
+        product_sizes: [
             { size_name: "L", size_price: 6.00, size_isPicked: true },
             { size_name: "XL", size_price: 8.00, size_isPicked: false }
         ]
@@ -287,11 +287,11 @@ export const products: IProduct[] = [
         isPublished: true,
         isModified: (name: string) => name !== "Áo Khoác Nữ",
         product_category: "620c8b3f8b6e934f560e9e5b",
-        product_color: [
+        product_colors: [
             { color_code: "#000", color_price: 0, color_isPicked: true },
             { color_code: "#FFFFFF", color_price: 0, color_isPicked: false }
         ],
-        product_size: [
+        product_sizes: [
             { size_name: "L", size_price: 6.00, size_isPicked: true },
             { size_name: "3XL", size_price: 8.00, size_isPicked: false }
         ]
@@ -309,11 +309,11 @@ export const products: IProduct[] = [
         isPublished: true,
         isModified: (name: string) => name !== "Váy Dạ Hội",
         product_category: "620c8b3f8b6e934f560e9e5b",
-        product_color: [
+        product_colors: [
             { color_code: "#000", color_price: 0, color_isPicked: true },
             { color_code: "#FFFFFF", color_price: 0, color_isPicked: false }
         ],
-        product_size: [
+        product_sizes: [
             { size_name: "L", size_price: 6.00, size_isPicked: true },
             { size_name: "2XL", size_price: 8.00, size_isPicked: false }
         ]
@@ -331,11 +331,11 @@ export const products: IProduct[] = [
         isPublished: true,
         isModified: (name: string) => name !== "Túi Xách",
         product_category: "620c8b3f8b6e934f560e9e5b",
-        product_color: [
+        product_colors: [
             { color_code: "#000", color_price: 0, color_isPicked: true },
             { color_code: "#FFFFFF", color_price: 0, color_isPicked: false }
         ],
-        product_size: [
+        product_sizes: [
             { size_name: "L", size_price: 6.00, size_isPicked: true },
             { size_name: "XL", size_price: 8.00, size_isPicked: false }
         ]
@@ -353,11 +353,11 @@ export const products: IProduct[] = [
         isPublished: true,
         isModified: (name: string) => name !== "Sách Công Nghệ",
         product_category: "620c8b3f8b6e934f560e9e5b",
-        product_color: [
+        product_colors: [
             { color_code: "#8DB4D2", color_price: 0, color_isPicked: true },
             { color_code: "#FFFFFF", color_price: 0, color_isPicked: false }
         ],
-        product_size: [
+        product_sizes: [
             { size_name: "L", size_price: 6.00, size_isPicked: true },
             { size_name: "3XL", size_price: 8.00, size_isPicked: false }
         ]
@@ -375,11 +375,11 @@ export const products: IProduct[] = [
         isPublished: true,
         isModified: (name: string) => name !== "Máy Tính Xách Tay",
         product_category: "620c8b3f8b6e934f560e9e5b",
-        product_color: [
+        product_colors: [
             { color_code: "#FFD1DC", color_price: 0, color_isPicked: true },
             { color_code: "#FFFFFF", color_price: 0, color_isPicked: false }
         ],
-        product_size: [
+        product_sizes: [
             { size_name: "L", size_price: 6.00, size_isPicked: true },
             { size_name: "XL", size_price: 8.00, size_isPicked: false }
         ]
@@ -397,11 +397,11 @@ export const products: IProduct[] = [
         isPublished: true,
         isModified: (name: string) => name !== "Bộ Đồ Thể Thao",
         product_category: "620c8b3f8b6e934f560e9e5b",
-        product_color: [
+        product_colors: [
             { color_code: "#FFD1DC", color_price: 0, color_isPicked: true },
             { color_code: "#FFFFFF", color_price: 0, color_isPicked: false }
         ],
-        product_size: [
+        product_sizes: [
             { size_name: "L", size_price: 6.00, size_isPicked: true },
             { size_name: "XXL", size_price: 8.00, size_isPicked: false }
         ]

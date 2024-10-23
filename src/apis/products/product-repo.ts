@@ -6,9 +6,16 @@ const api = new API({ headerType: "json" });
 const formApi = new API({headerType: "formdata"})
 export async function getNewestProduct(n: number) {
   try {
-
+    const response = await api.get<any>(`product/getLastestProduct/${n}`)
+    return response
   } catch (e) {
-    const error = e as AxiosError
+    if(e instanceof AxiosError) {
+      const error = e as AxiosError
+      console.log(error)
+      return error
+    }
+    console.log(e)
+    throw e
   }
 }
 export async function getProduct() {
