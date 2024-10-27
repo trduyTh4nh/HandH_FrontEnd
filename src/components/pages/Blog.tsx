@@ -14,6 +14,39 @@ import { Label } from "@/components/ui/label";
 import { Input } from "../ui/input";
 import ModalImage from "react-modal-image";
 
+import {
+    Cloud,
+    CreditCard,
+    Github,
+    Keyboard,
+    LifeBuoy,
+    LogOut,
+    Mail,
+    MessageSquare,
+    Plus,
+    PlusCircle,
+    Settings,
+    User,
+    UserPlus,
+    Users,
+  } from "lucide-react"
+   
+  import { Button } from "@/components/ui/button"
+  import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuGroup,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuPortal,
+    DropdownMenuSeparator,
+    DropdownMenuShortcut,
+    DropdownMenuSub,
+    DropdownMenuSubContent,
+    DropdownMenuSubTrigger,
+    DropdownMenuTrigger,
+  } from "@/components/ui/dropdown-menu"
+   
 const navLinks = [
     {
       path: "post",
@@ -28,6 +61,9 @@ const navLinks = [
   
   ];
 const Blog: React.FC = () => {
+
+    const menus=["Edit","Delete","Hight light"]
+    const [open,setOpen]=useState(false);   
     const [key, setKey] = React.useState<string>("")
     const hanldeOnKeyDown = (e: any): void => {
         if (e.key === 'Enter') {
@@ -41,11 +77,8 @@ const Blog: React.FC = () => {
         setImageSrc(src);
         setIsOpen(true);
     };
-    const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const [popUpMenu, setPopUpMenu] = React.useState(false);
 
-  const handleMenuToggle = () => {
-    setIsMenuOpen(isMenuOpen);
-  };
     const [isAddBlogOpen, setIsAddBlogOpen] = React.useState(false);
     return (
         <>
@@ -151,15 +184,37 @@ const Blog: React.FC = () => {
                                         </div>
                                     </div>
                                </div>
-                               <div className="post-header-left">
-                               <MoreHorizIcon onClick={handleMenuToggle} style={{ cursor: 'pointer' }} />
-                                    {isMenuOpen && (
-                                        <div className="popup-menu">
+                               <div className="post-header-left"  style={{ cursor: 'pointer' }}>
+                                  
+                                    <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                    <MoreHorizIcon />
+                                        {/* <Button variant="outline">Open</Button> */}
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent className="w-56">
+                                        <DropdownMenuSeparator />
+                                        
+                                            
+                                        <DropdownMenuItem>
+                                        <span>Setting</span>
+                                        </DropdownMenuItem>  <DropdownMenuItem>
+                                        <span>More</span>
+                                        </DropdownMenuItem>  <DropdownMenuItem>
+                                        <span>Edit</span>
+                                        </DropdownMenuItem>
+                                        
+                                        
+                                    </DropdownMenuContent>
+                                    </DropdownMenu>
+                                    {
+                                        open &&(
+                                    <div className="p-4 w-52 shadow-lg asoblute">
                                         <ul>
-                                            <li>Edit Post</li>
-                                            <li>Delete Post</li>
+                                            {menus.map((menu)=>
+                                            <li className="p-2 text-lg cursor-pointer rounded hover:bg-blue-100" key={menu}>{menu}</li>
+                                            )}
                                         </ul>
-                                        </div>
+                                    </div>
                                     )}
 
                                </div>
