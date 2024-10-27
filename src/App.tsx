@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import "./App.css";
 import Navbar from "./components/layout/NavBar";
+import {Helmet} from "react-helmet";
 import SideBar from "./components/layout/SideBar"; // Chỉ sử dụng cho Admin
 import Dashboard from "./AdminPage/Dashboard";
 import ProductPage from "./AdminPage/ProductPage";
@@ -38,66 +39,94 @@ import { Button } from "./components/ui/button";
 import { Link } from "react-router-dom";
 import { Dialog, DialogContent, DialogTrigger } from "./components/ui/dialog";
 import PopupComponent from "./components/widget/popUpComponent";
+import { getLoggedInUser, UnauthenticatedError } from "./apis/user/user-repo";
+import { AxiosError } from "axios";
 const AdminRoute: React.FC = () => {
   const user = localStorage.getItem("user");
   const [isUserValid, setUserValid] = useState(false);
   const [login, setLogin] = useState(false);
-  const [loginStatus, setLoginStatus] = useState(false)
-  useEffect(() => {
-    if (user) {
-      const userObj = JSON.parse(user);
-      setUserValid(
-        (userObj.role as string[]).find((e) => e == "3107").length > 0
-      );
-    } else {
+  const [checkingAuth, setCheckingAuth] = useState(false);
+  const [loginStatus, setLoginStatus] = useState(false);
+  async function checkUser() {
+    setCheckingAuth(true);
+    try {
+      const res = await getLoggedInUser();
+      const user = res;
+      console.log(user);
+      setUserValid(user.role[0] == "3107");
+      setCheckingAuth(false);
+    } catch (e) {
+      console.log(e);
       setUserValid(false);
+      setCheckingAuth(false);
     }
+    setCheckingAuth(false);
+  }
+  useEffect(() => {
+    checkUser();
   }, [loginStatus]);
   return (
-    <div className="wrap-route flex">
-      <SideBar userStatus={loginStatus} />
-      <Toaster/>
-      {isUserValid ? (
-        <Routes>
-          <Route path="/" element={<Dashboard />} />
-          <Route path="/productsManage" element={<ProductPage />} />
-          <Route path="/ordersManage" element={<OrderPage />} />
-          <Route path="/customersManage" element={<CustomerPage />} />
-          <Route path="/financeManage" element={<FinancePage />} />
-          <Route path="/bannerManage" element={<BannerPage />} />
-          <Route path="/categoryManage" element={<CategoryPage />} />
-        </Routes>
-      ) : (
-        <ErrorView
-          className="h-screen"
-          title="Bạn không có quyền truy cập vào trang này"
-          message="Vui lòng đăng nhập với tư cách là quản trị viên để có thể truy cập."
-          icon="notallowed"
-        >
-          <div className="flex gap-2">
-            <Link to={"/"}>
-              <Button>Quay lại</Button>
-            </Link>
-            <Dialog>
-              <DialogTrigger>
-                <Button variant="secondary">Đăng nhập</Button>
-              </DialogTrigger>
-              <DialogContent className="min-w-[45%]">
-                <PopupComponent handleChange={(e) => {
-                  window.location.reload()
-                }}/>
-              </DialogContent>
-            </Dialog>
-          </div>
-        </ErrorView>
-      )}
-    </div>
+    <>
+      <Helmet>
+        <title>Kênh quản lý cửa hàng - Hồng Đức Store</title>
+      </Helmet>
+      <div className="wrap-route flex">
+        {isUserValid ? <SideBar userStatus={loginStatus} /> : null}
+        <Toaster />
+        {isUserValid ? (
+          <Routes>
+            <Route path="/" element={<Dashboard />} />
+            <Route path="/productsManage" element={<ProductPage />} />
+            <Route path="/ordersManage" element={<OrderPage />} />
+            <Route path="/customersManage" element={<CustomerPage />} />
+            <Route path="/financeManage" element={<FinancePage />} />
+            <Route path="/bannerManage" element={<BannerPage />} />
+            <Route path="/categoryManage" element={<CategoryPage />} />
+          </Routes>
+        ) : (
+          <ErrorView
+            className="h-screen"
+            title={
+              !checkingAuth
+                ? "Bạn không có quyền truy cập vào trang này"
+                : "Đang kiểm tra quyền của bạn..."
+            }
+            message={
+              !checkingAuth
+                ? "Vui lòng đăng nhập với tư cách là quản trị viên để có thể truy cập."
+                : "Đợi chút nhé, chúng tôi đang kiểm tra quyền hạn của bạn..."
+            }
+            icon={!checkingAuth ? "notallowed" : "loading"}
+          >
+            {!checkingAuth ? (
+              <div className="flex gap-2">
+                <Link to={"/"}>
+                  <Button>Quay lại</Button>
+                </Link>
+                <Dialog>
+                  <DialogTrigger>
+                    <Button variant="secondary">Đăng nhập</Button>
+                  </DialogTrigger>
+                  <DialogContent className="min-w-[45%]">
+                    <PopupComponent
+                      handleChange={(e) => {
+                        window.location.reload();
+                      }}
+                    />
+                  </DialogContent>
+                </Dialog>
+              </div>
+            ) : null}
+          </ErrorView>
+        )}
+      </div>
+    </>
   );
 };
 
 const UserRoute: React.FC = () => {
   return (
-    <div className="flex-grow flex mt-[10.2rem]">
+    <div className="flex-grow flex mt-[5rem] md:mt-[10.2rem]">
       <Navbar />
       <Toaster />
       <Routes>
@@ -121,7 +150,7 @@ const UserRoute: React.FC = () => {
           </Route>
           <Route path="favoriteProduct" element={<FavoriteProduct />} />
         </Route>
-        <Route path="/product/:id/:name" element={<Product />} />
+        <Route path="/product/:id" element={<Product />} />
         <Route path="/cart" element={<CartPage />} />
         <Route path="/payment" element={<PurchaseLayout />}>
           <Route path="/payment/" element={<PurchaseReview />} />

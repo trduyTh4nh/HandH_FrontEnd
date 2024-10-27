@@ -29,7 +29,7 @@ import {
   SelectValue,
 } from "../ui/select";
 import ProductItem from "./productItem.widget";
-import { Delete, Image, Trash2, X } from "lucide-react";
+import { CircleHelp, Delete, Image, Trash2, X } from "lucide-react";
 import { formatBytes } from "@/utils";
 import { Button } from "../ui/button";
 import {
@@ -43,15 +43,23 @@ import {
 import { TableCell } from "@mui/material";
 import { Switch } from "../ui/switch";
 import { DialogClose } from "../ui/dialog";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "../ui/tooltip";
 
 const schema = z.object({
   product_name: z.string({ required_error: "Vui lòng nhập sản phẩm" }),
   product_description: z
-    .string()
+    .string({required_error: "Mô tả sản phẩm không được để trống"})
     .max(1024, { message: "Mô tả sản phẩm không được lớn hơn 1024 ký tự" }),
-  product_thumb: z.instanceof(File, {message: "Hình ảnh không được để trống"}).refine((x) => x.size < 104857600, {
-    message: "kích cỡ file không được vượt quá 100MB",
-  }),
+  product_thumb: z
+    .instanceof(File, { message: "Hình ảnh không được để trống" })
+    .refine((x) => x.size < 104857600, {
+      message: "kích cỡ file không được vượt quá 100MB",
+    }),
   product_price: z.coerce
     .number({
       required_error: "Giá sản phẩm không được để trống.",
@@ -75,7 +83,7 @@ export default function ProductUploadForm(props: ProductUploadFormProps) {
       {
         color_code: "#000",
         color_name: "Đen",
-        color_isPicked: true,
+        color_isPicked: false,
         color_price: 0,
       },
     ]);
@@ -86,14 +94,25 @@ export default function ProductUploadForm(props: ProductUploadFormProps) {
       {
         size_name: "",
         size_price: 0,
-        size_isPicked: true,
+        size_isPicked: false,
       },
     ]);
   }
   function setSizeProperty(value: ISizeProductVarication, index: number) {
     const arr = sizeList.map((e, i) => {
+      if(value.size_isPicked){
+        if(i != index) {
+          return {
+            ...e,
+            size_isPicked: false
+          }
+        }
+      }
       if (i == index) {
-        return value;
+        return {
+          ...value,
+          size_isPicked: true
+        };
       }
       return e;
     });
@@ -107,8 +126,19 @@ export default function ProductUploadForm(props: ProductUploadFormProps) {
   }
   function setColorProperty(value: IColorProductVariation, index: number) {
     const arr = colorList.map((e, i) => {
+      if(value.color_isPicked){
+        if(i != index) {
+          return {
+            ...e,
+            color_isPicked: false
+          }
+        }
+      }
       if (i == index) {
-        return value;
+        return {
+          ...value,
+          color_isPicked: true
+        };
       }
       return e;
     });
@@ -133,36 +163,38 @@ export default function ProductUploadForm(props: ProductUploadFormProps) {
   const [cateList, setCateList] = useState<ICategory[]>([]);
   const [colorList, setColorList] = useState<IColorProductVariation[]>([
     {
-        color_code: "#000",
-        color_price: 0,
-        color_name: "",
-        color_isPicked: true
-    }
+      color_code: "#000",
+      color_price: 0,
+      color_name: "",
+      color_isPicked: true,
+    },
   ]);
   const [sizeList, setSizeList] = useState<ISizeProductVarication[]>([
     {
-        size_name: "S",
-        size_price: 0,
-        size_isPicked: true
+      size_name: "S",
+      size_price: 0,
+      size_isPicked: true,
     },
     {
-        size_name: "M",
-        size_price: 0,
-        size_isPicked: true
+      size_name: "M",
+      size_price: 0,
+      size_isPicked: false,
     },
     {
-        size_name: "L",
-        size_price: 0,
-        size_isPicked: true
+      size_name: "L",
+      size_price: 0,
+      size_isPicked: false,
     },
     {
-        size_name: "XL",
-        size_price: 0,
-        size_isPicked: true
+      size_name: "XL",
+      size_price: 0,
+      size_isPicked: false,
     },
   ]);
-  const [sizeValidationMessage, setSizeValidationMessage] = useState<string>(null)
-  const [colorValidationMessage, setColorvalidationMessage] = useState<string>(null)
+  const [sizeValidationMessage, setSizeValidationMessage] =
+    useState<string>(null);
+  const [colorValidationMessage, setColorvalidationMessage] =
+    useState<string>(null);
   const form = useForm<z.infer<typeof schema>>({
     resolver: zodResolver(schema),
     defaultValues: {
@@ -172,37 +204,48 @@ export default function ProductUploadForm(props: ProductUploadFormProps) {
   //TODO: return kiểu IProduct.
   function parseToIProduct(data: z.infer<typeof schema>): IProduct {
     const tmpData = {
-        ...data,
-        product_sizes: sizeList,
-        product_colors: colorList,
-        isDraft: true,
-        isPublished: false
+      ...data,
+      product_sizes: sizeList,
+      product_colors: colorList,
+      isDraft: true,
+      isPublished: false,
     };
-    return tmpData
-
+    return tmpData;
   }
   function validateColor(): boolean {
-    const requiredFieldsFilled = colorList.filter(e => e.color_code == "" || e.color_name == "" || e.color_price < 0).length == 0
-    console.error(colorList.filter(e => e.color_code == "" || e.color_name == "" || e.color_price < 0))
+    const requiredFieldsFilled =
+      colorList.filter(
+        (e) => e.color_code == "" || e.color_name == "" || e.color_price < 0
+      ).length == 0;
+    console.error(
+      colorList.filter(
+        (e) => e.color_code == "" || e.color_name == "" || e.color_price < 0
+      )
+    );
     return requiredFieldsFilled;
   }
   function validateSize(): boolean {
-    const requiredFieldsFilled = sizeList.filter(e => e.size_name == "" || e.size_price < 0).length == 0
+    const requiredFieldsFilled =
+      sizeList.filter((e) => e.size_name == "" || e.size_price < 0).length == 0;
     return requiredFieldsFilled;
   }
   async function onSubmit(data: z.infer<typeof schema>) {
-    if(!validateColor() && (colorList.length > 0 || sizeList.length > 0)){
-        setColorvalidationMessage("Vui lòng nhập đầy đủ các trường bắt buộc của màu sắc")
-        if(!validateSize() && sizeList.length > 0) {
-            setSizeValidationMessage("Vui lòng nhập đẩy đủ các trường bắt buộc của kích cỡ")
-        }
-        return;
+    if (!validateColor() && (colorList.length > 0 || sizeList.length > 0)) {
+      setColorvalidationMessage(
+        "Vui lòng nhập đầy đủ các trường bắt buộc của màu sắc"
+      );
+      if (!validateSize() && sizeList.length > 0) {
+        setSizeValidationMessage(
+          "Vui lòng nhập đẩy đủ các trường bắt buộc của kích cỡ"
+        );
+      }
+      return;
     }
-    const tmpData = parseToIProduct(data)
-    console.log(tmpData)
-    setColorvalidationMessage(null)
-    setSizeValidationMessage(null)
-    props.onSubmit(tmpData)
+    const tmpData = parseToIProduct(data);
+    console.log(tmpData);
+    setColorvalidationMessage(null);
+    setSizeValidationMessage(null);
+    props.onSubmit(tmpData);
   }
   return (
     <Form {...form}>
@@ -260,6 +303,21 @@ export default function ProductUploadForm(props: ProductUploadFormProps) {
               <FormItem>
                 <Label>
                   Giá sản phẩm (giá sàn) <span className="text-red-400">*</span>
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger>
+                        <CircleHelp width={16} height={16} />
+                      </TooltipTrigger>
+                      <TooltipContent className="bg-background shadow-lg max-w-64">
+                        <b>Giá sàn sản phẩm</b>
+                        <p>
+                          Đây là mức giá ban đầu của sản phẩm. Khi bạn thêm các
+                          kích cỡ và màu sắc, thì giá sẽ tăng theo giá của kích
+                          cỡ và màu sắc mà người dùng chọn.
+                        </p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
                 </Label>
                 <FormControl>
                   <Input {...field} placeholder="Bắt buộc" />
@@ -277,7 +335,11 @@ export default function ProductUploadForm(props: ProductUploadFormProps) {
                   Loại sản phẩm <span className="text-red-400">*</span>
                 </Label>
                 <FormControl>
-                  <Select {...field} onValueChange={(e) => field.onChange(e)} disabled={cateList.length == 0}>
+                  <Select
+                    {...field}
+                    onValueChange={(e) => field.onChange(e)}
+                    disabled={cateList.length == 0}
+                  >
                     <SelectTrigger>
                       <SelectValue placeholder="Chọn danh mục của sản phẩm..."></SelectValue>
                       <SelectContent>
@@ -367,10 +429,14 @@ export default function ProductUploadForm(props: ProductUploadFormProps) {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="w-[100px]">Màu sắc <span className="text-red-400">*</span></TableHead>
-                    <TableHead>Tên màu <span className="text-red-400">*</span></TableHead>
+                    <TableHead className="w-[100px]">
+                      Màu sắc <span className="text-red-400">*</span>
+                    </TableHead>
+                    <TableHead>
+                      Tên màu <span className="text-red-400">*</span>
+                    </TableHead>
                     <TableHead>Giá màu</TableHead>
-                    <TableHead>Hiển thị</TableHead>
+                    <TableHead>Mặc định</TableHead>
                     <TableHead>H. Động</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -474,9 +540,11 @@ export default function ProductUploadForm(props: ProductUploadFormProps) {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Tên kích cỡ <span className="text-red-400">*</span></TableHead>
+                    <TableHead>
+                      Tên kích cỡ <span className="text-red-400">*</span>
+                    </TableHead>
                     <TableHead>Giá kích cỡ</TableHead>
-                    <TableHead>Hiển thị</TableHead>
+                    <TableHead>Mặc định</TableHead>
                     <TableHead>H. Động</TableHead>
                   </TableRow>
                 </TableHeader>

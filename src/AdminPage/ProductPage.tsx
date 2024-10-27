@@ -20,12 +20,15 @@ import {
   CircleX,
   Eye,
   EyeOff,
+  Filter,
+  Image,
   Info,
   Loader,
   Loader2,
   MoreHorizontalIcon,
   Pencil,
   Plus,
+  Search,
   Trash2,
   TriangleAlert,
   Upload,
@@ -59,12 +62,16 @@ import {
 import { AccordionContent } from "@radix-ui/react-accordion";
 import errorIndexes from "@/utils/errorKey";
 import ProductUploadForm from "@/components/widget/productUploadForm";
-import { Tooltip, TooltipContent, TooltipProvider } from "@/components/ui/tooltip";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+} from "@/components/ui/tooltip";
 import { TooltipTrigger } from "@radix-ui/react-tooltip";
 import { useToast } from "@/hooks/use-toast";
 
 const ProductPage: React.FC = () => {
-  const {toast} = useToast()
+  const { toast } = useToast();
   const [product, setProduct] = React.useState([]);
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState<AxiosError>(null);
@@ -88,19 +95,6 @@ const ProductPage: React.FC = () => {
   const [editingProduct, setEditingProduct] = React.useState<IProduct | null>(
     null
   );
-  const [newProduct, setNewProduct] = React.useState<IProduct>({
-    product_name: "",
-    product_thumb: "",
-    product_description: "",
-    product_price: 0,
-    product_slug: "",
-    product_rating: 0,
-    isDraft: true,
-    isPublished: false,
-    product_category: "",
-    product_color: [],
-    product_size: [],
-  });
   const [isAddProductOpen, setIsAddProductOpen] = React.useState(false);
 
   const handleEdit = (product: IProduct) => {
@@ -122,23 +116,26 @@ const ProductPage: React.FC = () => {
   const handleRemove = async (productSlug: string) => {
     setProcess({
       message: "Đang xoá sản phẩm",
-      isRunning: true
-    })
+      isRunning: true,
+    });
     const data = await deleteProduct(productSlug);
     if (data instanceof AxiosError) {
       console.log(data);
       setError(data);
       setProcess({
         message: "Đang xoá sản phẩm",
-        isRunning: false
-      })
+        isRunning: false,
+      });
       return;
     }
-    toast({title: "Xoá sản phẩm thành công", description: `Bạn đã xoá sản phẩm ${productSlug} thành công.`})
+    toast({
+      title: "Xoá sản phẩm thành công",
+      description: `Bạn đã xoá sản phẩm ${productSlug} thành công.`,
+    });
     setProcess({
       message: "Đang xoá sản phẩm",
-      isRunning: false
-    })
+      isRunning: false,
+    });
     setProducts(products.filter((p) => p._id !== productSlug));
   };
 
@@ -153,101 +150,6 @@ const ProductPage: React.FC = () => {
     );
   };
 
-  const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
-    isNewProduct: boolean = false
-  ) => {
-    const { name, value } = e.target;
-    if (isNewProduct) {
-      setNewProduct((prev) => ({
-        ...prev,
-        [name]:
-          name === "product_price" || name === "product_rating"
-            ? parseFloat(value)
-            : value,
-      }));
-    } else if (editingProduct) {
-      setEditingProduct((prev) => ({
-        ...prev,
-        [name]:
-          name === "product_price" || name === "product_rating"
-            ? parseFloat(value)
-            : value,
-      }));
-    }
-  };
-
-  const handleAddProduct = () => {
-    const productSlug =
-      newProduct.product_name?.toLowerCase().replace(/ /g, "-") || "";
-    const productToAdd = {
-      ...newProduct,
-      product_slug: productSlug,
-    };
-    setProducts((prev) => [...prev, productToAdd]);
-    setNewProduct({
-      product_name: "",
-      product_thumb: "",
-      product_description: "",
-      product_price: 0,
-      product_slug: "",
-      product_rating: 0,
-      isDraft: true,
-      isPublished: false,
-      product_category: "",
-      product_color: [],
-      product_size: [],
-    });
-    setIsAddProductOpen(false);
-  };
-
-  const handleColorChange = (
-    index: number,
-    field: keyof IColorProductVariation,
-    value: string | number | boolean
-  ) => {
-    setNewProduct((prev) => ({
-      ...prev,
-      product_color:
-        prev.product_color?.map((color, i) =>
-          i === index ? { ...color, [field]: value } : color
-        ) || [],
-    }));
-  };
-
-  const handleSizeChange = (
-    index: number,
-    field: keyof ISizeProductVarication,
-    value: string | number | boolean
-  ) => {
-    setNewProduct((prev) => ({
-      ...prev,
-      product_size:
-        prev.product_size?.map((size, i) =>
-          i === index ? { ...size, [field]: value } : size
-        ) || [],
-    }));
-  };
-
-  const handleAddColor = () => {
-    setNewProduct((prev) => ({
-      ...prev,
-      product_color: [
-        ...(prev.product_color || []),
-        { color_code: "", color_price: 0, color_isPicked: false },
-      ],
-    }));
-  };
-
-  const handleAddSize = () => {
-    setNewProduct((prev) => ({
-      ...prev,
-      product_size: [
-        ...(prev.product_size || []),
-        { size_name: "", size_price: 0, size_isPicked: false },
-      ],
-    }));
-  };
   const handleImageUploadEdit = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -313,15 +215,18 @@ const ProductPage: React.FC = () => {
       });
       return;
     }
-    setIsAddProductOpen(false)
+    setIsAddProductOpen(false);
     setProducts([
       ...products,
       {
         ...rest,
-        product_thumb: URL.createObjectURL(product_thumb as File)
-      }
-    ])
-    toast({title: 'Đăng tải sản phẩm thành công', description: `Bạn đã đăng tải sản phẩm ${rest.product_name} thành công!`})
+        product_thumb: URL.createObjectURL(product_thumb as File),
+      },
+    ]);
+    toast({
+      title: "Đăng tải sản phẩm thành công",
+      description: `Bạn đã đăng tải sản phẩm ${rest.product_name} thành công!`,
+    });
     setProcess({
       message: "Không có quá trình nào",
       isRunning: false,
@@ -330,9 +235,19 @@ const ProductPage: React.FC = () => {
   return (
     <div className="space-y-6 w-full p-8 h-screen">
       <div className="flex justify-between items-center">
-        <h2 className="text-3xl font-bold tracking-tight">
-          Danh sách sản phẩm
-        </h2>
+        <div className="flex gap-4 items-center">
+          <h2 className="text-3xl font-bold tracking-tight">
+            Danh sách sản phẩm
+          </h2>
+          <div className="flex gap-2 items-center">
+            <Search width={16} height={16} />
+            <Input placeholder="Tìm kiếm sản phẩm" />
+          </div>
+          <Button className="flex gap-2" variant="secondary">
+            <Filter width={16} height={16} />
+          </Button>
+        </div>
+
         <Dialog open={process.isRunning}>
           <DialogContent className="max-w-max">
             <div className="flex flex-col gap-2 justify-center items-center">
@@ -367,14 +282,12 @@ const ProductPage: React.FC = () => {
                   : "text-primary"
               }}`}
             >
-              {
-                error &&
-                error.response.data &&
-                //@ts-ignore
-                errorIndexes[error.response.data.message] == null ? (
-                  <CircleX />
-                ) : null
-              }
+              {error &&
+              error.response.data &&
+              //@ts-ignore
+              errorIndexes[error.response.data.message] == null ? (
+                <CircleX />
+              ) : null}
               Lỗi
             </DialogTitle>
             <p className="font-bold">
@@ -443,11 +356,15 @@ const ProductPage: React.FC = () => {
                 {products.map((product) => (
                   <TableRow key={product.product_slug}>
                     <TableCell>
-                      <img
-                        className="w-20 h-20 rounded-md object-contain"
-                        src={product.product_thumb}
-                        alt=""
-                      />
+                      {!product.product_thumb || product.product_thumb == "" ? (
+                        <Image width={80} height={80} />
+                      ) : (
+                        <img
+                          className="w-20 h-20 rounded-md object-contain"
+                          src={product.product_thumb}
+                          alt=""
+                        />
+                      )}
                     </TableCell>
                     <TableCell>{product.product_name}</TableCell>
                     <TableCell>{convertMoney(product.product_price)}</TableCell>
@@ -463,7 +380,12 @@ const ProductPage: React.FC = () => {
                           </TooltipTrigger>
                           <TooltipContent className="max-w-44 bg-background shadow-lg">
                             <b>Chế độ hiển thị</b>
-                            <p>Đây là trạng thái hiển thị sản phẩm của bạn trên trang của khách hàng, với trạng thái "Hiển thị" là sản phẩm đang được hiển thị trên cửa hàng và khách hàng có thể mua, "Đã ẩn" là ngược lại.</p>
+                            <p>
+                              Đây là trạng thái hiển thị sản phẩm của bạn trên
+                              trang của khách hàng, với trạng thái "Hiển thị" là
+                              sản phẩm đang được hiển thị trên cửa hàng và khách
+                              hàng có thể mua, "Đã ẩn" là ngược lại.
+                            </p>
                           </TooltipContent>
                         </Tooltip>
                       </TooltipProvider>
@@ -559,87 +481,7 @@ const ProductPage: React.FC = () => {
             <DialogTitle>Chỉnh sửa</DialogTitle>
           </DialogHeader>
           <DialogContent className="min-w-[75%]">
-            <form className="space-y-4">
-              <div>
-                <Label htmlFor="product_name">Tên sản phẩm</Label>
-                <Input
-                  id="product_name"
-                  name="product_name"
-                  value={editingProduct.product_name}
-                  onChange={handleInputChange}
-                />
-              </div>
-              <div>
-                <Label htmlFor="product_description">Mô tả sản phẩm</Label>
-                <Textarea
-                  id="product_description"
-                  name="product_description"
-                  value={editingProduct.product_description}
-                  onChange={handleInputChange}
-                />
-              </div>
-              <div>
-                <Label htmlFor="product_price">Giá sản phẩm</Label>
-                <Input
-                  id="product_price"
-                  name="product_price"
-                  type="number"
-                  value={editingProduct.product_price}
-                  onChange={handleInputChange}
-                />
-              </div>
-              <div>
-                <Label htmlFor="product_category">Loại sản phẩm</Label>
-                <Input
-                  id="product_category"
-                  name="product_category"
-                  value={editingProduct.product_category}
-                  onChange={handleInputChange}
-                />
-              </div>
-              <div className="flex items-center space-x-2">
-                <Switch
-                  id="isPublished"
-                  checked={editingProduct.isPublished}
-                  onCheckedChange={(checked) =>
-                    setEditingProduct({
-                      ...editingProduct,
-                      isPublished: checked,
-                      isDraft: !checked,
-                    })
-                  }
-                />
-                <Label htmlFor="isPublished">Published</Label>
-              </div>
-              <div className="grid grid-cols-1 items-center gap-4">
-                <Label htmlFor="new-product-image" className="text-left">
-                  Hình ảnh
-                </Label>
-                <div className="flex items-center gap-2">
-                  <Input
-                    id="new-product-image"
-                    type="file"
-                    accept="image/*"
-                    onChange={handleImageUploadEdit}
-                    className="hidden"
-                  />
-                  <Label htmlFor="new-product-image" className="cursor-pointer">
-                    <div className="flex items-center gap-2 px-4 py-2 bg-secondary text-secondary-foreground hover:bg-secondary/80 rounded-md">
-                      <Upload className="h-4 w-4" />
-                      Đăng tải hình ảnh
-                    </div>
-                  </Label>
-                  {editingProduct.product_thumb && (
-                    <img
-                      src={editingProduct.product_thumb as string}
-                      alt="Product"
-                      className="w-16 h-16 object-cover rounded"
-                    />
-                  )}
-                </div>
-              </div>
-              <Button onClick={handleSave}>Lưu sản phẩm</Button>
-            </form>
+            <h1>Coming soon...</h1>
           </DialogContent>
         </Dialog>
       )}
