@@ -1,5 +1,6 @@
 import { Axios, AxiosError } from "axios";
 import API from "../api";
+import { IUser } from "@/types/user.type";
 
 const api = new API({ headerType: "json" });
 async function login(data) {}
@@ -34,6 +35,16 @@ export class UnauthenticatedError extends Error {
         this.name = "USER_UNAUTHENTICATED";
         this.code = code
     }
+}
+export async function getUsers() {
+  try {
+    const res = await api.get<IUser>("access/getAllUser");
+    return res;
+  } catch (e) {
+    if(e instanceof AxiosError){
+      return e
+    }
+  }
 }
 export async function getLoggedInUser() {
     const userStr = localStorage.getItem("user")

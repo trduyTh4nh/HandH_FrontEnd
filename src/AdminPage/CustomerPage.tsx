@@ -101,7 +101,7 @@ const mockActivityHistory = [
 ];
 
 const CustomerPage: React.FC = () => {
-  const [users, setUsers] = React.useState<IUser[]>(mockUsers);
+  const [users, setUsers] = React.useState<IUser[]>([]);
   const [selectedUser, setSelectedUser] = React.useState<IUser | null>(null);
   const [searchTerm, setSearchTerm] = React.useState("");
 
