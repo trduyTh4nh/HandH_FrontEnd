@@ -64,19 +64,6 @@ export async function getLoggedInUser() {
     throw error;
   }
 }
-export async function getLoggedInUser(id) {
-    try {
-        const res = await api.get(`access/getUser/${id}`)
-        //@ts-ignore
-        return res.metadata
-    } catch (error) {
-        if (error instanceof AxiosError) {
-            console.warn(error)
-            throw error
-        }
-        throw error
-    }
-}
 export async function changePassword(body) {
     try {
         const res: any = await api.put("access/changePassword", body);
@@ -88,6 +75,16 @@ export async function changePassword(body) {
         }
         throw error;
     }
+}
+export async function getAllUsers() {
+  try {
+    const res = await api.get<IUser>("access/getAllUser");
+    return res;
+  } catch (e) {
+    if(e instanceof AxiosError){
+      return e
+    }
+  }
 }
 export async function changeInformation(_id) {
     try {

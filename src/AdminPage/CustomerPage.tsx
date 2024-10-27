@@ -1,5 +1,5 @@
 import { IUser } from "@/types/user.type";
-import React from "react";
+import React, { useEffect } from "react";
 import {
   IColorProductVariation,
   IProduct,
@@ -45,6 +45,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { getAllUsers } from "@/apis/user/user-repo";
 const mockUsers: IUser[] = [
   {
     _id: "1",
@@ -104,7 +105,6 @@ const CustomerPage: React.FC = () => {
   const [users, setUsers] = React.useState<IUser[]>([]);
   const [selectedUser, setSelectedUser] = React.useState<IUser | null>(null);
   const [searchTerm, setSearchTerm] = React.useState("");
-
   const handleLockUnlock = (userId: string) => {
     setUsers(
       users.map((user) =>
@@ -114,7 +114,18 @@ const CustomerPage: React.FC = () => {
       )
     );
   };
-
+  const getUsers = async () => {
+    const res = await getAllUsers();
+    if (res instanceof Error) {
+      console.error(res);
+      return;
+    }
+    //@ts-ignore
+    setUsers(res.metadata);
+  }
+  useEffect(() => {
+    getUsers();
+  }, [])
   const handleRoleChange = (userId: string, newRole: string) => {
     setUsers(
       users.map((user) =>
