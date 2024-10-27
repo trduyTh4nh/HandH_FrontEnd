@@ -14,6 +14,7 @@ export interface ISizeProductVarication {
 }
 
 export interface IProduct {
+    _id?: string,
     product_name?: string,
     product_thumb?: string | File,
     product_description?: string,

@@ -53,7 +53,7 @@ import {
 const schema = z.object({
   product_name: z.string({ required_error: "Vui lòng nhập sản phẩm" }),
   product_description: z
-    .string()
+    .string({required_error: "Mô tả sản phẩm không được để trống"})
     .max(1024, { message: "Mô tả sản phẩm không được lớn hơn 1024 ký tự" }),
   product_thumb: z
     .instanceof(File, { message: "Hình ảnh không được để trống" })
@@ -83,7 +83,7 @@ export default function ProductUploadForm(props: ProductUploadFormProps) {
       {
         color_code: "#000",
         color_name: "Đen",
-        color_isPicked: true,
+        color_isPicked: false,
         color_price: 0,
       },
     ]);
@@ -94,14 +94,25 @@ export default function ProductUploadForm(props: ProductUploadFormProps) {
       {
         size_name: "",
         size_price: 0,
-        size_isPicked: true,
+        size_isPicked: false,
       },
     ]);
   }
   function setSizeProperty(value: ISizeProductVarication, index: number) {
     const arr = sizeList.map((e, i) => {
+      if(value.size_isPicked){
+        if(i != index) {
+          return {
+            ...e,
+            size_isPicked: false
+          }
+        }
+      }
       if (i == index) {
-        return value;
+        return {
+          ...value,
+          size_isPicked: true
+        };
       }
       return e;
     });
@@ -115,8 +126,19 @@ export default function ProductUploadForm(props: ProductUploadFormProps) {
   }
   function setColorProperty(value: IColorProductVariation, index: number) {
     const arr = colorList.map((e, i) => {
+      if(value.color_isPicked){
+        if(i != index) {
+          return {
+            ...e,
+            color_isPicked: false
+          }
+        }
+      }
       if (i == index) {
-        return value;
+        return {
+          ...value,
+          color_isPicked: true
+        };
       }
       return e;
     });
@@ -156,17 +178,17 @@ export default function ProductUploadForm(props: ProductUploadFormProps) {
     {
       size_name: "M",
       size_price: 0,
-      size_isPicked: true,
+      size_isPicked: false,
     },
     {
       size_name: "L",
       size_price: 0,
-      size_isPicked: true,
+      size_isPicked: false,
     },
     {
       size_name: "XL",
       size_price: 0,
-      size_isPicked: true,
+      size_isPicked: false,
     },
   ]);
   const [sizeValidationMessage, setSizeValidationMessage] =
@@ -414,7 +436,7 @@ export default function ProductUploadForm(props: ProductUploadFormProps) {
                       Tên màu <span className="text-red-400">*</span>
                     </TableHead>
                     <TableHead>Giá màu</TableHead>
-                    <TableHead>Hiển thị</TableHead>
+                    <TableHead>Mặc định</TableHead>
                     <TableHead>H. Động</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -522,7 +544,7 @@ export default function ProductUploadForm(props: ProductUploadFormProps) {
                       Tên kích cỡ <span className="text-red-400">*</span>
                     </TableHead>
                     <TableHead>Giá kích cỡ</TableHead>
-                    <TableHead>Hiển thị</TableHead>
+                    <TableHead>Mặc định</TableHead>
                     <TableHead>H. Động</TableHead>
                   </TableRow>
                 </TableHeader>

@@ -50,14 +50,14 @@ const Home: React.FC = () => {
   const [bannerList, setBannerList] = useState<IBanner[]>(null);
   async function getBanners() {
     try {
-      const res = await getAllBanner()
-      console.log(res)
-      setBannerList((res.metadata as IBanner[]).filter((e) => {
-        return e.isActive
-      }))
-    } catch (e) {
-
-    }
+      const res = await getAllBanner();
+      console.log(res);
+      setBannerList(
+        (res.metadata as IBanner[]).filter((e) => {
+          return e.isActive;
+        })
+      );
+    } catch (e) {}
   }
   async function getAllCate() {
     try {
@@ -67,16 +67,15 @@ const Home: React.FC = () => {
   }
   async function getLatestProduct() {
     try {
-      const res = await getNewestProduct(8)
-      console.log(res.metadata as IProduct[])
-      setProdList(res.metadata)
-    } catch (e) {
-    }
+      const res = await getNewestProduct(8);
+      console.log(res.metadata as IProduct[]);
+      setProdList(res.metadata);
+    } catch (e) {}
   }
   useEffect(() => {
     getAllCate();
     getLatestProduct();
-    getBanners()
+    getBanners();
   }, []);
   return (
     <>
@@ -84,18 +83,19 @@ const Home: React.FC = () => {
         <title>Trang chủ - Hồng Đức Store</title>
       </Helmet>
       <div id="" className="home-page flex flex-col gap-8 w-full">
-        {
-          bannerList ? 
+        {bannerList ? (
           <HomeBanner
             title={bannerList[0].title}
             description={bannerList[0].content}
             image={bannerList[0].url}
             link=""
             button=""
-          /> : <AspectRatio ratio={3} className="w-full">
-            <Skeleton className="w-full h-full"/>
+          />
+        ) : (
+          <AspectRatio ratio={3} className="w-full">
+            <Skeleton className="w-full h-full" />
           </AspectRatio>
-        }
+        )}
         <div className="flex flex-col gap-8 px-20">
           <h2 className="text-center">Tại sao chọn chúng tôi?</h2>
           <div className="flex w-full gap-20">
@@ -119,29 +119,26 @@ const Home: React.FC = () => {
                   <HomeCategory
                     className="flex-1"
                     name={category.category_name}
-                    image={category.cagtegory_image}
+                    image={category.category_image}
                   />
                 ))
-              : [1, 2, 3, 4].map((e) => 
-                <AspectRatio ratio={2/3}>
-                  <Skeleton className="w-full h-full" />
-                </AspectRatio>
-              )}
+              : [1, 2, 3, 4].map((e) => (
+                  <AspectRatio ratio={2 / 3}>
+                    <Skeleton className="w-full h-full" />
+                  </AspectRatio>
+                ))}
           </div>
           <h2 className="text-center">Hàng mới</h2>
           <div className="home-new-list-product flex flex-wrap">
-            {prodList ? (
-              prodList.map((product: IProduct, index: number) => (
-                <div className="wrap-product">
-                  <ProductItem
-                    key={index}
-                    {...product}
-                  />
-                </div>
-              ))
-            ) : (
-              <p>Không có sản phẩm nào để hiển thị</p>
-            )}
+            {prodList
+              ? prodList.map((product: IProduct, index: number) => (
+                  <div className="wrap-product">
+                    <ProductItem key={index} {...product} />
+                  </div>
+                ))
+              : [1, 2, 3, 4].map((e) => {
+                  return <Skeleton className="w-[24%] h-36" />;
+                })}
           </div>
           <div className="flex gap-4 w-full justify-center">
             <Link to={"/shop"}>
@@ -195,11 +192,11 @@ const Home: React.FC = () => {
           </div>
           <h2 className="text-center">Sự kiện nổi bật</h2>
           <div className="banner-event p-8 w-full flex justify-center">
-            {
-              bannerList ? 
+            {bannerList ? (
               <CarouselBanner banners={bannerList}></CarouselBanner>
-              : <Skeleton/>
-            }
+            ) : (
+              <Skeleton />
+            )}
           </div>
           <h2 className="text-center">Liên hệ với chúng tôi</h2>
           <div className="flex gap-8 w-full justify-center">
