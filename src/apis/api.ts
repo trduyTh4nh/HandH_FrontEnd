@@ -78,8 +78,10 @@ class API {
     return response.data;
   }
 
-  public async put<T>(url: string): Promise<T> {
-    const response = await this.axiosInstance.put<T>(url);
+  public async put<T>(url: string, data?: object, headersConfig?: { "Content-Type"?: string } | any): Promise<T> {
+    const response = await this.axiosInstance.put<T>(url, data, {
+      headers: headersConfig
+    });
     return response.data;
   }
 }
