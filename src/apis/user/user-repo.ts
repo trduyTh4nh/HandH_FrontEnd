@@ -2,7 +2,7 @@ import { Axios, AxiosError } from "axios";
 import API from "../api";
 
 const api = new API({ headerType: "json" });
-async function login(data) {}
+async function login(data) { }
 export async function logout() {
     try {
         await api.post("access/logout")
@@ -17,10 +17,30 @@ export async function getLoggedInUser(id) {
         //@ts-ignore
         return res.metadata
     } catch (error) {
-        if(error instanceof AxiosError){
+        if (error instanceof AxiosError) {
             console.warn(error)
             throw error
         }
         throw error
+    }
+}
+export async function changePassword(body) {
+    try {
+        const res: any = await api.put("access/changePassword", body);
+        return res.metadata;
+    } catch (error) {
+        if (error instanceof AxiosError) {
+            console.warn(error);
+            throw error;
+        }
+        throw error;
+    }
+}
+export async function changeInformation(_id) {
+    try {
+        const res: any = await api.put(`access/updateInformationUser/${_id}`);
+        return res.metadata;
+    } catch (err) {
+        console.error(err);
     }
 }
