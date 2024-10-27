@@ -4,11 +4,39 @@ import { IProduct } from "@/types/product.type";
 
 const api = new API({ headerType: "json" });
 const formApi = new API({headerType: "formdata"})
+export async function getProductsByCate(cate: string) {
+  console.log(cate)
+  try {
+    const response = await api.get(`product/getProductCate/${cate}`)
+    return response;
+  } catch (error) {
+    const e = error as AxiosError;
+    return e;
+  }
+}
+export async function getProductById(id: string) {
+  try {
+    const response = await api.get(`product/getAProduct/${id}`);
+    console.log(response)
+    return response;
+  } catch (error) {
+    const e = error as AxiosError;
+    console.log(e)
+    return e;
+  }
+}
 export async function getNewestProduct(n: number) {
   try {
-
+    const response = await api.get<any>(`product/getLastestProduct/${n}`)
+    return response
   } catch (e) {
-    const error = e as AxiosError
+    if(e instanceof AxiosError) {
+      const error = e as AxiosError
+      console.log(error)
+      return error
+    }
+    console.log(e)
+    throw e
   }
 }
 export async function getProduct() {

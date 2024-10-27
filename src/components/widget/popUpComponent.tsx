@@ -50,6 +50,8 @@ function PopupComponent({ handleChange, switchToRegister }: any) {
       //@ts-ignore
       localStorage.setItem("token", response.metadata.tokens.accessToken);
       //@ts-ignore
+      localStorage.setItem("refreshToken", response.metadata.tokens.refreshToken);
+      //@ts-ignore
       localStorage.setItem("user", JSON.stringify(response.metadata.user));
       //@ts-ignore
       toast({

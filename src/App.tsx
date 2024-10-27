@@ -126,7 +126,7 @@ const AdminRoute: React.FC = () => {
 
 const UserRoute: React.FC = () => {
   return (
-    <div className="flex-grow flex mt-[10.2rem]">
+    <div className="flex-grow flex mt-[5rem] md:mt-[10.2rem]">
       <Navbar />
       <Toaster />
       <Routes>
@@ -150,7 +150,7 @@ const UserRoute: React.FC = () => {
           </Route>
           <Route path="favoriteProduct" element={<FavoriteProduct />} />
         </Route>
-        <Route path="/product/:id/:name" element={<Product />} />
+        <Route path="/product/:id" element={<Product />} />
         <Route path="/cart" element={<CartPage />} />
         <Route path="/payment" element={<PurchaseLayout />}>
           <Route path="/payment/" element={<PurchaseReview />} />

@@ -35,6 +35,7 @@ import {
 import {
   ChevronRight,
   Heart,
+  Loader,
   LogOut,
   ReceiptText,
   Shield,
@@ -65,6 +66,10 @@ const Navbar: React.FC = () => {
   const [admin, setAdmin] = React.useState(false);
   const [message, setMessage] = React.useState(false);
   const [user, setUser] = React.useState(null);
+  const [task, setTask] = React.useState({
+    message: null,
+    shown: false,
+  });
   useEffect(() => {
     const lsUser = localStorage.getItem("user");
     const user = JSON.parse(lsUser as string);
@@ -80,9 +85,13 @@ const Navbar: React.FC = () => {
     setLogin(false);
   }
   async function logOut() {
+    setTask({
+      message: "Đang đăng xuất...",
+      shown: true,
+    });
     const res = await logout();
     if (res instanceof AxiosError) {
-      console.log(res)
+      console.log(res);
       //@ts-ignore
       if (res.response.data.message != "invalid signature") {
         console.log(res);
@@ -90,12 +99,21 @@ const Navbar: React.FC = () => {
           title: `Lỗi ${res.code}`,
           description: `Lỗi hệ thống: ${res.message}`,
         });
+        setTask({
+          message: "Đang đăng xuất...",
+          shown: false,
+        });
         return;
       }
     }
     localStorage.removeItem("token");
     localStorage.removeItem("user");
     setUser(null);
+    window.location.reload();
+    setTask({
+      message: "Đang đăng xuất...",
+      shown: false,
+    });
   }
   function handleChangeRe() {
     setRegister(false);
@@ -125,9 +143,12 @@ const Navbar: React.FC = () => {
       id="nav-main"
       className=" bg-white fixed w-full top-0 z-30 rounded-b-3xl shadow-md"
     >
-      <div className="flex mx-auto px-20 py-4 justify-between items-center">
-        <div className="flex justify-start gap-4">
-          <div className="flex-shrink-0 flex items-center">
+      <div className="flex mx-auto px-10 md:px-20 py-4 justify-between items-center">
+        <div className="flex justify-start gap-4 items-center">
+          <div className="flex-shrink-0 flex items-center gap-2">
+            <Button variant="ghost" className="block md:hidden bg-transparent">
+              <Menu></Menu>
+            </Button>
             <NavLink to="/">
               <img
                 className="w-auto h-12"
@@ -161,7 +182,7 @@ const Navbar: React.FC = () => {
         </div>
         <HeaderComponentSearch></HeaderComponentSearch>
       </div>
-      <div className="flex px-0 py-0 pb-3  items-center flex-col ">
+      <div className="hidden md:flex px-0 py-0 pb-3  items-center flex-col ">
         {/* <HeaderBottom></HeaderBottom> */}
         <div className="flex items-center justify-between w-full px-20 pb-4 rounded-b-2xl">
           {!showCate ? (
@@ -205,7 +226,12 @@ const Navbar: React.FC = () => {
           )}
 
           <div className="flex gap-6">
-            {user ? (
+            {task.shown ? (
+              <div className="flex gap-2 items-center">
+                <Loader className="animate-spin" />
+                <p>{task.message}</p>
+              </div>
+            ) : user ? (
               <DropdownMenu>
                 <DropdownMenuTrigger>
                   <div className="cursor-pointer text-title-nav hover:underline hover:text-black hover:bg-gray-100 transition-all duration-800 px-3 py-2 rounded-md font-medium flex justify-center items-center">
@@ -315,8 +341,8 @@ const Navbar: React.FC = () => {
                     <DialogContent className="min-w-[45%]">
                       <PopupComponent
                         handleChange={(e) => {
-                          console.log(e);
                           handleChange(e);
+                          window.location.reload();
                         }}
                         switchToRegister={switchToRegister}
                       ></PopupComponent>

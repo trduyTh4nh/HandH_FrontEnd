@@ -271,38 +271,8 @@ const CustomerPage: React.FC = () => {
                           )}
                         </DialogContent>
                       </Dialog>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handleLockUnlock(user._id!)}
-                      >
-                        {user.role === "locked" ? (
-                          <>
-                            <Unlock className="h-4 w-4 mr-1" />
-                            Bỏ chặn
-                          </>
-                        ) : (
-                          <>
-                            <Lock className="h-4 w-4 mr-1" />
-                            CHặn
-                          </>
-                        )}
-                      </Button>
-                      <Select
-                        value={user.role}
-                        onValueChange={(value) =>
-                          handleRoleChange(user._id!, value)
-                        }
-                      >
-                        <SelectTrigger className="w-[130px]">
-                          <SelectValue placeholder="Select role" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="customer">Khách hàng</SelectItem>
-                          <SelectItem value="admin">Quản trị viên</SelectItem>
-                          <SelectItem value="manager">Quản lý</SelectItem>
-                        </SelectContent>
-                      </Select>
+                      
+                      
                     </div>
                   </TableCell>
                 </TableRow>

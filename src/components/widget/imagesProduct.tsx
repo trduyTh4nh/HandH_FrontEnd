@@ -3,9 +3,9 @@ type PropImgs = {
 };
 export default function ImagesProduct({ imgList }: PropImgs) {
   return (
-    <div className="grid grid-cols-2 gap-4">
+    <div className="flex">
       {imgList.map((e) => (
-        <img alt={e.desc} src={e.img} className="flex-1 w-full" />
+        <img alt={e.desc} src={e.img} className="flex-1 w-full rounded-lg" />
       ))}
     </div>
   );

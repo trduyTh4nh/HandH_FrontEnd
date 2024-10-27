@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import "../../styles/shop.css";
 
 import ZoomInMapIcon from "@mui/icons-material/ZoomInMap";
@@ -14,6 +14,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger } from "../ui/select";
 import { SelectValue } from "@radix-ui/react-select";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
+import { getProduct } from "@/apis/products/product-repo";
 type PriceFilter = {
   id: number;
   price: number;
@@ -30,6 +31,12 @@ export type Size = {
 };
 
 const Shop: React.FC = () => {
+  async function getProducts() {
+    const products = await getProduct();
+    setMaximumPageCount(products.metadata.length);
+  }
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [maximumPageCount, setMaximumPageCount] = useState<number>(null);
   const [colors, setColors] = React.useState([
     {
       tooltip: "Xanh dương",
@@ -189,17 +196,25 @@ const Shop: React.FC = () => {
   const [pickerColor, setPickerColor] = React.useState<string>("");
   return (
     <>
-      <div className={`shop ${showNav ? "pl-20" : "pl-4"} transition-all pr-20 w-screen`}>
+      <div
+        className={`shop ${
+          showNav ? "pl-20" : "pl-4"
+        } transition-all pr-20 w-screen`}
+      >
         <div className="wrap-shop justify-between flex">
           <div
-            className={`shop-filter mt-2 mb-2 ${showNav ? "" : "flex-none w-16"} transition-all duration-300 top-16`}
+            className={`shop-filter mt-2 mb-2 ${
+              showNav ? "" : "flex-none w-16"
+            } transition-all duration-300 top-16 h-screen relative`}
             // style={{
             //     flex: showNav ? 1 : 0
             // }}
           >
-            <div className="shop-filter_wrap fixed z-10 flex top-100 flex-col w-[15%] gap-2 ">
+            <div className="shop-filter_wrap box-border fixed z-10 flex top-0 flex-col w-[15%] gap-2 h-full overflow-auto pt-[11.2rem] pb-4">
               <div
-                className={`filer-hide-btn h-full ${showNav ? "w-full" : "w-fit"}
+                className={`filer-hide-btn h-full ${
+                  showNav ? "w-full" : "w-fit"
+                }
                             gap-4 items-center 
                             flex hover:bg-gray-300 
                             px-3 py-2 cursor-pointer
@@ -207,7 +222,8 @@ const Shop: React.FC = () => {
                             rounded-md
                             duration-150
                             transition-all
-                            ease-in`}
+                            ease-in
+                            h-fit`}
                 onClick={handleShow}
               >
                 <div className="filter-icon-zoom">
@@ -217,13 +233,16 @@ const Shop: React.FC = () => {
                     <ZoomOutMapIcon></ZoomOutMapIcon>
                   )}
                 </div>
-                  {showNav ? <p>Ẩn</p> : null}
+                {showNav ? <p>Ẩn</p> : null}
               </div>
 
               {transition(
                 (styles, showNav) =>
                   showNav && (
-                    <animated.div style={styles} className="Sidebar">
+                    <animated.div
+                      style={styles}
+                      className="Sidebar"
+                    >
                       <div className="fliter-body bg-white flex flex-col gap-4 pr-4 border-r border-r-gray-300">
                         <div className="child-title text-[1.2rem] font-bold">
                           <p>Giá</p>
@@ -358,7 +377,7 @@ const Shop: React.FC = () => {
                           <p>Màu sắc</p>
                         </div>
 
-                        <div className="pick-color flex gap-4">
+                        <div className="pick-color flex gap-4 flex-wrap">
                           {colors.map((e: any) => (
                             <ColorChip
                               active={e.enabled}
