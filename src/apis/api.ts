@@ -84,6 +84,10 @@ class API {
     });
     return response.data;
   }
+  public async patch<T>(url: string, data?: object): Promise<T> {
+    const response = await this.axiosInstance.patch<T>(url, data);
+    return response.data;
+  }
 }
 
 export default API;

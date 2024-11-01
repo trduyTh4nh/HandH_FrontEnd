@@ -78,7 +78,7 @@ export async function changePassword(body) {
 }
 export async function getAllUsers() {
   try {
-    const res = await api.get<IUser>("access/getAllUser");
+    const res = await api.get("access/getAllUser");
     return res;
   } catch (e) {
     if(e instanceof AxiosError){

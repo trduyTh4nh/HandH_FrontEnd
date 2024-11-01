@@ -17,9 +17,16 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import {
+  Book,
+  BookDashed,
+  Circle,
+  CircleDashed,
   CircleX,
   Eye,
   EyeOff,
+  File,
+  FilePen,
+  FilePenLine,
   Filter,
   Image,
   Info,
@@ -69,6 +76,14 @@ import {
 } from "@/components/ui/tooltip";
 import { TooltipTrigger } from "@radix-ui/react-tooltip";
 import { useToast } from "@/hooks/use-toast";
+import { Badge } from "@/components/ui/badge";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { EyeClosedIcon } from "@radix-ui/react-icons";
 
 const ProductPage: React.FC = () => {
   const { toast } = useToast();
@@ -372,9 +387,18 @@ const ProductPage: React.FC = () => {
                     <TableCell>
                       <TooltipProvider>
                         <Tooltip>
-                          <TooltipTrigger>
-                            <div className="flex items-center gap-2">
-                              {!product.isDraft ? "Đang hiển thị" : "Đã ẩn"}
+                          <TooltipTrigger className="w-full">
+                            <div className="flex items-center gap-2 w-full">
+                              <div className="flex items-center gap-2 flex-1">
+                                <Badge variant="secondary">
+                                  {product.isDraft ? "Bản nháp" : "Bản chính"}
+                                </Badge>
+                                <Badge variant="secondary">
+                                  {product.isPublished
+                                    ? "Hiển thị"
+                                    : "Không hiển thị"}
+                                </Badge>
+                              </div>
                               <Info width={16} height={16} />
                             </div>
                           </TooltipTrigger>
@@ -397,23 +421,14 @@ const ProductPage: React.FC = () => {
                           size="sm"
                           onClick={() => handleEdit(product)}
                         >
-                          <Pencil className="h-4 w-4 mr-1" />
-                          Chỉnh sửa
+                          <Pencil className="h-4 w-4" />
                         </Button>
                         {/* New button  */}
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleEdit(product)}
-                        >
-                          <MoreHorizontalIcon className="h-4 w-4 mr-1" />
-                          Chi tiết
-                        </Button>
+
                         <Dialog>
                           <DialogTrigger asChild>
                             <Button variant="outline" size="sm">
-                              <Trash2 className="h-4 w-4 mr-1" />
-                              Xóa
+                              <Trash2 className="h-4 w-4" />
                             </Button>
                           </DialogTrigger>
                           <DialogContent>
@@ -442,25 +457,39 @@ const ProductPage: React.FC = () => {
                             </DialogFooter>
                           </DialogContent>
                         </Dialog>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() =>
-                            handleTogglePublish(product.product_slug!)
-                          }
-                        >
-                          {product.isPublished ? (
-                            <>
-                              <EyeOff className="h-4 w-4 mr-1" />
-                              Không hiển thị
-                            </>
-                          ) : (
-                            <>
-                              <Eye className="h-4 w-4 mr-1" />
-                              Hiển thị
-                            </>
-                          )}
-                        </Button>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger>
+                            <Button variant="outline" size="sm">
+                              <MoreHorizontalIcon className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent>
+                            <DropdownMenuItem disabled={product.isDraft} className="flex gap-2">
+                              {product.isPublished ? (
+                                <EyeOff width={16} height={16}></EyeOff>
+                              ) : (
+                                <Eye width={16} height={16}></Eye>
+                              )}
+                              <p>
+                                {product.isPublished
+                                  ? "Ẩn sản phẩm"
+                                  : "Hiển thị sản phẩm"}
+                              </p>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem className="flex gap-2">
+                              {product.isDraft ? (
+                                <File width={16} height={16}></File>
+                              ) : (
+                                <FilePen width={16} height={16}></FilePen>
+                              )}
+                              <p>
+                                {product.isDraft
+                                  ? "Chuyển thành bản chính"
+                                  : "Chuyển thành nháp"}
+                              </p>
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
                       </div>
                     </TableCell>
                   </TableRow>

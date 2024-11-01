@@ -1,6 +1,7 @@
 
 
 export interface IColorProductVariation {
+    color_image?: string | File,
     color_code: string,
     color_price: number,
     color_isPicked: boolean,
