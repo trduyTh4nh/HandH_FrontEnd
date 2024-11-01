@@ -2,6 +2,7 @@ import axios, {
   AxiosInstance,
   InternalAxiosRequestConfig,
   AxiosResponse,
+  AxiosError,
 } from "axios";
 
 class API {
@@ -27,8 +28,12 @@ class API {
     this.axiosInstance.interceptors.request.use(
       (config: InternalAxiosRequestConfig) => {
         const token = localStorage.getItem("token");
+        const rToken = localStorage.getItem("refreshToken");
         if (token) {
           config.headers.authorization = `${token}`;
+        }
+        if (rToken) {
+          config.headers["x-rtoken-id"] = rToken;
         }
         const user = localStorage.getItem("user");
         if (user) {
@@ -51,8 +56,8 @@ class API {
       }
     );
   }
-
   public async get<T>(url: string, params?: object): Promise<T> {
+    console.log(params)
     const response = await this.axiosInstance.get<T>(url, { params });
     return response.data;
   }
@@ -73,8 +78,14 @@ class API {
     return response.data;
   }
 
-  public async put<T>(url: string): Promise<T> {
-    const response = await this.axiosInstance.put<T>(url);
+  public async put<T>(url: string, data?: object, headersConfig?: { "Content-Type"?: string } | any): Promise<T> {
+    const response = await this.axiosInstance.put<T>(url, data, {
+      headers: headersConfig
+    });
+    return response.data;
+  }
+  public async patch<T>(url: string, data?: object): Promise<T> {
+    const response = await this.axiosInstance.patch<T>(url, data);
     return response.data;
   }
 }

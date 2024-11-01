@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import "../../styles/home.css";
 import ProductItem from "../widget/productItem.widget";
-import { IProduct, products } from "../../types/product.type";
+import { IProduct } from "../../types/product.type";
 import CarouselBanner from "../widget/carouselBanner.widget";
 import { render } from "react-dom";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
@@ -38,34 +38,64 @@ import {
 } from "../ui/accordion";
 import Contacts from "../widget/contacts.widget";
 import { getCate } from "@/apis/cate/cate-repo";
+import { Skeleton } from "../ui/skeleton";
+import { AspectRatio } from "../ui/aspect-ratio";
+import { getNewestProduct } from "@/apis/products/product-repo";
+import { IBanner } from "@/types/banner.type";
+import { getAllBanner } from "@/apis/banner/banner-repo";
 
 const Home: React.FC = () => {
-  const [cateList, setCateList] = useState<ICategory[]>([])
+  const [cateList, setCateList] = useState<ICategory[]>(null);
+  const [prodList, setProdList] = useState<IProduct[]>(null);
+  const [bannerList, setBannerList] = useState<IBanner[]>(null);
+  async function getBanners() {
+    try {
+      const res = await getAllBanner();
+      console.log(res);
+      setBannerList(
+        (res.metadata as IBanner[]).filter((e) => {
+          return e.isActive;
+        })
+      );
+    } catch (e) {}
+  }
   async function getAllCate() {
     try {
-      const res = await getCate()
-      setCateList(res.metadata)
-    } catch (e) {
-
-    }
+      const res = await getCate();
+      setCateList(res.metadata);
+    } catch (e) {}
+  }
+  async function getLatestProduct() {
+    try {
+      const res = await getNewestProduct(8);
+      console.log(res.metadata as IProduct[]);
+      setProdList(res.metadata);
+    } catch (e) {}
   }
   useEffect(() => {
-    getAllCate()
-  }, [])
+    getAllCate();
+    getLatestProduct();
+    getBanners();
+  }, []);
   return (
     <>
       <Helmet>
         <title>Trang chủ - Hồng Đức Store</title>
       </Helmet>
       <div id="" className="home-page flex flex-col gap-8 w-full">
-        {/* redesign trang home */}
-        <HomeBanner
-          title="Lorem ipsum dolor sit"
-          description="Lorem ipsum dolor sit amet consectetur. Cras urna malesuada nunc eget id magna massa. Nec eget tristique vitae venenatis amet semper. Porta aliquam amet ligula vulputate. Sagittis tincidunt tortor quis pellentesque orci. Orci ac posuere aenean magna magna sed. Tincidunt id nulla nulla dictum ultrices. Suspendisse arcu vel cras lorem tempor."
-          image="/sample_image.jpg"
-          link=""
-          button=""
-        />
+        {bannerList ? (
+          <HomeBanner
+            title={bannerList[0].title}
+            description={bannerList[0].content}
+            image={bannerList[0].url}
+            link=""
+            button=""
+          />
+        ) : (
+          <AspectRatio ratio={3} className="w-full">
+            <Skeleton className="w-full h-full" />
+          </AspectRatio>
+        )}
         <div className="flex flex-col gap-8 px-20">
           <h2 className="text-center">Tại sao chọn chúng tôi?</h2>
           <div className="flex w-full gap-20">
@@ -84,31 +114,31 @@ const Home: React.FC = () => {
           </div>
           <h2 className="text-center">Bắt đầu mua sắm</h2>
           <div className="grid grid-cols-4 gap-4">
-            {cateList.map((category: ICategory) => (
-              <HomeCategory
-                className="flex-1"
-                name={category.category_name}
-                image={category.cagtegory_image}
-              />
-            ))}
+            {cateList
+              ? cateList.map((category: ICategory) => (
+                  <HomeCategory
+                    className="flex-1"
+                    name={category.category_name}
+                    image={category.category_image}
+                  />
+                ))
+              : [1, 2, 3, 4].map((e) => (
+                  <AspectRatio ratio={2 / 3}>
+                    <Skeleton className="w-full h-full" />
+                  </AspectRatio>
+                ))}
           </div>
           <h2 className="text-center">Hàng mới</h2>
           <div className="home-new-list-product flex flex-wrap">
-            {products.length > 0 ? (
-              products.map((product: IProduct, index: number) => (
-                <div className="wrap-product">
-                  <ProductItem
-                    key={index}
-                    product_name={product.product_name}
-                    product_price={product.product_price}
-                    product_thumb={product.product_thumb}
-                    product_variations={product.product_variations}
-                  />
-                </div>
-              ))
-            ) : (
-              <p>Không có sản phẩm nào để hiển thị</p>
-            )}
+            {prodList
+              ? prodList.map((product: IProduct, index: number) => (
+                  <div className="wrap-product">
+                    <ProductItem key={index} {...product} />
+                  </div>
+                ))
+              : [1, 2, 3, 4].map((e) => {
+                  return <Skeleton className="w-[24%] h-36" />;
+                })}
           </div>
           <div className="flex gap-4 w-full justify-center">
             <Link to={"/shop"}>
@@ -162,7 +192,11 @@ const Home: React.FC = () => {
           </div>
           <h2 className="text-center">Sự kiện nổi bật</h2>
           <div className="banner-event p-8 w-full flex justify-center">
-            <CarouselBanner></CarouselBanner>
+            {bannerList ? (
+              <CarouselBanner banners={bannerList}></CarouselBanner>
+            ) : (
+              <Skeleton />
+            )}
           </div>
           <h2 className="text-center">Liên hệ với chúng tôi</h2>
           <div className="flex gap-8 w-full justify-center">

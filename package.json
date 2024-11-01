@@ -10,7 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@emotion/react": "^11.13.0",
+    "@emotion/react": "^11.13.3",
     "@emotion/styled": "^11.13.0",
     "@hookform/resolvers": "^3.9.0",
     "@material-tailwind/react": "^2.1.9",
@@ -39,6 +39,7 @@
     "react-dropzone": "^14.2.9",
     "react-helmet": "^6.1.0",
     "react-hook-form": "^7.53.0",
+    "react-modal-image": "^2.6.0",
     "react-responsive-carousel": "^3.2.23",
     "react-router-dom": "^6.26.0",
     "react-spring": "^9.7.4",

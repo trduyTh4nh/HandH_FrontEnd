@@ -193,7 +193,7 @@ const CategoryPage: React.FC = () => {
             <Button>
               <Plus className="mr-2 h-4 w-4" /> Thêm loại sản phẩm
             </Button>
-          </DialogTrigger>
+           </DialogTrigger>
           <DialogContent className="sm:max-w-[1000px]">
 
           <DialogHeader>
