@@ -107,6 +107,7 @@ const schema = z
 type ProductUploadFormProps = {
   onSubmit: (data: IProduct) => void;
   defaultValue?: IProduct;
+  readOnly?: boolean;
 };
 export default function ProductUploadForm(props: ProductUploadFormProps) {
   function addProductColor() {
@@ -241,8 +242,7 @@ export default function ProductUploadForm(props: ProductUploadFormProps) {
       ...data,
       product_sizes: sizeList,
       product_colors: colorList,
-      isDraft: true,
-      isPublished: false,
+      product_images: imageList,
     };
     return tmpData;
   }
@@ -360,6 +360,11 @@ export default function ProductUploadForm(props: ProductUploadFormProps) {
                 <FormControl>
                   <Input {...field} placeholder="Bắt buộc" />
                 </FormControl>
+                <p className="text-sm">
+                  {
+                    Number(form.getValues("product_price")).toLocaleString() + " "
+                  } đồng
+                </p>
                 <FormMessage />
               </FormItem>
             )}
@@ -527,6 +532,7 @@ export default function ProductUploadForm(props: ProductUploadFormProps) {
                   {imageList.map((e, index) => (
                     <div className="flex justify-center items-center px-4 py-8 border-gray-200 border rounded-xl relative">
                       <Button
+                        type="button"
                         onClick={() => {
                           removeImage(index);
                         }}
@@ -838,7 +844,7 @@ export default function ProductUploadForm(props: ProductUploadFormProps) {
                 Huỷ
               </Button>
             </DialogClose>
-            <Button className="flex-1">Thêm sản phẩm</Button>
+            <Button className="flex-1">Thêm sản phẩm {form.getValues("isDraft") ? "(nháp)" : ""}</Button>
           </div>
         </div>
       </form>

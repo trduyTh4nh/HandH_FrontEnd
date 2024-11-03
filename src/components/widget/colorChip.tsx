@@ -5,11 +5,13 @@ export default function ColorChip({
   tooltip,
   color,
   onClick,
+  image
 }: {
   active: boolean;
   color: string;
   tooltip: string;
   onClick: (active: boolean) => void;
+  image?: string
 }) {
   return (
     <Tooltip title={tooltip}>
@@ -23,11 +25,16 @@ export default function ColorChip({
           onClick={() => {
             onClick(true);
           }}
-          className={`p-4 rounded-full cursor-pointer shadow-md ${
+          className={`w-8 h-8 overflow-hidden rounded-full cursor-pointer shadow-md ${
             active ? "outline-2" : "outline-0"
           } outline-black outline-none hover:outline-2 hover:outline-black hover:outline-none active:outline-4 active:outline-black active:outline-none transition-all`}
-          style={{ backgroundColor: color }}
-        ></div>
+          style={{ backgroundColor: color ? color : "transparent" }}
+        >
+          {
+            image &&
+            <img src={image} alt="color" className="w-full h-full object-cover"/>
+          }
+        </div>
         {
           tooltip &&
           <p>{tooltip}</p>

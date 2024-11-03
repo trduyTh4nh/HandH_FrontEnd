@@ -3,10 +3,10 @@ type PropImgs = {
 };
 export default function ImagesProduct({ imgList }: PropImgs) {
   return (
-    <div className="flex">
+    <>
       {imgList.map((e) => (
-        <img alt={e.desc} src={e.img} className="flex-1 w-full rounded-lg" />
+        <img alt={e.desc} src={e.img} className="w-full rounded-lg" />
       ))}
-    </div>
+    </>
   );
 }
