@@ -1,7 +1,7 @@
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import "./App.css";
 import Navbar from "./components/layout/NavBar";
-import {Helmet} from "react-helmet";
+import { Helmet } from "react-helmet";
 import SideBar from "./components/layout/SideBar"; // Chỉ sử dụng cho Admin
 import Dashboard from "./AdminPage/Dashboard";
 import ProductPage from "./AdminPage/ProductPage";
@@ -41,6 +41,9 @@ import { Dialog, DialogContent, DialogTrigger } from "./components/ui/dialog";
 import PopupComponent from "./components/widget/popUpComponent";
 import { getLoggedInUser, UnauthenticatedError } from "./apis/user/user-repo";
 import { AxiosError } from "axios";
+
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+const queryClient = new QueryClient();
 const AdminRoute: React.FC = () => {
   const user = localStorage.getItem("user");
   const [isUserValid, setUserValid] = useState(false);
@@ -165,15 +168,16 @@ const UserRoute: React.FC = () => {
 };
 const App = () => {
   return (
-    <Router>
-      <div className="flex flex-col min-h-screen w-full">
-        <Routes>
-          {/* Routes cho người dùng */}
-          <Route path="/*" element={<UserRoute />} /> {/* Routes cho admin */}
-          <Route path="/admin/*" element={<AdminRoute />} />{" "}
-        </Routes>
-      </div>
-    </Router>
+    <QueryClientProvider client={queryClient}>
+      <Router>
+        <div className="flex flex-col min-h-screen w-full">
+          <Routes>
+            <Route path="/*" element={<UserRoute />} />
+            <Route path="/admin/*" element={<AdminRoute />} />{" "}
+          </Routes>
+        </div>
+      </Router>
+    </QueryClientProvider>
   );
 };
 
