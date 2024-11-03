@@ -1,8 +1,9 @@
 import { Axios, AxiosError } from "axios";
 import API from "../api";
+import { IUser } from "@/types/user.type";
 
 const api = new API({ headerType: "json" });
-async function login(data) {}
+async function login(data) { }
 export async function logout() {
   try {
     const res = await api.post("access/logout");
@@ -35,6 +36,16 @@ export class UnauthenticatedError extends Error {
         this.code = code
     }
 }
+export async function getUsers() {
+  try {
+    const res = await api.get<IUser>("access/getAllUser");
+    return res;
+  } catch (e) {
+    if(e instanceof AxiosError){
+      return e
+    }
+  }
+}
 export async function getLoggedInUser() {
     const userStr = localStorage.getItem("user")
     if(!userStr){
@@ -52,4 +63,34 @@ export async function getLoggedInUser() {
     }
     throw error;
   }
+}
+export async function changePassword(body) {
+    try {
+        const res: any = await api.put("access/changePassword", body);
+        return res.metadata;
+    } catch (error) {
+        if (error instanceof AxiosError) {
+            console.warn(error);
+            throw error;
+        }
+        throw error;
+    }
+}
+export async function getAllUsers() {
+  try {
+    const res = await api.get("access/getAllUser");
+    return res;
+  } catch (e) {
+    if(e instanceof AxiosError){
+      return e
+    }
+  }
+}
+export async function changeInformation(_id) {
+    try {
+        const res: any = await api.put(`access/updateInformationUser/${_id}`);
+        return res.metadata;
+    } catch (err) {
+        console.error(err);
+    }
 }

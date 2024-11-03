@@ -29,9 +29,19 @@ import {
   SelectValue,
 } from "../ui/select";
 import ProductItem from "./productItem.widget";
-import { CircleHelp, Delete, Image, Trash2, X } from "lucide-react";
+import {
+  CircleHelp,
+  Delete,
+  HelpCircle,
+  Image,
+  ImagePlus,
+  Images,
+  Plus,
+  Trash2,
+  X,
+} from "lucide-react";
 import { formatBytes } from "@/utils";
-import { Button } from "../ui/button";
+import { Button, buttonVariants } from "../ui/button";
 import {
   Table,
   TableBody,
@@ -42,39 +52,62 @@ import {
 } from "../ui/table";
 import { TableCell } from "@mui/material";
 import { Switch } from "../ui/switch";
-import { DialogClose } from "../ui/dialog";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "../ui/dialog";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from "../ui/tooltip";
+import { toast } from "@/hooks/use-toast";
+import { cn } from "@/lib/utils";
 
-const schema = z.object({
-  product_name: z.string({ required_error: "Vui lòng nhập sản phẩm" }),
-  product_description: z
-    .string({required_error: "Mô tả sản phẩm không được để trống"})
-    .max(1024, { message: "Mô tả sản phẩm không được lớn hơn 1024 ký tự" }),
-  product_thumb: z
-    .instanceof(File, { message: "Hình ảnh không được để trống" })
-    .refine((x) => x.size < 104857600, {
-      message: "kích cỡ file không được vượt quá 100MB",
-    }),
-  product_price: z.coerce
-    .number({
-      required_error: "Giá sản phẩm không được để trống.",
-      invalid_type_error: "Giá sản phẩm phải là một số",
-    })
-    .int({ message: "Giá sản phẩm phải là một số nguyên" })
-    .positive({ message: "Giá không được âm." })
-    .min(500, { message: "Giá sản phẩn phải lớn hơn 500 đồng." }),
-  product_category: z.string({
-    required_error: "Loại sản phẩm không được để trống.",
-  }),
-});
+const schema = z
+  .object({
+    product_name: z.string({ required_error: "Vui lòng nhập sản phẩm" }),
+    product_description: z
+      .string({ required_error: "Mô tả sản phẩm không được để trống" })
+      .max(1024, { message: "Mô tả sản phẩm không được lớn hơn 1024 ký tự" })
+      .optional(),
+    product_thumb: z
+      .instanceof(File, { message: "Hình ảnh không được để trống" })
+      .refine((x) => x.size < 104857600, {
+        message: "kích cỡ file không được vượt quá 100MB",
+      })
+      .optional(),
+    product_price: z.coerce
+      .number({
+        required_error: "Giá sản phẩm không được để trống.",
+        invalid_type_error: "Giá sản phẩm phải là một số",
+      })
+      .int({ message: "Giá sản phẩm phải là một số nguyên" })
+      .positive({ message: "Giá không được âm." })
+      .min(500, { message: "Giá sản phẩn phải lớn hơn 500 đồng." }),
+    product_category: z
+      .string({
+        required_error: "Loại sản phẩm không được để trống.",
+      })
+      .optional(),
+    isDraft: z.boolean().optional(),
+    isPublished: z.boolean().optional(),
+  })
+  .required({
+    product_name: true,
+    product_price: true,
+    product_category: true,
+  });
 type ProductUploadFormProps = {
   onSubmit: (data: IProduct) => void;
   defaultValue?: IProduct;
+  readOnly?: boolean;
 };
 export default function ProductUploadForm(props: ProductUploadFormProps) {
   function addProductColor() {
@@ -100,18 +133,18 @@ export default function ProductUploadForm(props: ProductUploadFormProps) {
   }
   function setSizeProperty(value: ISizeProductVarication, index: number) {
     const arr = sizeList.map((e, i) => {
-      if(value.size_isPicked){
-        if(i != index) {
+      if (value.size_isPicked) {
+        if (i != index) {
           return {
             ...e,
-            size_isPicked: false
-          }
+            size_isPicked: false,
+          };
         }
       }
       if (i == index) {
         return {
           ...value,
-          size_isPicked: true
+          size_isPicked: true,
         };
       }
       return e;
@@ -126,18 +159,18 @@ export default function ProductUploadForm(props: ProductUploadFormProps) {
   }
   function setColorProperty(value: IColorProductVariation, index: number) {
     const arr = colorList.map((e, i) => {
-      if(value.color_isPicked){
-        if(i != index) {
+      if (value.color_isPicked) {
+        if (i != index) {
           return {
             ...e,
-            color_isPicked: false
-          }
+            color_isPicked: false,
+          };
         }
       }
       if (i == index) {
         return {
           ...value,
-          color_isPicked: true
+          color_isPicked: true,
         };
       }
       return e;
@@ -191,6 +224,7 @@ export default function ProductUploadForm(props: ProductUploadFormProps) {
       size_isPicked: false,
     },
   ]);
+  const [imageList, setImageList] = useState<File[]>([]);
   const [sizeValidationMessage, setSizeValidationMessage] =
     useState<string>(null);
   const [colorValidationMessage, setColorvalidationMessage] =
@@ -199,6 +233,7 @@ export default function ProductUploadForm(props: ProductUploadFormProps) {
     resolver: zodResolver(schema),
     defaultValues: {
       product_price: 0,
+      isDraft: true,
     },
   });
   //TODO: return kiểu IProduct.
@@ -207,8 +242,7 @@ export default function ProductUploadForm(props: ProductUploadFormProps) {
       ...data,
       product_sizes: sizeList,
       product_colors: colorList,
-      isDraft: true,
-      isPublished: false,
+      product_images: imageList,
     };
     return tmpData;
   }
@@ -247,6 +281,24 @@ export default function ProductUploadForm(props: ProductUploadFormProps) {
     setSizeValidationMessage(null);
     props.onSubmit(tmpData);
   }
+  function addImages(file: FileList) {
+    const files = Array.from(file);
+    if (imageList.length + files.length > 6) {
+      toast({
+        title: "Đã vượt quá số lượng hình ảnh cho phép",
+        description: `Số lượng hình ảnh cho phép là 6 hình ảnh, hệ thống đã thêm ${
+          6 - imageList.length
+        } hình ảnh bạn đã chọn gần nhất.`,
+      });
+    }
+    setImageList([
+      ...imageList,
+      ...files.filter((e, index) => index + imageList.length + 1 <= 6),
+    ]);
+  }
+  function removeImage(index: number) {
+    setImageList(imageList.filter((e, i) => i != index));
+  }
   return (
     <Form {...form}>
       <form
@@ -274,9 +326,7 @@ export default function ProductUploadForm(props: ProductUploadFormProps) {
             name="product_description"
             render={({ field }) => (
               <FormItem>
-                <Label>
-                  Mô tả sản phẩm <span className="text-red-400">*</span>
-                </Label>
+                <Label>Mô tả sản phẩm</Label>
                 <FormControl>
                   <Textarea
                     {...field}
@@ -301,27 +351,20 @@ export default function ProductUploadForm(props: ProductUploadFormProps) {
             name="product_price"
             render={({ field }) => (
               <FormItem>
-                <Label>
+                <Label className="flex items-center gap-1">
                   Giá sản phẩm (giá sàn) <span className="text-red-400">*</span>
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger>
-                        <CircleHelp width={16} height={16} />
-                      </TooltipTrigger>
-                      <TooltipContent className="bg-background shadow-lg max-w-64">
-                        <b>Giá sàn sản phẩm</b>
-                        <p>
-                          Đây là mức giá ban đầu của sản phẩm. Khi bạn thêm các
-                          kích cỡ và màu sắc, thì giá sẽ tăng theo giá của kích
-                          cỡ và màu sắc mà người dùng chọn.
-                        </p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
                 </Label>
+                <p className="text-sm">
+                  Giá này sẽ thay đổi theo màu sắc và kích cỡ tương ứng.
+                </p>
                 <FormControl>
                   <Input {...field} placeholder="Bắt buộc" />
                 </FormControl>
+                <p className="text-sm">
+                  {
+                    Number(form.getValues("product_price")).toLocaleString() + " "
+                  } đồng
+                </p>
                 <FormMessage />
               </FormItem>
             )}
@@ -356,17 +399,12 @@ export default function ProductUploadForm(props: ProductUploadFormProps) {
               </FormItem>
             )}
           />
-        </div>
-        <hr className="h-full border-r border-gray-200" />
-        <div className="flex-1 flex flex-col gap-2">
           <FormField
             control={form.control}
             name="product_thumb"
             render={({ field }) => (
               <FormItem>
-                <Label>
-                  Hình sản phẩm <span className="text-red-400">*</span>
-                </Label>
+                <Label>Hình chính của sản phẩm </Label>
                 <FormControl>
                   <Label
                     htmlFor="image_picker"
@@ -417,6 +455,159 @@ export default function ProductUploadForm(props: ProductUploadFormProps) {
               </FormItem>
             )}
           />
+          <Label>Tuỳ chọn lưu</Label>
+          <div className="flex gap-4">
+            <FormField
+              control={form.control}
+              name="isDraft"
+              render={({ field }) => {
+                return (
+                  <FormItem>
+                    <FormControl className="flex items-center gap-2">
+                      <div>
+                        <Switch
+                          disabled={
+                            !form.formState.isValid ||
+                            form.getValues("product_thumb") == null ||
+                            imageList.length == 0
+                          }
+                          checked={field.value}
+                          onCheckedChange={(e) => {
+                            field.onChange(e);
+                            if (e) {
+                              form.setValue("isPublished", false);
+                            }
+                          }}
+                          id="draft-switch"
+                        ></Switch>
+                        <Label htmlFor="draft-switch">Lưu bản nháp</Label>
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                );
+              }}
+            />
+            <FormField
+              control={form.control}
+              name="isPublished"
+              render={({ field }) => (
+                <FormItem>
+                  <FormControl className="flex items-center gap-2">
+                    <div>
+                      <Switch
+                        disabled={form.getValues("isDraft")}
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                        id="draft-switch"
+                      ></Switch>
+                      <Label htmlFor="draft-switch">Hiển thị</Label>
+                    </div>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+        </div>
+        <hr className="h-full border-r border-gray-200" />
+        <div className="flex-1 flex flex-col gap-2">
+          <Label>Hình miêu tả sản phẩm</Label>
+          <Label
+            htmlFor={imageList.length == 0 ? "images-input" : ""}
+            className={`px-4 w-100 min-h-24 flex flex-col gap-2 border border-gray-200 rounded-2xl justify-center items-center py-4 ${
+              imageList.length != 0 ? "border-solid shadow-sm" : "border-dashed"
+            } hover:border-solid hover:shadow-sm transition-all ${
+              imageList.length == 0 ? "active:scale-95" : ""
+            }`}
+          >
+            {imageList.length == 0 ? (
+              <>
+                <Images className="text-gray-200" />
+                <p>Chọn 1 hoặc nhiều hình</p>
+              </>
+            ) : (
+              <>
+                <div className="w-full grid grid-cols-3 gap-2">
+                  {imageList.map((e, index) => (
+                    <div className="flex justify-center items-center px-4 py-8 border-gray-200 border rounded-xl relative">
+                      <Button
+                        type="button"
+                        onClick={() => {
+                          removeImage(index);
+                        }}
+                        variant="secondary"
+                        className="absolute right-2 top-2 bg-secondary/80 backdrop-blur-lg"
+                      >
+                        <Trash2
+                          width={16}
+                          height={16}
+                          className="text-red-400"
+                        />
+                      </Button>
+                      <img
+                        src={URL.createObjectURL(e)}
+                        key={index}
+                        className="h-24 object-contain rounded-lg"
+                      />
+                    </div>
+                  ))}
+                  {imageList.length != 6 && (
+                    <label
+                      htmlFor="images-input"
+                      className="flex justify-center flex-col gap-2 border-gray-200 border items-center px-4 py-8 rounded-2xl relative"
+                    >
+                      <Plus />
+                      <p>Thêm hình</p>
+                    </label>
+                  )}
+                </div>
+                <Dialog>
+                  <DialogTrigger className="w-full">
+                    <Button variant="outline" type="button" className="w-full">
+                      Xoá tất cả
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>
+                        Xác nhận xoá tất cả hình ảnh sản phẩm
+                      </DialogTitle>
+                    </DialogHeader>
+                    <p>
+                      Bạn có chắc là muốn xoá tất cả hình ảnh sản phẩm không?
+                      Việc này không thể hoàn tác.
+                    </p>
+                    <DialogFooter>
+                      <DialogClose>
+                        <Button
+                          onClick={() => {
+                            setImageList([]);
+                          }}
+                        >
+                          Có
+                        </Button>
+                      </DialogClose>
+                      <DialogClose>
+                        <Button variant="secondary">Không</Button>
+                      </DialogClose>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
+              </>
+            )}
+            <Input
+              type="file"
+              multiple
+              accept="image/*"
+              className="hidden"
+              id="images-input"
+              onChange={(e) => {
+                addImages(e.target.files);
+              }}
+            />
+          </Label>
+          <p>{imageList.length}/6 hình ảnh</p>
           <Label>
             Màu sản phẩm <span className="text-red-400">*</span>
           </Label>
@@ -430,7 +621,7 @@ export default function ProductUploadForm(props: ProductUploadFormProps) {
                 <TableHeader>
                   <TableRow>
                     <TableHead className="w-[100px]">
-                      Màu sắc <span className="text-red-400">*</span>
+                      Hình ảnh <span className="text-red-400">*</span>
                     </TableHead>
                     <TableHead>
                       Tên màu <span className="text-red-400">*</span>
@@ -444,20 +635,42 @@ export default function ProductUploadForm(props: ProductUploadFormProps) {
                   {colorList.map((e, index) => (
                     <TableRow key={index}>
                       <TableCell>
+                        <Label
+                          htmlFor={`color-input-${index}`}
+                          className={cn(buttonVariants({ variant: "outline" }))}
+                        >
+                          {!e.color_image ? (
+                            <ImagePlus width={16} height={16} />
+                          ) : (
+                            <img
+                              src={
+                                e.color_image instanceof File
+                                  ? URL.createObjectURL(e.color_image)
+                                  : e.color_image
+                              }
+                            />
+                          )}
+                        </Label>
                         <Input
+                          accept="image/*"
                           onChange={(el) => {
-                            setColorProperty(
-                              {
-                                ...e,
-                                color_code: el.target.value,
-                              },
-                              index
-                            );
+                            if (el.target.files[0]) {
+                              setColorList(
+                                colorList.map((e, i) => {
+                                  if (i == index) {
+                                    return {
+                                      ...e,
+                                      color_image: el.target.files[0],
+                                    };
+                                  }
+                                  return e;
+                                })
+                              );
+                            }
                           }}
-                          value={e.color_code}
                           id={`color-input-${index}`}
-                          className="p-0 rounded-none border-0"
-                          type="color"
+                          className="p-0 rounded-none border-0 hidden"
+                          type="file"
                         />
                       </TableCell>
                       <TableCell>
@@ -631,7 +844,7 @@ export default function ProductUploadForm(props: ProductUploadFormProps) {
                 Huỷ
               </Button>
             </DialogClose>
-            <Button className="flex-1">Thêm sản phẩm</Button>
+            <Button className="flex-1">Thêm sản phẩm {form.getValues("isDraft") ? "(nháp)" : ""}</Button>
           </div>
         </div>
       </form>

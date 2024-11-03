@@ -26,6 +26,7 @@ import Recommendations from "../widget/recommendations";
 export default function Product() {
   const { id } = useParams<{ id: string }>();
   const [error, setError] = useState<AxiosError>(null);
+  const [productImages, setProductImages] = useState([]);
   async function getProduct() {
     console.log(id);
     const response = await getProductById(decodeURI(id));
@@ -51,9 +52,11 @@ export default function Product() {
       setColors(
         product.product_colors.map((e) => {
           return {
+            image: e.image_product_col,
             tooltip: e.color_name,
             color: e.color_code,
             enabled: e.color_isPicked,
+            
           };
         })
       );
@@ -66,7 +69,15 @@ export default function Product() {
         })
       );
       console.log(product.product_category);
-      
+    }
+  }, [product]);
+  useEffect(() => {
+    if (product) {
+      const half = Math.ceil(product.product_images.length / 2);
+      setProductImages([
+        product.product_images.slice(0, half),
+        product.product_images.slice(half),
+      ]);
     }
   }, [product]);
   const [quantity, setQuantity] = useState(1);
@@ -103,21 +114,23 @@ export default function Product() {
               <b>
                 Mã lỗi: {error.status} - {error.code}
               </b>
-              <p>{
-                //@ts-ignore
-              error.response.data.message
-              }</p>
+              <p>
+                {
+                  //@ts-ignore
+                  error.response.data.message
+                }
+              </p>
             </AccordionContent>
           </AccordionItem>
         </Accordion>
       </div>
     </ErrorView>
   ) : !product ? (
-    <SkeletonLoadingProduct/>
+    <SkeletonLoadingProduct />
   ) : (
-    <div className={`pt-4 transition-all`}>
+    <div className={`pt-4 transition-all w-full`}>
       <div className="product_main flex flex-1 gap-8 px-48 pb-10 justify-stretch relative box-border">
-        <div className="w-1/2 flex">
+        <div className="w-1/2">
           <ImagesProduct
             imgList={[
               {
@@ -152,6 +165,7 @@ export default function Product() {
               <div className="flex gap-4 w-full">
                 {colors.map((e) => (
                   <ColorChip
+                    image={e.image}
                     active={e.enabled}
                     color={e.color}
                     onClick={(selected) => {
@@ -196,8 +210,21 @@ export default function Product() {
       <div className="px-48 flex flex-col gap-2 pb-4">
         <h2 className="font-light">Mô tả sản phẩm</h2>
         <p>{product.product_description}</p>
+        <div className="grid grid-cols-2 gap-x-2">
+          {
+            productImages.map(e => {
+              return <div className="flex flex-col gap-2">
+                {
+                  e.map((img) => {
+                   return <img src={img} className="h-auto w-full"/>
+                  })
+                }
+              </div>
+            })
+          }
+        </div>
         <h2 className="font-light">Sản phẩm tương tự</h2>
-        <Recommendations cate={cateId} currentId={id}/>
+        <Recommendations cate={cateId} currentId={id} />
       </div>
       <Footer />
     </div>
