@@ -14,11 +14,11 @@ export async function logout() {
   }
 }
 export async function register(data) {
-    const {fullName, rePassword, ...rest} = data;
+  const { fullName, rePassword, ...rest } = data;
   try {
     const res = await api.post("access/register", {
-        ...rest,
-        name: fullName
+      ...rest,
+      name: fullName
     })
     return res
   } catch (error) {
@@ -28,30 +28,30 @@ export async function register(data) {
   }
 }
 export class UnauthenticatedError extends Error {
-    code: number
-    constructor(message, code) {
-        super()
-        this.message = message;
-        this.name = "USER_UNAUTHENTICATED";
-        this.code = code
-    }
+  code: number
+  constructor(message, code) {
+    super()
+    this.message = message;
+    this.name = "USER_UNAUTHENTICATED";
+    this.code = code
+  }
 }
 export async function getUsers() {
   try {
     const res = await api.get<IUser>("access/getAllUser");
     return res;
   } catch (e) {
-    if(e instanceof AxiosError){
+    if (e instanceof AxiosError) {
       return e
     }
   }
 }
 export async function getLoggedInUser() {
-    const userStr = localStorage.getItem("user")
-    if(!userStr){
-        throw new UnauthenticatedError("Người dùng chưa đăng nhập", 401)
-    }
-    const userObj = JSON.parse(userStr)
+  const userStr = localStorage.getItem("user")
+  if (!userStr) {
+    throw new UnauthenticatedError("Người dùng chưa đăng nhập", 401)
+  }
+  const userObj = JSON.parse(userStr)
   try {
     const res = await api.get(`access/getUser/${userObj._id}`);
     //@ts-ignore
@@ -65,32 +65,42 @@ export async function getLoggedInUser() {
   }
 }
 export async function changePassword(body) {
-    try {
-        const res: any = await api.put("access/changePassword", body);
-        return res.metadata;
-    } catch (error) {
-        if (error instanceof AxiosError) {
-            console.warn(error);
-            throw error;
-        }
-        throw error;
+  try {
+    const res: any = await api.put("access/changePassword", body);
+    return res.metadata;
+  } catch (error) {
+    if (error instanceof AxiosError) {
+      console.warn(error);
+      throw error;
     }
+    throw error;
+  }
 }
 export async function getAllUsers() {
   try {
     const res = await api.get<IUser>("access/getAllUser");
     return res;
   } catch (e) {
-    if(e instanceof AxiosError){
+    if (e instanceof AxiosError) {
       return e
     }
   }
 }
-export async function changeInformation(_id) {
-    try {
-        const res: any = await api.put(`access/updateInformationUser/${_id}`);
-        return res.metadata;
-    } catch (err) {
-        console.error(err);
+export async function changeInformation(body: IUser) {
+  // const userStr = JSON.parse(localStorage.getItem("user"))
+  const userStr = localStorage.getItem("user");
+  if (!userStr) {
+    throw new UnauthenticatedError("Người dùng chưa đăng nhập", 401)
+  }
+  const userObj = JSON.parse(userStr)
+  try {
+    const res: any = await api.put(`access/updateInformationUser/${userObj._id}`, body);
+    console.log(userObj._id);
+    return res.metadata;
+  } catch (err) {
+    console.error("Lỗi xảy ra:", err);
+    if (err instanceof AxiosError && err.response) {
+      console.error("Chi tiết lỗi:", err.response.data); // Kiểm tra thông tin lỗi
     }
+  }
 }

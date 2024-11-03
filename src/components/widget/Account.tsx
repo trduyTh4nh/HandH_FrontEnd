@@ -4,6 +4,7 @@ import {
 } from "@mui/icons-material";
 import { Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField } from '@mui/material';
 import { changeInformation, changePassword } from '@/apis/user/user-repo';
+import { userInfo } from 'os';
 
 export const Account: React.FC = () => {
   const [openPasswordDialog, setOpenPasswordDialog] = useState(false);
@@ -13,11 +14,22 @@ export const Account: React.FC = () => {
   const [newPassword, setNewPassword] = useState('');
   const [confirmNewPassword, setConfirmNewPassword] = useState('');
 
-  const [name, setName] = useState('Tiêu Trí Quang');
+  const [name, setName] = useState('Tiêu Trí Quang Test');
   const [phone, setPhone] = useState('0828907967');
   const [email, setEmail] = useState('quangrain2014@gmail.com');
   const [birthday, setBirthday] = useState('2003-08-27');
-  const [address, setAddress] = useState('00 Example Street, Phường 0, Quận 0, Tỉnh Example');
+  const [street, setStreet] = useState('');
+  const [city, setCity] = useState('');
+  const [address, setAddress] = useState('');
+  const [state, setState] = useState('');
+  const [country, setCountry] = useState('');
+  const [zipcode, setZipcode] = useState('');
+  const [apartmentNumber, setApartmentNumber] = useState('');
+  const [nameEdit, setNameEdit] = useState(name);
+  const [phoneEdit, setPhoneEdit] = useState('0828907967');
+  const [emailEdit, setEmailEdit] = useState('quangrain2014@gmail.com');
+  const [birthdayEdit, setBirthdayEdit] = useState('2003-08-27');
+  const [addressEdit, setAddressEdit] = useState('00 Example Street, Phường 0, Quận 0, Tỉnh Example');
 
   const handleOpenPasswordDialog = () => {
     setOpenPasswordDialog(true);
@@ -55,11 +67,25 @@ export const Account: React.FC = () => {
     }
   };
 
-  const handleSaveProfile = async(id) => {
+  const handleSaveProfile = async () => {
+    const user: any = JSON.parse(localStorage.getItem('user'))
     try {
-      changeInformation(id);
+      await changeInformation({
+        name: name,
+        birthDay: birthday,
+        userAddress: {
+          street: street,
+          city: city,
+          state: state,
+          country: country,
+          zipcode: zipcode,
+          apartmentNumber: apartmentNumber,
+        }
+      });
+      console.log(user);
+      alert("thông tin đã được cập nhật");
     } catch (error) {
-      
+      console.error(error);
     }
     alert('Thông tin cá nhân đã được cập nhật!');
     handleCloseEditProfileDialog();
@@ -83,11 +109,11 @@ export const Account: React.FC = () => {
               <p className="text-gray-700 font-semibold">Số điện thoại:</p>
               <p className="ml-auto text-gray-800 font-medium">{phone}</p>
             </div>
-            <div className="flex items-center gap-2 mb-4">
+            {/* <div className="flex items-center gap-2 mb-4">
               <AttachEmailOutlined className="text-black" />
               <p className="text-gray-700 font-semibold">Email:</p>
               <p className="ml-auto text-gray-800 font-medium">{email}</p>
-            </div>
+            </div> */}
             <div className="flex items-center gap-2 mb-4">
               <CakeOutlined className="text-black" />
               <p className="text-gray-700 font-semibold">Ngày sinh:</p>
@@ -96,115 +122,143 @@ export const Account: React.FC = () => {
             <div className="flex items-center gap-2 mb-4">
               <LocationOnOutlined className="text-black" />
               <p className="text-gray-700 font-semibold">Địa chỉ:</p>
-              <p className="ml-auto text-gray-800 font-medium">{address}</p>
+              <p className="ml-auto text-gray-800 font-medium">{street + ' ' + city + ' ' + state + ' ' + country + ' ' + zipcode + ' ' + apartmentNumber}</p>
             </div>
-          </div>
-          <div className="flex w-full justify-between mt-6">
-            <button onClick={handleOpenEditProfileDialog} className="bg-[#FFF7E6] text-black py-2 px-6 rounded-lg hover:bg-[#ffecc4] transition-colors duration-300">Chỉnh sửa hồ sơ</button>
-            <button onClick={handleOpenPasswordDialog} className="bg-[#FFF7E6] text-black py-2 px-6 rounded-lg hover:bg-[#ffecc4] transition-colors duration-300">Đổi mật khẩu</button>
-          </div>
-        </div>
-      </div>
 
-      {/* change pass */}
-      {openPasswordDialog && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-30">
-          <div className="bg-white p-8 rounded-xl shadow-lg w-full max-w-md relative transition-transform transform scale-100 duration-300">
-            <h2 className="text-2xl font-bold mb-6 text-gray-800 text-center">Đổi mật khẩu</h2>
-            <button onClick={handleClosePasswordDialog} className="absolute top-4 right-4 text-gray-500 hover:text-gray-800 text-xl">✕</button>
-            <div className="space-y-4">
-              <input
-                type="password"
-                name="currentPassword"
-                value={currentPassword}
-                onChange={(e) => setCurrentPassword(e.target.value)}
-                placeholder="Mật khẩu hiện tại"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#ffecc4] transition duration-300"
-                required
-              />
-              <input
-                type="password"
-                name="newPassword"
-                value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
-                placeholder="Mật khẩu mới"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#ffecc4] transition duration-300"
-                required
-              />
-              <input
-                type="password"
-                name="confirmNewPassword"
-                value={confirmNewPassword}
-                onChange={(e) => setConfirmNewPassword(e.target.value)}
-                placeholder="Xác nhận mật khẩu mới"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#ffecc4] transition duration-300"
-                required
-              />
-              <button onClick={handleChangePassword} type="submit" className="w-full bg-gradient-to-r from-[#FFF7E6] to-[#ffecc4] text-black py-3 rounded-lg hover:bg-gradient-to-l hover:from-[#FFF7E6] hover:to-[#ffecc4] transition duration-300">
-                Xác nhận
-              </button>
+            <div className="flex w-full justify-between mt-6">
+              <button onClick={handleOpenEditProfileDialog} className="bg-[#FFF7E6] text-black py-2 px-6 rounded-lg hover:bg-[#ffecc4] transition-colors duration-300">Chỉnh sửa hồ sơ</button>
+              <button onClick={handleOpenPasswordDialog} className="bg-[#FFF7E6] text-black py-2 px-6 rounded-lg hover:bg-[#ffecc4] transition-colors duration-300">Đổi mật khẩu</button>
             </div>
           </div>
         </div>
-      )}
-      {/* edit hồ sơ */}
-      {openEditProfileDialog && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-30">
-          <div className="bg-white p-8 rounded-xl shadow-lg w-full max-w-md relative transition-transform transform scale-100 duration-300">
-            <h2 className="text-2xl font-bold mb-6 text-gray-800 text-center">Chỉnh sửa hồ sơ</h2>
-            <button onClick={handleCloseEditProfileDialog} className="absolute top-4 right-4 text-gray-500 hover:text-gray-800 text-xl">✕</button>
-            <div className="space-y-4">
-              <input
-                type="text"
-                name="name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="Họ tên"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#ffecc4] transition duration-300"
-                required
-              />
-              <input
-                type="text"
-                name="phone"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                placeholder="Số điện thoại"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#ffecc4] transition duration-300"
-                required
-              />
-              <input
-                type="email"
-                name="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="Email"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#ffecc4] transition duration-300"
-                required
-              />
-              <input
-                type="date"
-                name="birthday"
-                value={birthday}
-                onChange={(e) => setBirthday(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#ffecc4] transition duration-300"
-                required
-              />
-              <input
-                type="text"
-                name="address"
-                value={address}
-                onChange={(e) => setAddress(e.target.value)}
-                placeholder="Địa chỉ"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FFF7E6] transition duration-300"
-                required
-              />
-              <button onClick={handleSaveProfile} type="submit" className="w-full bg-gradient-to-r from-[#FFF7E6] to-[#ffecc4] text-black py-3 rounded-lg hover:bg-gradient-to-l hover:from-[#FFF7E6] hover:to-[#ffecc4] transition duration-300">
-                Lưu
-              </button>
+
+        {/* change pass */}
+        {openPasswordDialog && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-30">
+            <div className="bg-white p-8 rounded-xl shadow-lg w-full max-w-md relative transition-transform transform scale-100 duration-300">
+              <h2 className="text-2xl font-bold mb-6 text-gray-800 text-center">Đổi mật khẩu</h2>
+              <button onClick={handleClosePasswordDialog} className="absolute top-4 right-4 text-gray-500 hover:text-gray-800 text-xl">✕</button>
+              <div className="space-y-4">
+                <input
+                  type="password"
+                  name="currentPassword"
+                  value={currentPassword}
+                  onChange={(e) => setCurrentPassword(e.target.value)}
+                  placeholder="Mật khẩu hiện tại"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#ffecc4] transition duration-300"
+                  required
+                />
+                <input
+                  type="password"
+                  name="newPassword"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  placeholder="Mật khẩu mới"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#ffecc4] transition duration-300"
+                  required
+                />
+                <input
+                  type="password"
+                  name="confirmNewPassword"
+                  value={confirmNewPassword}
+                  onChange={(e) => setConfirmNewPassword(e.target.value)}
+                  placeholder="Xác nhận mật khẩu mới"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#ffecc4] transition duration-300"
+                  required
+                />
+                <button onClick={handleChangePassword} type="submit" className="w-full bg-gradient-to-r from-[#FFF7E6] to-[#ffecc4] text-black py-3 rounded-lg hover:bg-gradient-to-l hover:from-[#FFF7E6] hover:to-[#ffecc4] transition duration-300">
+                  Xác nhận
+                </button>
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
+        {/* edit hồ sơ */}
+        {openEditProfileDialog && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-30">
+            <div className="bg-white p-8 rounded-xl shadow-lg w-full max-w-md relative transition-transform transform scale-100 duration-300">
+              <h2 className="text-2xl font-bold mb-6 text-gray-800 text-center">Chỉnh sửa hồ sơ</h2>
+              <button onClick={handleCloseEditProfileDialog} className="absolute top-4 right-4 text-gray-500 hover:text-gray-800 text-xl">✕</button>
+              <div className="space-y-4">
+                <input
+                  type="text"
+                  name="name"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="Họ tên"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#ffecc4] transition duration-300"
+                  required
+                />
+                <input
+                  type="date"
+                  name="birthday"
+                  value={birthday}
+                  onChange={(e) => setBirthday(e.target.value)}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#ffecc4] transition duration-300"
+                  required
+                />
+                <input
+                  type="text"
+                  name="street"
+                  value={street}
+                  onChange={(e) => setStreet(e.target.value)}
+                  placeholder="Địa chỉ"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FFF7E6] transition duration-300"
+                  required
+                />
+                <input
+                  type="text"
+                  name="city"
+                  value={city}
+                  onChange={(e) => setCity(e.target.value)}
+                  placeholder="Địa chỉ"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FFF7E6] transition duration-300"
+                  required
+                />
+                <input
+                  type="text"
+                  name="state"
+                  value={state}
+                  onChange={(e) => setState(e.target.value)}
+                  placeholder="Địa chỉ"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FFF7E6] transition duration-300"
+                  required
+                />
+                <input
+                  type="text"
+                  name="country"
+                  value={country}
+                  onChange={(e) => setCountry(e.target.value)}
+                  placeholder="Địa chỉ"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FFF7E6] transition duration-300"
+                  required
+                />
+                <input
+                  type="text"
+                  name="zipcode"
+                  value={zipcode}
+                  onChange={(e) => setZipcode(e.target.value)}
+                  placeholder="Địa chỉ"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FFF7E6] transition duration-300"
+                  required
+                />
+                <input
+                  type="text"
+                  name="apartmentNumber"
+                  value={apartmentNumber}
+                  onChange={(e) => setApartmentNumber(e.target.value)}
+                  placeholder="Địa chỉ"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FFF7E6] transition duration-300"
+                  required
+                />
+                <button onClick={handleSaveProfile} type="submit" className="w-full bg-gradient-to-r from-[#FFF7E6] to-[#ffecc4] text-black py-3 rounded-lg hover:bg-gradient-to-l hover:from-[#FFF7E6] hover:to-[#ffecc4] transition duration-300">
+                  Lưu
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 };
