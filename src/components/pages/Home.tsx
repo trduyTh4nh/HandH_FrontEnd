@@ -118,7 +118,7 @@ const Home: React.FC = () => {
               ? cateList.map((category: ICategory, index: number) => (
                 <div
                 key={index}
-                className="flex-1 min-w-[25%] max-w-[25%] flex-shrink-0"
+                className="flex-1 min-w-[2.5%] max-w-[25%] flex-shrink-0"
                 >
                 <HomeCategory
                   name={category.category_name}
