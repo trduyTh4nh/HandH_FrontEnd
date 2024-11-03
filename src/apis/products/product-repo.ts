@@ -102,3 +102,16 @@ export async function getProductFilter(
     return error as AxiosError;
   }
 }
+
+export async function getProductPage(skip: number, take: number) {
+  try {
+    const response = await api.post("product/getProductPage", {
+      skip: skip,
+      take: take,
+    });
+    return response;
+  } catch (error) {
+    const e = error as AxiosError;
+    return error;
+  }
+}

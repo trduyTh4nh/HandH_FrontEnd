@@ -15,6 +15,7 @@ import { SelectValue } from "@radix-ui/react-select";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 import { getProduct } from "@/apis/products/product-repo";
+import PaginationControls from "../widget/PaginationsControl";
 type PriceFilter = {
   id: number;
   price: number;
@@ -125,8 +126,8 @@ const Shop: React.FC = () => {
   const [listFilter, setListFilter] = React.useState<PriceFilter[]>(dataFilter);
 
   const [priceFilter, setPriceFilter] = React.useState<TypeFilterPice>({
-    priceFilter: 0,
-    isHigher: false,
+    price: 0,
+    isUp: false,
   });
   const handlePickPrice = (id: number) => {
     const updateFilter = listFilter.map((item) =>
@@ -135,8 +136,8 @@ const Shop: React.FC = () => {
     setListFilter(updateFilter);
 
     setPriceFilter({
-      priceFilter: listFilter[id - 1].price,
-      isHigher: listFilter[id - 1].isHigher,
+      price: listFilter[id - 1].price,
+      isUp: listFilter[id - 1].isHigher,
     });
   };
 
@@ -209,10 +210,13 @@ const Shop: React.FC = () => {
     console.log("Delete filter");
   };
 
+  const [page, setPage] = React.useState(0);
+  const [take, setTake] = React.useState(9);
+
   return (
     <>
       <div
-        className={`shop ${
+        className={`shop pb-20 ${
           showNav ? "pl-20" : "pl-4"
         } transition-all pr-20 w-screen`}
       >
@@ -428,13 +432,16 @@ const Shop: React.FC = () => {
             </div>
           </div>
 
-          <div className="shop-product h-screen">
+          <div className="shop-product h- screen">
             <ProductComponentShop
+              take={take}
+              skip={page}
               highLowPrice={objPrice}
               size={arrSize}
               color={pickerColor}
               LowToHigh={isLowHigh}
               priceFilter={priceFilter}
+              onPageChange={setPage}
             ></ProductComponentShop>
           </div>
         </div>
