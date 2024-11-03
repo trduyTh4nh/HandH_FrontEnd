@@ -1,27 +1,73 @@
 import React from "react";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
+import axios from "axios";
 
-export default function Test(){
-    const [localStorageKey, setLocalStorageKey] = React.useState<string>('');
-    const [localStorageValue, setLocalStorageValue] = React.useState<string>('');
-    function handleSaveLocalStorage(){
-        const ls = localStorage.getItem(localStorageKey);
-        setLocalStorageValue(ls || 'Không tìm thấy');
+export default function Test() {
+  const [localStorageKey, setLocalStorageKey] = React.useState<string>("");
+  const [localStorageValue, setLocalStorageValue] = React.useState<string>("");
+  const [file, setFile] = React.useState<File>(null);
+  const [url, setUrl] = React.useState<string>("");
+  function handleSaveLocalStorage() {
+    const ls = localStorage.getItem(localStorageKey);
+    setLocalStorageValue(ls || "Không tìm thấy");
+  }
+  function handleWipeLocalStorage() {
+    localStorage.removeItem(localStorageKey);
+  }
+  async function handleConvertUrlToFile() {
+    try {
+        const response = await axios.get(url, { responseType: "blob" });
+        const fileName = url.split("/").pop();
+        const newFile = new File([response.data], fileName, { type: response.data.type });
+        setFile(newFile);
+    } catch (error) {
+        console.error("Error converting URL to file:", error);
     }
-    function handleWipeLocalStorage(){
-        localStorage.removeItem(localStorageKey);
-    }
-    return (
-        <div className="px-20 py-8">
-            <h1>Trang dành cho nhà phát triển</h1>
-            <p>Đây là trang dành cho nhà phát triển</p>
-            <p>TODO: Nhớ xoá khi lên prod 😓</p>
-            <h2>LocalStorage</h2>
-            <Input placeholder="Nhập key" value={localStorageKey} className="w-1/2" onChange={(e) => {setLocalStorageKey(e.target.value)}}></Input>
-            <Button className="mt-4" onClick={handleSaveLocalStorage}>Lấy</Button>
-            <Button className="mt-4" onClick={handleWipeLocalStorage}>Thanh Tẩy</Button>
-            <p>Kết quả: {localStorageValue}</p>
-        </div>
-    )
+  }
+  return (
+    <div className="px-20 py-8">
+      <h1>Trang dành cho nhà phát triển</h1>
+      <p>Đây là trang dành cho nhà phát triển</p>
+      <p>TODO: Nhớ xoá khi lên prod 😓</p>
+      <h2>LocalStorage</h2>
+      <Input
+        placeholder="Nhập key"
+        value={localStorageKey}
+        className="w-1/2"
+        onChange={(e) => {
+          setLocalStorageKey(e.target.value);
+        }}
+      ></Input>
+      <Button className="mt-4" onClick={handleSaveLocalStorage}>
+        Lấy
+      </Button>
+      <Button className="mt-4" onClick={handleWipeLocalStorage}>
+        Thanh Tẩy
+      </Button>
+      <p>Kết quả: {localStorageValue}</p>
+      <h2>Url to File</h2>
+      <Input
+        value={url}
+        onChange={(e) => {
+          setUrl(e.target.value);
+        }}
+        placeholder="Nhập url"
+        className="w-1/2"
+      ></Input>
+      <Button onClick={handleConvertUrlToFile} className="mt-4">
+        Chuyển đổi
+      </Button>
+      <p>Kết quả:</p>
+      {file && (
+        <>
+          <p>
+            FileName: {file?.name} <br />
+            FileSize: {file?.size} bytes <br />
+          </p>
+          <img src={URL.createObjectURL(file)} alt="preview" />
+        </>
+      )}
+    </div>
+  );
 }

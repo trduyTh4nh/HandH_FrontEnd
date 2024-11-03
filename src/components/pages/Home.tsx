@@ -113,21 +113,30 @@ const Home: React.FC = () => {
             />
           </div>
           <h2 className="text-center">Bắt đầu mua sắm</h2>
-          <div className="grid grid-cols-4 gap-4">
+            <div className="flex gap-4 overflow-x-auto">
             {cateList
-              ? cateList.map((category: ICategory) => (
-                  <HomeCategory
-                    className="flex-1"
-                    name={category.category_name}
-                    image={category.category_image}
-                  />
-                ))
-              : [1, 2, 3, 4].map((e) => (
-                  <AspectRatio ratio={2 / 3}>
-                    <Skeleton className="w-full h-full" />
-                  </AspectRatio>
-                ))}
-          </div>
+              ? cateList.map((category: ICategory, index: number) => (
+                <div
+                key={index}
+                className="flex-1 min-w-[25%] max-w-[25%] flex-shrink-0"
+                >
+                <HomeCategory
+                  name={category.category_name}
+                  image={category.category_image}
+                />
+                </div>
+              ))
+              : [1, 2, 3, 4].map((e, index) => (
+                <div
+                key={index}
+                className="flex-1 min-w-[25%] max-w-[25%] flex-shrink-0"
+                >
+                <AspectRatio ratio={2 / 3}>
+                  <Skeleton className="w-full h-full" />
+                </AspectRatio>
+                </div>
+              ))}
+            </div>
           <h2 className="text-center">Hàng mới</h2>
           <div className="home-new-list-product flex flex-wrap">
             {prodList
