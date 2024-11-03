@@ -2,6 +2,7 @@ import React from "react";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import axios from "axios";
+import useAddressPicker from "@/hooks/use-address-picker";
 
 export default function Test() {
   const [localStorageKey, setLocalStorageKey] = React.useState<string>("");
@@ -15,6 +16,7 @@ export default function Test() {
   function handleWipeLocalStorage() {
     localStorage.removeItem(localStorageKey);
   }
+  const {districts} = useAddressPicker({})
   async function handleConvertUrlToFile() {
     try {
         const response = await axios.get(url, { responseType: "blob" });
@@ -68,6 +70,18 @@ export default function Test() {
           <img src={URL.createObjectURL(file)} alt="preview" />
         </>
       )}
+      <div>
+        <h2>Address Picker</h2>
+        <p>{
+            districts.map(e => {
+              return <p>{e.name} : {e.id}: {
+                e.children.map(e1 => {
+                  return <p>- {e1.name} : {e1.id}</p>
+                })
+              }</p>
+            })
+          }</p>
+      </div>
     </div>
   );
 }

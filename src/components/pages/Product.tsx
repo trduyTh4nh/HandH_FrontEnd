@@ -20,7 +20,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "../ui/accordion";
-import { ShoppingCart } from "lucide-react";
+import { Heart, ShoppingCart } from "lucide-react";
 import SkeletonLoadingProduct from "../widget/skeletonLoadingProduct";
 import Recommendations from "../widget/recommendations";
 export default function Product() {
@@ -203,6 +203,9 @@ export default function Product() {
                   <Add />
                 </div>
               </div>
+              <Button variant="secondary">
+                <Heart width={16} height={16}/>
+              </Button>
             </div>
           </div>
         </div>
