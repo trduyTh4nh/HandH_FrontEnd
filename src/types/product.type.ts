@@ -5,7 +5,8 @@ export interface IColorProductVariation {
     color_code: string,
     color_price: number,
     color_isPicked: boolean,
-    color_name?: string
+    color_name?: string,
+    image_product_col?: string
 }
 
 export interface ISizeProductVarication {
@@ -29,7 +30,7 @@ export interface IProduct {
     product_category?: string;
     product_colors?: IColorProductVariation[],
     product_sizes?: ISizeProductVarication[]
-
+    product_images?: string[] | File[]
 }
 
 export enum CateFilter {

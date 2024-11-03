@@ -231,7 +231,7 @@ const Shop: React.FC = () => {
           >
             <div className="shop-filter_wrap box-border fixed z-10 flex top-0 flex-col w-[15%] gap-2  overflow-auto pt-[11.2rem] pb-4">
               <div
-                className={`filer-hide-btn h-full ${
+                className={`filer-hide-btn ${
                   showNav ? "w-full" : "w-fit"
                 }
                             gap-4 items-center 

@@ -1,6 +1,5 @@
 
 .container-left{
-    border: 1px solid #F0F0F0;
     border-radius: 12pt;
     padding: 20px;
 }
@@ -54,7 +53,6 @@
   transform: scale(1.05);
 } */
   .containe-center{
-    border:  1px solid #F0F0F0;
     border-radius: 12pt;
     padding: 10pt;
   }
