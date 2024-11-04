@@ -48,7 +48,7 @@ const CategoryPage: React.FC = () => {
   const [newCate, setNewcate] = React.useState<ICategory>({
     category_name: "",
     category_description: "",
-    cagtegory_image: "",
+    category_image: "",
     category_total: 0,
     createdAt:"",
     updatedAt:""
@@ -88,7 +88,7 @@ const CategoryPage: React.FC = () => {
       reader.onloadend = () => {
         setNewcate((prev) => ({
           ...prev,
-          cagtegory_image: reader.result as string,
+          category_image: reader.result as string,
         }));
       };
       reader.readAsDataURL(file);
@@ -130,7 +130,7 @@ const CategoryPage: React.FC = () => {
       reader.onloadend = () => {
         setEditingCate((prev) => ({
           ...prev,
-          cagtegory_image: reader.result as string,
+          category_image: reader.result as string,
         }));
       };
       reader.readAsDataURL(file);
@@ -152,7 +152,7 @@ const CategoryPage: React.FC = () => {
       setNewcate({
         category_name: "",
         category_description: "",
-        cagtegory_image: "",
+        category_image: "",
         category_total: 0,
         createdAt: "",
         updatedAt: "",
@@ -173,7 +173,7 @@ const CategoryPage: React.FC = () => {
   //     setNewcate({
   //       category_name: "",
   //       category_description: "",
-  //       cagtegory_image: "",
+  //       category_image: "",
   //       category_total: 0,
   //       createdAt: "",
   //       updatedAt: "",
@@ -266,9 +266,9 @@ const CategoryPage: React.FC = () => {
                         Đăng tải hình ảnh
                       </div>
                     </Label>
-                    {newCate.cagtegory_image && (
+                    {newCate.category_image && (
                       <img
-                        src={newCate.cagtegory_image}
+                        src={newCate.category_image}
                         alt="cate"
                         className="w-16 h-16 object-cover rounded"
                       />
@@ -306,7 +306,7 @@ const CategoryPage: React.FC = () => {
                   <TableCell>
                   <img
                       className="w-20 h-20 rounded-md object-contain"
-                      src={category.cagtegory_image}
+                      src={category.category_image}
                       alt=""
                     />
                   </TableCell>
@@ -397,8 +397,8 @@ const CategoryPage: React.FC = () => {
                       Đăng tải hình ảnh
                     </div>
                     </Label>
-                    {editingCate.cagtegory_image&&(
-                      <img src={editingCate.cagtegory_image}
+                    {editingCate.category_image&&(
+                      <img src={editingCate.category_image}
                        alt="Product"
                       className="w-16 h-16 object-cover rounded"
                       />
