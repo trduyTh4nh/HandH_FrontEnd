@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import {
   BadgeOutlined,
   CallOutlined,
@@ -21,31 +21,15 @@ import { AxiosError } from "axios";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Button } from "../ui/button";
 import { Cake, CircleUser, Mail, MapPin, Phone } from "lucide-react";
+import { UserContext } from "../contexts/UserContext";
 
 export const Account: React.FC = () => {
   const [openPasswordDialog, setOpenPasswordDialog] = useState(false);
   const [openEditProfileDialog, setOpenEditProfileDialog] = useState(false);
-  const [user, setUser] = useState<IUser>(null);
+  const {user, setUser} = useContext(UserContext);
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmNewPassword, setConfirmNewPassword] = useState("");
-  async function getUser() {
-    try {
-      const user = await getLoggedInUser();
-      setUser(user);
-    } catch (e) {
-      if (e instanceof AxiosError) {
-        return;
-      }
-      if (e instanceof UnauthenticatedError) {
-        return;
-      }
-      return;
-    }
-  }
-  useEffect(() => {
-    getUser();
-  }, []);
 
   const handleOpenPasswordDialog = () => {
     setOpenPasswordDialog(true);

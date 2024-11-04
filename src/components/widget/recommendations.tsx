@@ -6,6 +6,7 @@ import ProductItem from "./productItem.widget";
 import { Skeleton } from "../ui/skeleton";
 import ErrorView from "./Error.widget";
 import ProductErrorView from "./productError.widget";
+import SkeletonLoadingProductGrid from "./SkeletonGridLoading";
 
 export default function Recommendations(props: {cate: string, currentId: string}) {
     async function getProducts() {
@@ -21,13 +22,7 @@ export default function Recommendations(props: {cate: string, currentId: string}
     useEffect(() => {
         getProducts();
     }, [])
-    return !products ? <div className="grid grid-cols-4 gap-4">
-        {
-            [1,2,3,4].map((e) => {
-                return <Skeleton className="w-full h-[480px] rounded-2xl"/>
-            })
-        }
-    </div> : products.length != 0 ? <div className="grid grid-cols-4">
+    return !products ? <SkeletonLoadingProductGrid/> : products.length != 0 ? <div className="grid grid-cols-4">
         {
             products.map((e) => {
                 return <ProductItem {...e} />

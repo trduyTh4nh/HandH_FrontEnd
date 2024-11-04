@@ -43,6 +43,7 @@ import { AspectRatio } from "../ui/aspect-ratio";
 import { getNewestProduct } from "@/apis/products/product-repo";
 import { IBanner } from "@/types/banner.type";
 import { getAllBanner } from "@/apis/banner/banner-repo";
+import SkeletonLoadingProductGrid from "../widget/SkeletonGridLoading";
 
 const Home: React.FC = () => {
   const [cateList, setCateList] = useState<ICategory[]>(null);
@@ -146,7 +147,7 @@ const Home: React.FC = () => {
                   </div>
                 ))
               : [1, 2, 3, 4].map((e) => {
-                  return <Skeleton className="w-[24%] h-36" />;
+                  return <SkeletonLoadingProductGrid />;
                 })}
           </div>
           <div className="flex gap-4 w-full justify-center">
