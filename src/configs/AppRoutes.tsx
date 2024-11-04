@@ -30,8 +30,8 @@ import PurchaseChoose from "../components/pages/purchase/PurchaseChoose";
 import BannerPage from "@/AdminPage/BannerPage";
 import CategoryPage from "@/AdminPage/CategoryPage";
 import Blog from "../components/pages/Blog";
-import { Post } from "@/components/widget/Post";
 import { PostManager } from "@/components/widget/postManager";
+import { Post } from "@/components/widget/post";
 const AdminRoute: React.FC = () => {
   return (
     <div className="wrap-route flex">
@@ -76,8 +76,6 @@ const UserRoute: React.FC = () => {
         <Route path="blog" element={<Blog/>}>
           <Route path="post" element={<Post/>}/>
           <Route path="postManager" element={<PostManager/>}/>
-
-
         </Route>
         <Route path="/product/:id/:name" element={<Product />} />
         <Route path="/cart" element={<CartPage />} />
