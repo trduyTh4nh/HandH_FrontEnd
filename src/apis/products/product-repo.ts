@@ -60,6 +60,59 @@ export async function updateImageToProduct(id: string, image: File) {
   } catch (error) {
     const e = error as AxiosError;
     console.log(e);
+
+    return error;
+  }
+}
+export async function publishProduct(id: string) {
+  try {
+    const response = await api.patch(`product/publicProduct/${id}`);
+    return response;
+  } catch (error) {
+    const e = error as AxiosError;
+    console.log(e);
+    return error;
+  }
+}
+export async function draftProduct(id: string) {
+  try {
+    const response = await api.patch(`product/draftProduct/${id}`);
+    return response;
+  } catch (error) {
+    const e = error as AxiosError;
+    console.log(e);
+    return error;
+  }
+}
+export async function unDraftProduct(id: string) {
+  try {
+    const response = await api.patch(`product/unDaftProduct/${id}`);
+    return response;
+  } catch (error) {
+    const e = error as AxiosError;
+    console.log(e);
+    return error;
+  }
+}
+export async function addToWishlish(idProd: string) {
+  try {
+    const response = await api.post(`wishlist/addProductToWishList`, {
+      productId: idProd,
+    });
+    return response;
+  } catch (error) {
+    const e = error as AxiosError;
+    console.log(e);
+    return error;
+  }
+}
+export async function unPublishProduct(id: string) {
+  try {
+    const response = await api.patch(`product/unPublicProduct/${id}`);
+    return response;
+  } catch (error) {
+    const e = error as AxiosError;
+    console.log(e);
     return error;
   }
 }
@@ -113,6 +166,7 @@ export async function addColorsToProduct(
   } catch (error) {
     const e = error as AxiosError;
     console.log(e);
+
     return error;
   }
 }
@@ -132,6 +186,36 @@ export async function createProduct(product: IProduct) {
 export async function deleteProduct(id) {
   try {
     const response = await api.delete(`product/deleteProduct/${id}`);
+    return response;
+  } catch (error) {
+    const e = error as AxiosError;
+    return error;
+  }
+}
+
+export async function getProductFilter(
+  dataFilter: any,
+  skip: number,
+  take: number
+) {
+  try {
+    const response = await api.post("product/searchProductFilter", {
+      filter: dataFilter,
+      skip: skip,
+      take: take,
+    });
+    return response;
+  } catch (error) {
+    return error as AxiosError;
+  }
+}
+
+export async function getProductPage(skip: number, take: number) {
+  try {
+    const response = await api.post("product/getProductPage", {
+      skip: skip,
+      take: take,
+    });
     return response;
   } catch (error) {
     const e = error as AxiosError;

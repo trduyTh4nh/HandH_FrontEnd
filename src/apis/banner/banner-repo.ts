@@ -64,3 +64,16 @@ export async function deleteBanner(id: string) {
     return error;
   }
 }
+
+export async function updateModeBanner(id: string, mode: boolean) {
+  try {
+    const response = await api.put(`upload/updateModeBanner`, {
+      idBanner: id,
+      mode: mode,
+    });
+    return response;
+  } catch (error) {
+    console.log(error);
+    return error;
+  }
+}

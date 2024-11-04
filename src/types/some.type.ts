@@ -1,11 +1,9 @@
-
-
 export type TypeObjPrice = {
-    lowPrice: number,
-    highPrice: number
-}
+  lowPrice: number;
+  highPrice: number;
+};
 
 export type TypeFilterPice = {
-    priceFilter: number,
-    isHigher: boolean
-}
+  price: number;
+  isUp: boolean;
+};

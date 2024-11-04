@@ -40,11 +40,14 @@ import {
   ReceiptText,
   Shield,
   User,
+  UserCircle,
 } from "lucide-react";
 import { Button } from "../ui/button";
 import { logout } from "@/apis/user/user-repo";
 import { AxiosError } from "axios";
 import { useToast } from "@/hooks/use-toast";
+import { UserContext } from "../contexts/UserContext";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 // import { duration } from "@mui/material";
 
 const Navbar: React.FC = () => {
@@ -65,17 +68,25 @@ const Navbar: React.FC = () => {
   const [register, setRegister] = React.useState(false);
   const [admin, setAdmin] = React.useState(false);
   const [message, setMessage] = React.useState(false);
-  const [user, setUser] = React.useState(null);
+  const { user, setUser, isLoading } = React.useContext(UserContext);
   const [task, setTask] = React.useState({
     message: null,
     shown: false,
   });
-  useEffect(() => {
-    const lsUser = localStorage.getItem("user");
-    const user = JSON.parse(lsUser as string);
-    setUser(user);
-  }, []);
   const { toast } = useToast();
+  useEffect(() => {
+    if (isLoading) {
+      setTask({
+        message: "Đang tải...",
+        shown: true,
+      });
+    } else {
+      setTask({
+        message: "Đang tải...",
+        shown: false,
+      });
+    }
+  }, [isLoading]);
   function handleChange(isLogin: boolean) {
     if (isLogin) {
       const lsUser = localStorage.getItem("user");
@@ -234,8 +245,12 @@ const Navbar: React.FC = () => {
             ) : user ? (
               <DropdownMenu>
                 <DropdownMenuTrigger>
-                  <div className="cursor-pointer text-title-nav hover:underline hover:text-black hover:bg-gray-100 transition-all duration-800 px-3 py-2 rounded-md font-medium flex justify-center items-center">
+                  <div className="gap-4 cursor-pointer text-title-nav hover:underline hover:text-black hover:bg-gray-100 transition-all duration-800 px-3 py-2 rounded-md font-medium flex justify-center items-center">
                     Xin chào, {user.name}!
+                    <Avatar className="w-8 h-8">
+                      <AvatarImage src={user.avatar}></AvatarImage>
+                      <AvatarFallback><UserCircle width={16} height={16}/></AvatarFallback>
+                    </Avatar>
                   </div>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent>
@@ -272,16 +287,18 @@ const Navbar: React.FC = () => {
                       <p className="flex-1">Lịch sử mua hàng</p>
                       <ChevronRight className="w-4 h-4" />
                     </DropdownMenuItem>
-                    <DropdownMenuItem
-                      className="flex gap-2"
-                      onClick={() => {
-                        navigate("/admin");
-                      }}
-                    >
-                      <Shield className="w-4 h-4" />
-                      <p className="flex-1">Quản lý</p>
-                      <ChevronRight className="w-4 h-4" />
-                    </DropdownMenuItem>
+                    {user.role == '3107' ? (
+                      <DropdownMenuItem
+                        className="flex gap-2"
+                        onClick={() => {
+                          navigate("/admin");
+                        }}
+                      >
+                        <Shield className="w-4 h-4" />
+                        <p className="flex-1">Quản lý</p>
+                        <ChevronRight className="w-4 h-4" />
+                      </DropdownMenuItem>
+                    ) : null}
                   </DropdownMenuGroup>
                   <DropdownMenuSeparator />
                   <DropdownMenuGroup>
@@ -322,7 +339,7 @@ const Navbar: React.FC = () => {
                 </DialogFooter>
               </DialogContent>
             </Dialog>
-            {!user ? (
+            {!user && !task.shown ? (
               <>
                 <div>
                   <Dialog
