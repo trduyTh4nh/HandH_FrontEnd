@@ -1,0 +1,161 @@
+
+.container-left{
+    border-radius: 12pt;
+    padding: 20px;
+}
+.entire-page {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+    padding-left: 5rem;
+    padding-right: 5rem;
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+  }
+ 
+  .body {
+    display: flex;
+    justify-content: space-between; 
+  }
+  
+  .column-left,.column-right {
+    flex: 1; 
+    padding: 10px; 
+  }.column-center {
+    flex: 2; 
+    padding: 10px; 
+  }
+  
+  .container-left-item-abc {
+    display: flex;
+    flex-direction: row;
+    padding-top: 20px;
+    cursor: pointer;
+    padding: 10px; 
+    border-radius: 5px; 
+    transition: background-color 0.3s ease, text-decoration 0.3s ease; 
+  }
+  
+  .container-left-item-abc:hover {
+    background-color: #f0f0f0; /* Màu xám nhạt khi hover */
+  }
+  
+  .container-left-item-abc:hover h3 {
+    text-decoration: underline; /* Gạch chân chữ khi hover */
+  }
+/* .post-image img {
+  transition: transform 0.3s ease-in-out;
+  cursor: pointer;
+}
+
+.post-image img:hover {
+  transform: scale(1.05);
+} */
+  .containe-center{
+    border-radius: 12pt;
+    padding: 10pt;
+  }
+
+  .circle-image {
+    width: 65px; 
+    height: 65px; 
+    border-radius: 50%; 
+    object-fit: cover; 
+  }
+  .cicrle-item{
+    width: 40px; 
+    height: 40px; 
+    border-radius: 50%; 
+    object-fit: cover; 
+    margin-right: 10px;
+    
+  }
+
+  .post-header{
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    height: 100%;
+    justify-content: space-between;
+  }
+  .item-container-right{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 15px 0;
+    cursor: pointer;
+    padding: 10px;
+    border-radius: 5px; /* Làm mềm các góc khi có viền */
+    transition: background-color 0.3s ease, text-decoration 0.3s ease; 
+  }
+  .item-container-right:hover{
+    background-color: #f0f0f0;
+  }
+  .popup-menu {
+    position: absolute;
+    background-color: white;
+    border: 1px solid #ccc;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 10px;
+    right: 0; /* Đảm bảo nó nằm ở bên phải của biểu tượng */
+    top: 30px; /* Điều chỉnh vị trí theo nhu cầu */
+    z-index: 10;
+  }
+  
+  .popup-menu ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  
+  .popup-menu li {
+    padding: 8px;
+    cursor: pointer;
+  }
+  
+  .popup-menu li:hover {
+    background-color: #f0f0f0;
+  }
+  .post-header-right{
+    display: flex;
+    flex-direction: row;
+  }
+  .post-header-title-daypost{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+  }
+  .post-header-left{
+    align-content: center;
+
+  }
+  .post-header-title{
+    margin-left: 10px;
+    align-content: center;
+  }
+  .post-title{
+    margin: 16px 0;
+  }
+
+  .divider{
+    height: 0;
+    width: 100%;
+    border-bottom: 1px solid #F0F0F0;
+    margin-top: 20px ;
+    }
+
+    .divider-post{
+      height: 0;
+      width: 100%;
+      border-bottom: 1px solid #F0F0F0;
+    margin-top: 20px ;
+      margin-bottom: 40px;
+      }
+
+.container-right{
+    border:  1px solid #F0F0F0;
+    border-radius: 12pt;
+    padding: 20px ;
+
+}

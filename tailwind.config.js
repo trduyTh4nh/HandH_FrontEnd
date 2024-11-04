@@ -15,13 +15,15 @@ export default {
   			'black-transclusent': '#000000',
   			white: '#fff',
   			gray: {
+				'100': '#F0F0F0',
   				'200': '#DCDCDC',
   				'300': '#E8E8E8',
   				'400': 'rgba(0, 0, 0, 0.34)'
   			},
   			primary: {
   				DEFAULT: 'var(--primary)',
-  				foreground: '#000'
+  				foreground: '#000',
+				light: '#FFFBF4'
   			},
   			background: 'hsl(var(--background))',
   			foreground: 'hsl(var(--foreground))',

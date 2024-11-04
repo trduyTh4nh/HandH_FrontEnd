@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import API from "../apis/api";
 import {
   IColorProductVariation,
@@ -17,14 +17,26 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import {
+  Book,
+  BookDashed,
+  Circle,
+  CircleDashed,
   CircleX,
   Eye,
   EyeOff,
+  File,
+  FilePen,
+  FilePenLine,
+  Filter,
+  Image,
+  Info,
   Loader,
   Loader2,
   MoreHorizontalIcon,
   Pencil,
   Plus,
+  Search,
+  TextSearch,
   Trash2,
   TriangleAlert,
   Upload,
@@ -43,8 +55,15 @@ import {
 import { TableBody } from "@mui/material";
 import { Switch } from "@/components/ui/switch";
 import { convertMoney } from "@/utils";
-import { deleteProduct, getProduct } from "@/apis/products/product-repo";
-import { AxiosError } from "axios";
+import {
+  addColorsToProduct,
+  addImageToProduct,
+  createProduct,
+  deleteProduct,
+  getProduct,
+  updateImageToProduct,
+} from "@/apis/products/product-repo";
+import { Axios, AxiosError } from "axios";
 import {
   Accordion,
   AccordionItem,
@@ -52,8 +71,30 @@ import {
 } from "@/components/ui/accordion";
 import { AccordionContent } from "@radix-ui/react-accordion";
 import errorIndexes from "@/utils/errorKey";
-
+import ProductUploadForm from "@/components/widget/productUploadForm";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+} from "@/components/ui/tooltip";
+import { TooltipTrigger } from "@radix-ui/react-tooltip";
+import { useToast } from "@/hooks/use-toast";
+import { Badge } from "@/components/ui/badge";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { EyeClosedIcon } from "@radix-ui/react-icons";
+import { Progress } from "@/components/ui/progress";
+type UploadProcess = {
+  message: string;
+  isRunning: boolean;
+  progress?: number;
+};
 const ProductPage: React.FC = () => {
+  const { toast } = useToast();
   const [product, setProduct] = React.useState([]);
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState<AxiosError>(null);
@@ -77,19 +118,6 @@ const ProductPage: React.FC = () => {
   const [editingProduct, setEditingProduct] = React.useState<IProduct | null>(
     null
   );
-  const [newProduct, setNewProduct] = React.useState<IProduct>({
-    product_name: "",
-    product_thumb: "",
-    product_description: "",
-    product_price: 0,
-    product_slug: "",
-    product_rating: 0,
-    isDraft: true,
-    isPublished: false,
-    product_category: "",
-    product_color: [],
-    product_size: [],
-  });
   const [isAddProductOpen, setIsAddProductOpen] = React.useState(false);
 
   const handleEdit = (product: IProduct) => {
@@ -109,12 +137,28 @@ const ProductPage: React.FC = () => {
   };
 
   const handleRemove = async (productSlug: string) => {
+    setProcess({
+      message: "Đang xoá sản phẩm",
+      isRunning: true,
+    });
     const data = await deleteProduct(productSlug);
     if (data instanceof AxiosError) {
       console.log(data);
       setError(data);
+      setProcess({
+        message: "Đang xoá sản phẩm",
+        isRunning: false,
+      });
       return;
     }
+    toast({
+      title: "Xoá sản phẩm thành công",
+      description: `Bạn đã xoá sản phẩm ${productSlug} thành công.`,
+    });
+    setProcess({
+      message: "Đang xoá sản phẩm",
+      isRunning: false,
+    });
     setProducts(products.filter((p) => p._id !== productSlug));
   };
 
@@ -127,116 +171,6 @@ const ProductPage: React.FC = () => {
         return p;
       })
     );
-  };
-
-  const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
-    isNewProduct: boolean = false
-  ) => {
-    const { name, value } = e.target;
-    if (isNewProduct) {
-      setNewProduct((prev) => ({
-        ...prev,
-        [name]:
-          name === "product_price" || name === "product_rating"
-            ? parseFloat(value)
-            : value,
-      }));
-    } else if (editingProduct) {
-      setEditingProduct((prev) => ({
-        ...prev,
-        [name]:
-          name === "product_price" || name === "product_rating"
-            ? parseFloat(value)
-            : value,
-      }));
-    }
-  };
-
-  const handleAddProduct = () => {
-    const productSlug =
-      newProduct.product_name?.toLowerCase().replace(/ /g, "-") || "";
-    const productToAdd = {
-      ...newProduct,
-      product_slug: productSlug,
-    };
-    setProducts((prev) => [...prev, productToAdd]);
-    setNewProduct({
-      product_name: "",
-      product_thumb: "",
-      product_description: "",
-      product_price: 0,
-      product_slug: "",
-      product_rating: 0,
-      isDraft: true,
-      isPublished: false,
-      product_category: "",
-      product_color: [],
-      product_size: [],
-    });
-    setIsAddProductOpen(false);
-  };
-
-  const handleColorChange = (
-    index: number,
-    field: keyof IColorProductVariation,
-    value: string | number | boolean
-  ) => {
-    setNewProduct((prev) => ({
-      ...prev,
-      product_color:
-        prev.product_color?.map((color, i) =>
-          i === index ? { ...color, [field]: value } : color
-        ) || [],
-    }));
-  };
-
-  const handleSizeChange = (
-    index: number,
-    field: keyof ISizeProductVarication,
-    value: string | number | boolean
-  ) => {
-    setNewProduct((prev) => ({
-      ...prev,
-      product_size:
-        prev.product_size?.map((size, i) =>
-          i === index ? { ...size, [field]: value } : size
-        ) || [],
-    }));
-  };
-
-  const handleAddColor = () => {
-    setNewProduct((prev) => ({
-      ...prev,
-      product_color: [
-        ...(prev.product_color || []),
-        { color_code: "", color_price: 0, color_isPicked: false },
-      ],
-    }));
-  };
-
-  const handleAddSize = () => {
-    setNewProduct((prev) => ({
-      ...prev,
-      product_size: [
-        ...(prev.product_size || []),
-        { size_name: "", size_price: 0, size_isPicked: false },
-      ],
-    }));
-  };
-
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setNewProduct((prev) => ({
-          ...prev,
-          product_thumb: reader.result as string,
-        }));
-      };
-      reader.readAsDataURL(file);
-    }
   };
 
   const handleImageUploadEdit = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -252,45 +186,202 @@ const ProductPage: React.FC = () => {
       reader.readAsDataURL(file);
     }
   };
-
+  const [process, setProcess] = useState<UploadProcess>({
+    message: "Không có quá trình nào",
+    isRunning: false,
+  });
+  async function uploadProduct(data: IProduct) {
+    const { product_thumb, product_images, product_colors, ...rest } = data;
+    try {
+      setProcess({
+        message: "Đang đăng tải sản phẩm...",
+        isRunning: true,
+        progress: 5,
+      });
+      let id = "";
+      let res;
+      console.log({ ...rest, product_thumb: "/sample_image.jpg" });
+      res = await createProduct({
+        ...rest,
+        product_thumb: "/sample_image.jpg",
+      });
+      if (res instanceof AxiosError) {
+        setError(res);
+        setProcess({
+          message: "Đang đăng tải sản phẩm...",
+          isRunning: false,
+          progress: 5
+        });
+        return;
+      }
+      id = res.metadata._id;
+      setProcess({
+        message: "Đang đăng tải hình ảnh của sản phẩm...",
+        isRunning: true,
+        progress: 25
+      });
+      const res2 = await updateImageToProduct(id, product_thumb as File);
+      if (res2 instanceof AxiosError) {
+        setError(res2);
+        setProcess({
+          message: "Đang đăng tải hình ảnh của sản phẩm...",
+          isRunning: false,
+          progress: 25
+        });
+        return;
+      }
+      if (product_images.length > 0) {
+        setProcess({
+          message: "Đang đăng tải hình ảnh của sản phẩm...",
+          isRunning: true,
+          progress: 50
+        });
+        const res3 = await addImageToProduct(id, product_images as File[], (n) => {
+          setProcess({
+            message: "Đang đăng tải hình ảnh của sản phẩm...",
+            isRunning: true,
+            progress: process.progress + n / 50
+          });
+        });
+        if (res3 instanceof AxiosError) {
+          setError(res3);
+          setProcess({
+            message: "Đang đăng tải hình ảnh của sản phẩm...",
+            isRunning: false,
+            progress: 50
+          });
+          return;
+        }
+      }
+      setProcess({
+        message: "Đang đăng tải hình ảnh của sản phẩm...",
+        isRunning: true,
+        progress: 75
+      });
+      const res4 = await addColorsToProduct(id, product_colors as IColorProductVariation[], (progress) => {
+        setProcess({
+          message: "Đang đăng tải hình ảnh của sản phẩm...",
+          isRunning: true,
+          progress: process.progress + progress / 75
+        });
+      })
+      if(res4 instanceof AxiosError) {
+        setError(res4);
+        setProcess({
+          message: "Đang đăng tải hình ảnh của sản phẩm...",
+          isRunning: false,
+          progress: 0
+        });
+        return;
+      }
+      setProcess({
+        message: "Đang đăng tải hình ảnh của sản phẩm...",
+        isRunning: false,
+        progress: 0
+      });
+    } catch (e) {
+      console.error(e);
+      setProcess({
+        message: "Không có quá trình nào",
+        isRunning: false,
+      });
+      return;
+    }
+    setIsAddProductOpen(false);
+    setProducts([
+      ...products,
+      {
+        ...rest,
+        product_thumb: URL.createObjectURL(product_thumb as File),
+      },
+    ]);
+    toast({
+      title: "Đăng tải sản phẩm thành công",
+      description: `Bạn đã đăng tải sản phẩm ${rest.product_name} thành công!`,
+    });
+    setProcess({
+      message: "Không có quá trình nào",
+      isRunning: false,
+    });
+  }
   return (
     <div className="space-y-6 w-full p-8 h-screen">
       <div className="flex justify-between items-center">
-        <h2 className="text-3xl font-bold tracking-tight">
-          Danh sách sản phẩm
-        </h2>
+        <div className="flex gap-4 items-center">
+          <h2 className="text-3xl font-bold tracking-tight">
+            Danh sách sản phẩm
+          </h2>
+          <div className="flex gap-2 items-center">
+            <Search width={16} height={16} />
+            <Input placeholder="Tìm kiếm sản phẩm" />
+          </div>
+          <Button className="flex gap-2" variant="secondary">
+            <Filter width={16} height={16} />
+          </Button>
+        </div>
 
+        <Dialog open={process.isRunning}>
+          <DialogContent className="max-w-max">
+            <div className="flex flex-col gap-2 justify-center items-center">
+              <Loader className="animate-spin" />
+              <p className="text-lg">{process.message}</p>
+              {process.progress && (
+                <div className="flex gap-2 items-center w-full">
+                  <Progress className="flex-1" value={process.progress} />
+                  <p>{process.progress}%</p>
+                </div>
+              )}
+            </div>
+          </DialogContent>
+        </Dialog>
         <Dialog
           open={error != null}
           onOpenChange={(o) => {
             setError(null);
           }}
         >
-          <DialogContent className={`${ //@ts-ignore
-            error && errorIndexes[error.response.data.message] == null ? "border-red-400 bg-red-50" : ""}`}>
-            <DialogTitle className={`flex gap-4 items-center ${ //@ts-ignore
-              error && errorIndexes[error.response.data.message] == null ? "text-red-400" : "text-primary"}}`}>
-                {
-                  //@ts-ignore
-                  error && errorIndexes[error.response.data.message] == null ? <CircleX /> : <TriangleAlert/>
-                }
-              
-              Lỗi {error ? error.status || "bất định" : "🙂"}
+          <DialogContent
+            className={`${
+              error &&
+              error.response &&
+              //@ts-ignore
+              errorIndexes[error.response.data.message] == null
+                ? "border-red-400 bg-red-50"
+                : ""
+            }`}
+          >
+            <DialogTitle
+              className={`flex gap-4 items-center ${
+                error &&
+                error.response &&
+                //@ts-ignore
+                errorIndexes[error.response.data.message] == null
+                  ? "text-red-400"
+                  : "text-primary"
+              }}`}
+            >
+              {error &&
+              error.response.data &&
+              //@ts-ignore
+              errorIndexes[error.response.data.message] == null ? (
+                <CircleX />
+              ) : null}
+              Lỗi
             </DialogTitle>
-            <DialogDescription>
-              {error
+            <p className="font-bold">
+              {error && error.response
                 ? //@ts-ignore
                   errorIndexes[error.response.data.message] ||
                   "Lỗi bất định hoặc lỗi do máy chủ, vui lòng thử lại sau."
                 : ""}
-            </DialogDescription>
+            </p>
             <Accordion type="single" collapsible className="w-full">
               <AccordionItem value="0">
                 <AccordionTrigger>Xem chi tiết</AccordionTrigger>
                 <AccordionContent>
                   <p>Stack trace</p>
                   <p>
-                    {error
+                    {error && error.response
                       ? //@ts-ignore
                         error.response.data.stack || "Không tìm thấy chi tiết"
                       : "Ai biết đâu, tự nhiên bật dialog này lên?"}
@@ -311,223 +402,15 @@ const ProductPage: React.FC = () => {
               <Plus className="mr-2 h-4 w-4" /> Thêm sản phẩm
             </Button>
           </DialogTrigger>
-          <DialogContent className="sm:max-w-[1000px]">
+          <DialogContent className="sm:max-w-[85%] max-h-full overflow-auto">
             <DialogHeader>
               <DialogTitle>Thêm sản phẩm mới</DialogTitle>
             </DialogHeader>
-            <div className="flex gap-8 px-4">
-              <div className="grid gap-4 py-4 max-h-[70vh]   flex-1 w-32 overflow-x-auto">
-                <div className="grid grid-cols-1 items-center">
-                  <Label htmlFor="new-product-name" className="text-left">
-                    Tên
-                  </Label>
-                  <Input
-                    className="w-full"
-                    id="new-product-name"
-                    name="product_name"
-                    value={newProduct.product_name}
-                    onChange={(e) => handleInputChange(e, true)}
-                  />
-                </div>
-                <div className="grid grid-cols-1 items-center">
-                  <Label
-                    htmlFor="new-product-description"
-                    className="text-left"
-                  >
-                    Mô tả
-                  </Label>
-                  <Textarea
-                    id="new-product-description"
-                    name="product_description"
-                    value={newProduct.product_description}
-                    onChange={(e) => handleInputChange(e, true)}
-                  />
-                </div>
-                <div className="grid grid-cols-1 items-center ">
-                  <Label htmlFor="new-product-price" className="text-left">
-                    Giá
-                  </Label>
-                  <Input
-                    id="new-product-price"
-                    name="product_price"
-                    type="number"
-                    value={newProduct.product_price}
-                    onChange={(e) => handleInputChange(e, true)}
-                  />
-                </div>
-                <div className="grid grid-cols-1 items-center ">
-                  <Label htmlFor="new-product-category" className="text-left">
-                    Loại
-                  </Label>
-                  <Input
-                    id="new-product-category"
-                    name="product_category"
-                    value={newProduct.product_category}
-                    onChange={(e) => handleInputChange(e, true)}
-                  />
-                </div>
-              </div>
-              {/*  */}
-              <div className="grid gap-4 py-4 max-h-[70vh]  flex-initial w-80 overflow-y-auto">
-                {" "}
-                <div className="grid grid-cols-1 items-center gap-4">
-                  <Label htmlFor="new-product-rating" className="text-left">
-                    Đánh giá
-                  </Label>
-                  <Input
-                    id="new-product-rating"
-                    name="product_rating"
-                    type="number"
-                    min="0"
-                    max="5"
-                    step="0.1"
-                    value={newProduct.product_rating}
-                    onChange={(e) => handleInputChange(e, true)}
-                  />
-                </div>
-                <div className="grid grid-cols-1 items-center gap-4">
-                  <Label htmlFor="new-product-image" className="text-left">
-                    Hình ảnh
-                  </Label>
-                  <div className="flex items-center gap-2">
-                    <Input
-                      id="new-product-image"
-                      type="file"
-                      accept="image/*"
-                      onChange={handleImageUpload}
-                      className="hidden"
-                    />
-                    <Label
-                      htmlFor="new-product-image"
-                      className="cursor-pointer"
-                    >
-                      <div className="flex items-center gap-2 px-4 py-2 bg-secondary text-secondary-foreground hover:bg-secondary/80 rounded-md">
-                        <Upload className="h-4 w-4" />
-                        Đăng tải hình ảnh
-                      </div>
-                    </Label>
-                    {newProduct.product_thumb && (
-                      <img
-                        src={newProduct.product_thumb}
-                        alt="Product"
-                        className="w-16 h-16 object-cover rounded"
-                      />
-                    )}
-                  </div>
-                </div>
-                <div className="grid grid-cols-1 items-center gap-4">
-                  <Label className="text-left">Màu</Label>
-                  <div>
-                    {newProduct.product_color?.map((color, index) => (
-                      <div key={index} className="flex items-center gap-2 mb-2">
-                        <Input
-                          type="color"
-                          value={color.color_code}
-                          onChange={(e) =>
-                            handleColorChange(
-                              index,
-                              "color_code",
-                              e.target.value
-                            )
-                          }
-                        />
-                        <Input
-                          type="number"
-                          value={color.color_price}
-                          onChange={(e) =>
-                            handleColorChange(
-                              index,
-                              "color_price",
-                              parseFloat(e.target.value)
-                            )
-                          }
-                          placeholder="Price"
-                        />
-                        <Switch
-                          checked={color.color_isPicked}
-                          onCheckedChange={(checked) =>
-                            handleColorChange(index, "color_isPicked", checked)
-                          }
-                        />
-                      </div>
-                    ))}
-                    <Button
-                      type="button"
-                      onClick={handleAddColor}
-                      variant="outline"
-                      size="sm"
-                    >
-                      Thêm màu
-                    </Button>
-                  </div>
-                </div>
-                <div className="grid grid-cols-1 items-center gap-4">
-                  <Label className="text-left">Kích cỡ</Label>
-                  <div>
-                    {newProduct.product_size?.map((size, index) => (
-                      <div key={index} className="flex items-center gap-2 mb-2">
-                        <Input
-                          value={size.size_name}
-                          onChange={(e) =>
-                            handleSizeChange(index, "size_name", e.target.value)
-                          }
-                          placeholder="Size"
-                        />
-                        <Input
-                          type="number"
-                          value={size.size_price}
-                          onChange={(e) =>
-                            handleSizeChange(
-                              index,
-                              "size_price",
-                              parseFloat(e.target.value)
-                            )
-                          }
-                          placeholder="Price"
-                        />
-                        <Switch
-                          checked={size.size_isPicked}
-                          onCheckedChange={(checked) =>
-                            handleSizeChange(index, "size_isPicked", checked)
-                          }
-                        />
-                      </div>
-                    ))}
-                    <Button
-                      type="button"
-                      onClick={handleAddSize}
-                      variant="outline"
-                      size="sm"
-                    >
-                      Thêm kích cỡ
-                    </Button>
-                  </div>
-                </div>
-                <div className="grid grid-cols-1 items-center gap-4">
-                  <Label htmlFor="new-product-draft" className="text-left">
-                    Draft
-                  </Label>
-                  <Switch
-                    id="new-product-draft"
-                    checked={newProduct.isDraft}
-                    onCheckedChange={(checked) =>
-                      setNewProduct((prev) => ({
-                        ...prev,
-                        isDraft: checked,
-                        isPublished: !checked,
-                      }))
-                    }
-                  />
-                </div>
-              </div>
-            </div>
-            <div className="flex justify-end">
-              <Button onClick={handleAddProduct}>Thêm sản phẩm</Button>
-            </div>
+            <ProductUploadForm onSubmit={uploadProduct} />
           </DialogContent>
         </Dialog>
       </div>
-                    
+
       <Card>
         <CardContent>
           {loading ? (
@@ -551,17 +434,48 @@ const ProductPage: React.FC = () => {
                 {products.map((product) => (
                   <TableRow key={product.product_slug}>
                     <TableCell>
-                      <img
-                        className="w-20 h-20 rounded-md object-contain"
-                        src={product.product_thumb}
-                        alt=""
-                      />
+                      {!product.product_thumb || product.product_thumb == "" ? (
+                        <Image width={80} height={80} />
+                      ) : (
+                        <img
+                          className="w-20 h-20 rounded-md object-contain"
+                          src={product.product_thumb}
+                          alt=""
+                        />
+                      )}
                     </TableCell>
                     <TableCell>{product.product_name}</TableCell>
                     <TableCell>{convertMoney(product.product_price)}</TableCell>
                     <TableCell>{product.product_category}</TableCell>
                     <TableCell>
-                      {!product.isDraft ? "Published" : "Draft"}
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger className="w-full">
+                            <div className="flex items-center gap-2 w-full">
+                              <div className="flex items-center gap-2 flex-1">
+                                <Badge variant="secondary">
+                                  {product.isDraft ? "Bản nháp" : "Bản chính"}
+                                </Badge>
+                                <Badge variant="secondary">
+                                  {product.isPublished
+                                    ? "Hiển thị"
+                                    : "Không hiển thị"}
+                                </Badge>
+                              </div>
+                              <Info width={16} height={16} />
+                            </div>
+                          </TooltipTrigger>
+                          <TooltipContent className="max-w-44 bg-background shadow-lg">
+                            <b>Chế độ hiển thị</b>
+                            <p>
+                              Đây là trạng thái hiển thị sản phẩm của bạn trên
+                              trang của khách hàng, với trạng thái "Hiển thị" là
+                              sản phẩm đang được hiển thị trên cửa hàng và khách
+                              hàng có thể mua, "Đã ẩn" là ngược lại.
+                            </p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
                     </TableCell>
                     <TableCell>
                       <div className="flex space-x-2">
@@ -570,23 +484,14 @@ const ProductPage: React.FC = () => {
                           size="sm"
                           onClick={() => handleEdit(product)}
                         >
-                          <Pencil className="h-4 w-4 mr-1" />
-                          Chỉnh sửa
+                          <Pencil className="h-4 w-4" />
                         </Button>
                         {/* New button  */}
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleEdit(product)}
-                        >
-                          <MoreHorizontalIcon className="h-4 w-4 mr-1" />
-                          Chi tiết
-                        </Button>
+
                         <Dialog>
                           <DialogTrigger asChild>
                             <Button variant="outline" size="sm">
-                              <Trash2 className="h-4 w-4 mr-1" />
-                              Xóa
+                              <Trash2 className="h-4 w-4" />
                             </Button>
                           </DialogTrigger>
                           <DialogContent>
@@ -615,25 +520,46 @@ const ProductPage: React.FC = () => {
                             </DialogFooter>
                           </DialogContent>
                         </Dialog>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() =>
-                            handleTogglePublish(product.product_slug!)
-                          }
-                        >
-                          {product.isPublished ? (
-                            <>
-                              <EyeOff className="h-4 w-4 mr-1" />
-                              Không hiển thị
-                            </>
-                          ) : (
-                            <>
-                              <Eye className="h-4 w-4 mr-1" />
-                              Hiển thị
-                            </>
-                          )}
-                        </Button>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger>
+                            <Button variant="outline" size="sm">
+                              <MoreHorizontalIcon className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent>
+                            <DropdownMenuItem
+                              disabled={product.isDraft}
+                              className="flex gap-2"
+                            >
+                              {product.isPublished ? (
+                                <EyeOff width={16} height={16}></EyeOff>
+                              ) : (
+                                <Eye width={16} height={16}></Eye>
+                              )}
+                              <p>
+                                {product.isPublished
+                                  ? "Ẩn sản phẩm"
+                                  : "Hiển thị sản phẩm"}
+                              </p>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem className="flex gap-2">
+                              {product.isDraft ? (
+                                <File width={16} height={16}></File>
+                              ) : (
+                                <FilePen width={16} height={16}></FilePen>
+                              )}
+                              <p>
+                                {product.isDraft
+                                  ? "Chuyển thành bản chính"
+                                  : "Chuyển thành nháp"}
+                              </p>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem className="flex gap-2">
+                              <TextSearch width={16} height={16}></TextSearch>
+                              <p>Xem chi tiết</p>
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
                       </div>
                     </TableCell>
                   </TableRow>
@@ -654,87 +580,7 @@ const ProductPage: React.FC = () => {
             <DialogTitle>Chỉnh sửa</DialogTitle>
           </DialogHeader>
           <DialogContent className="min-w-[75%]">
-            <form className="space-y-4">
-              <div>
-                <Label htmlFor="product_name">Tên sản phẩm</Label>
-                <Input
-                  id="product_name"
-                  name="product_name"
-                  value={editingProduct.product_name}
-                  onChange={handleInputChange}
-                />
-              </div>
-              <div>
-                <Label htmlFor="product_description">Mô tả sản phẩm</Label>
-                <Textarea
-                  id="product_description"
-                  name="product_description"
-                  value={editingProduct.product_description}
-                  onChange={handleInputChange}
-                />
-              </div>
-              <div>
-                <Label htmlFor="product_price">Giá sản phẩm</Label>
-                <Input
-                  id="product_price"
-                  name="product_price"
-                  type="number"
-                  value={editingProduct.product_price}
-                  onChange={handleInputChange}
-                />
-              </div>
-              <div>
-                <Label htmlFor="product_category">Loại sản phẩm</Label>
-                <Input
-                  id="product_category"
-                  name="product_category"
-                  value={editingProduct.product_category}
-                  onChange={handleInputChange}
-                />
-              </div>
-              <div className="flex items-center space-x-2">
-                <Switch
-                  id="isPublished"
-                  checked={editingProduct.isPublished}
-                  onCheckedChange={(checked) =>
-                    setEditingProduct({
-                      ...editingProduct,
-                      isPublished: checked,
-                      isDraft: !checked,
-                    })
-                  }
-                />
-                <Label htmlFor="isPublished">Published</Label>
-              </div>
-              <div className="grid grid-cols-1 items-center gap-4">
-                <Label htmlFor="new-product-image" className="text-left">
-                  Hình ảnh
-                </Label>
-                <div className="flex items-center gap-2">
-                  <Input
-                    id="new-product-image"
-                    type="file"
-                    accept="image/*"
-                    onChange={handleImageUploadEdit}
-                    className="hidden"
-                  />
-                  <Label htmlFor="new-product-image" className="cursor-pointer">
-                    <div className="flex items-center gap-2 px-4 py-2 bg-secondary text-secondary-foreground hover:bg-secondary/80 rounded-md">
-                      <Upload className="h-4 w-4" />
-                      Đăng tải hình ảnh
-                    </div>
-                  </Label>
-                  {editingProduct.product_thumb && (
-                    <img
-                      src={editingProduct.product_thumb}
-                      alt="Product"
-                      className="w-16 h-16 object-cover rounded"
-                    />
-                  )}
-                </div>
-              </div>
-              <Button onClick={handleSave}>Lưu sản phẩm</Button>
-            </form>
+            <h1>Coming soon...</h1>
           </DialogContent>
         </Dialog>
       )}

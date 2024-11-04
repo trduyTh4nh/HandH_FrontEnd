@@ -1,5 +1,6 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
+import { findById, findLevel1ById } from 'dvhcvn'
 type AddressPickerProps = {
     defaultValues?: any;
 }
@@ -8,20 +9,15 @@ export default function useAddressPicker(props: AddressPickerProps) {
   const [districts, setDistricts] = useState([]);
   const [wards, setWards] = useState([]);
   async function getDistricts() {
-    const res = await axios.get("https://esgoo.net/api-tinhthanh/2/79.htm");
-    setDistricts(res.data.data);
+    const dis = findLevel1ById('79')
+    setDistricts(dis.children);
   }
-  async function getWards(districtId: any) {
-    const res = await axios.get(
-      `https://esgoo.net/api-tinhthanh/3/${districtId}.htm`
-    );
-    setWards(res.data.data);
+  async function getWards(districtName: any) {
+    const res = findLevel1ById('79').findLevel2ByName(districtName)
+    setWards(res.children);
   }
   useEffect(() => {
     getDistricts();
-    if(props.defaultValues){
-        getWards(JSON.parse(props.defaultValues.state).id)
-    }
   }, []);
   return {
     districts,

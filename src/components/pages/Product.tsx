@@ -1,4 +1,4 @@
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import Chip from "../widget/chip";
 import ImagesProduct from "../widget/imagesProduct";
 import ColorChip from "../widget/colorChip";
@@ -7,43 +7,94 @@ import { Add, RemoveOutlined } from "@mui/icons-material";
 import ImageViewer from "../widget/imageViewer";
 import Footer from "../widget/footer";
 import { ImageModelContext } from "../../providers/Providers";
+import { Button } from "../ui/button";
+import { useParams } from "react-router-dom";
+import { addToWishlish, getProductById } from "@/apis/products/product-repo";
+import { IProduct } from "@/types/product.type";
+import { AxiosError } from "axios";
+import ErrorView from "../widget/Error.widget";
+import { Link } from "react-router-dom";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "../ui/accordion";
+import { Heart, ShoppingCart } from "lucide-react";
+import SkeletonLoadingProduct from "../widget/skeletonLoadingProduct";
+import Recommendations from "../widget/recommendations";
+import { useToast } from "@/hooks/use-toast";
+import { UserContext } from "../contexts/UserContext";
 export default function Product() {
+  const {user} = useContext(UserContext);
+  const {toast} = useToast()
+  const { id } = useParams<{ id: string }>();
+  const [error, setError] = useState<AxiosError>(null);
+  const [productImages, setProductImages] = useState([]);
+  async function getProduct() {
+    console.log(id);
+    const response = await getProductById(decodeURI(id));
+    if (response instanceof AxiosError) {
+      console.log(response);
+      setError(response);
+      return;
+    }
+    //@ts-ignore
+    setProduct(response.metadata);
+    //@ts-ignore
+    setCateId(response.metadata.product_category);
+  }
+  async function addFavorite() {
+    const res = await addToWishlish(id);
+    if (res instanceof AxiosError) {
+      console.log(res);
+      return;
+    }
+    toast({title: "Đã thêm sản phẩm vào mục yêu thích.", description: `Đã thêm sản phẩm ${product.product_name} vào mục yêu thích. Vui lòng truy cập 'Hồ Sơ > Mục Yêu Thích' để xem.`})
+    return res
+  }
+  useEffect(() => {
+    setProduct(null);
+    getProduct();
+  }, [id]);
+  const [product, setProduct] = useState<IProduct>(null);
+  const [cateId, setCateId] = useState<string>(null);
+  useEffect(() => {
+    if (product) {
+      setColors(
+        product.product_colors.map((e) => {
+          return {
+            image: e.image_product_col,
+            tooltip: e.color_name,
+            color: e.color_code,
+            enabled: e.color_isPicked,
+            
+          };
+        })
+      );
+      setSizes(
+        product.product_sizes.map((e) => {
+          return {
+            name: e.size_name,
+            enabled: e.size_isPicked,
+          };
+        })
+      );
+      console.log(product.product_category);
+    }
+  }, [product]);
+  useEffect(() => {
+    if (product) {
+      const half = Math.ceil(product.product_images.length / 2);
+      setProductImages([
+        product.product_images.slice(0, half),
+        product.product_images.slice(half),
+      ]);
+    }
+  }, [product]);
   const [quantity, setQuantity] = useState(1);
-  const [sizes, setSizes] = useState([
-    {
-      name: "S",
-      enabled: true,
-    },
-    {
-      name: "M",
-      enabled: false,
-    },
-    {
-      name: "L",
-      enabled: false,
-    },
-    {
-      name: "XL",
-      enabled: false,
-    },
-  ]);
-  const [colors, setColors] = useState([
-    {
-      tooltip: "Xanh dương",
-      color: "#8DB4D2",
-      enabled: true,
-    },
-    {
-      tooltip: "Đen",
-      color: "#000",
-      enabled: false,
-    },
-    {
-      tooltip: "Hồng",
-      color: "#FFD1DC",
-      enabled: false,
-    },
-  ]);
+  const [sizes, setSizes] = useState([]);
+  const [colors, setColors] = useState([]);
   function changeSelected(element: any, array: Array<any>, value: boolean) {
     return array.map((e) => {
       if (e == element) {
@@ -58,28 +109,54 @@ export default function Product() {
       };
     });
   }
-  return (
-    <div className="pt-4">
-      <div className="product_main flex flex-1 gap-8 px-20 pb-10 justify-stretch relative box-border">
-        <div className="w-1/2 flex">
+  return error ? (
+    <ErrorView
+      title={`Sản phẩm không hợp lệ`}
+      message={`Sản phẩm với mã ${id} không tồn tại, đã bị ẩn hoặc đã bị xóa`}
+      icon="error"
+    >
+      <div className="flex flex-col gap-4 w-full items-center">
+        <Link to={"/shop"}>
+          <Button>Quay lại cửa hàng</Button>
+        </Link>
+        <Accordion type="single" collapsible className="w-full">
+          <AccordionItem value="0">
+            <AccordionTrigger>Chi tiết</AccordionTrigger>
+            <AccordionContent>
+              <b>
+                Mã lỗi: {error.status} - {error.code}
+              </b>
+              <p>
+                {
+                  //@ts-ignore
+                  error.response.data.message
+                }
+              </p>
+            </AccordionContent>
+          </AccordionItem>
+        </Accordion>
+      </div>
+    </ErrorView>
+  ) : !product ? (
+    <SkeletonLoadingProduct />
+  ) : (
+    <div className={`pt-4 transition-all w-full`}>
+      <div className="product_main flex flex-1 gap-8 px-48 pb-10 justify-stretch relative box-border">
+        <div className="w-1/2">
           <ImagesProduct
             imgList={[
               {
-                img: "/sample_image.jpg",
-              },
-              {
-                img: "/sample_image.jpg",
-              },
-              {
-                img: "/sample_image.jpg",
+                img: product.product_thumb as string,
               },
             ]}
           />
         </div>
-        <div className="flex flex-col gap-4 sticky top-[9.5rem] self-start w-1/2">
+        <div className="flex flex-col gap-4 sticky top-[11.5rem] self-start w-1/2">
           <div>
-            <h1>Lorem Ipsum Dolor Sit Amet</h1>
-            <h2 className="text-3xl font-light">590.000 đồng</h2>
+            <h1>{product.product_name}</h1>
+            <h2 className="text-3xl font-light">
+              {product.product_price.toLocaleString()} đồng
+            </h2>
           </div>
           <div className="flex flex-col gap-4">
             <h3 className="text-2xl font-light">Kích cỡ</h3>
@@ -100,6 +177,7 @@ export default function Product() {
               <div className="flex gap-4 w-full">
                 {colors.map((e) => (
                   <ColorChip
+                    image={e.image}
                     active={e.enabled}
                     color={e.color}
                     onClick={(selected) => {
@@ -111,11 +189,11 @@ export default function Product() {
               </div>
             </div>
             <div className="flex gap-2">
-              <button className="bg-primary flex items-center gap-4">
-                <ShoppingCartOutlinedIcon />
+              <Button className="flex items-center gap-4">
+                <ShoppingCart width={18} height={18} />
                 Thêm vào giỏ
-              </button>
-              <div className="button flex items-center gap-6 cursor-default">
+              </Button>
+              <div className=" flex items-center gap-6 px-4 bg-gray-100 rounded-full cursor-default">
                 <div
                   onClick={() => {
                     setQuantity((prev) => {
@@ -137,43 +215,31 @@ export default function Product() {
                   <Add />
                 </div>
               </div>
-            </div>
-            <div className="flex flex-col gap-2">
-              <h2 className="text-2xl font-light">Mô tả</h2>
-              <p>
-                Lorem ipsum dolor sit amet consectetur. Turpis sed tempus vel
-                neque eget sed tellus non senectus. Pellentesque maecenas
-                gravida dis arcu. Ut velit diam ut pulvinar nulla. Integer
-                rhoncus egestas consequat semper. Lobortis dictum sit ipsum
-                velit amet arcu bibendum ut gravida. Ut habitasse purus proin
-                amet nisi ipsum. Sed venenatis rhoncus nam odio elementum. Urna
-                leo ultricies quisque elementum. Urna leo diam id lacus ac quis
-                integer. Enim id sed tellus in id. Ultricies convallis mattis
-                tristique sit enim nec aliquet. Ligula auctor diam molestie sit
-                lectus mattis purus faucibus. Lorem ipsum dolor sit amet
-                consectetur. Turpis sed tempus vel neque eget sed tellus non
-                senectus. Pellentesque maecenas gravida dis arcu. Ut velit diam
-                ut pulvinar nulla. Integer rhoncus egestas consequat semper.
-                Lobortis dictum sit ipsum velit amet arcu bibendum ut gravida.
-                Ut habitasse purus proin amet nisi ipsum. Sed venenatis rhoncus
-                nam odio elementum. Urna leo ultricies quisque elementum. Urna
-                leo diam id lacus ac quis integer. Enim id sed tellus in id.
-                Ultricies convallis mattis tristique sit enim nec aliquet.
-                Ligula auctor diam molestie sit lectus mattis purus faucibus.
-                Lorem ipsum dolor sit amet consectetur. Turpis sed tempus vel
-                neque eget sed tellus non senectus. Pellentesque maecenas
-                gravida dis arcu. Ut velit diam ut pulvinar nulla. Integer
-                rhoncus egestas consequat semper. Lobortis dictum sit ipsum
-                velit amet arcu bibendum ut gravida. Ut habitasse purus proin
-                amet nisi ipsum. Sed venenatis rhoncus nam odio elementum. Urna
-                leo ultricies quisque elementum. Urna leo diam id lacus ac quis
-                integer. Enim id sed tellus in id. Ultricies convallis mattis
-                tristique sit enim nec aliquet. Ligula auctor diam molestie sit
-                lectus mattis purus faucibus.
-              </p>
+              <Button disabled={!user} variant="secondary" onClick={addFavorite}>
+                <Heart width={16} height={16}/>
+              </Button>
             </div>
           </div>
         </div>
+      </div>
+      <div className="px-48 flex flex-col gap-2 pb-4">
+        <h2 className="font-light">Mô tả sản phẩm</h2>
+        <p>{product.product_description}</p>
+        <div className="grid grid-cols-2 gap-x-2">
+          {
+            productImages.map(e => {
+              return <div className="flex flex-col gap-2">
+                {
+                  e.map((img) => {
+                   return <img src={img} className="h-auto w-full"/>
+                  })
+                }
+              </div>
+            })
+          }
+        </div>
+        <h2 className="font-light">Sản phẩm tương tự</h2>
+        <Recommendations cate={cateId} currentId={id} />
       </div>
       <Footer />
     </div>
