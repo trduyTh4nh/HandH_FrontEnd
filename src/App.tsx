@@ -41,6 +41,7 @@ import { Dialog, DialogContent, DialogTrigger } from "./components/ui/dialog";
 import PopupComponent from "./components/widget/popUpComponent";
 import { getLoggedInUser, UnauthenticatedError } from "./apis/user/user-repo";
 import { AxiosError } from "axios";
+import AboutUs from "./components/pages/AboutUs";
 const AdminRoute: React.FC = () => {
   const user = localStorage.getItem("user");
   const [isUserValid, setUserValid] = useState(false);
@@ -135,6 +136,7 @@ const UserRoute: React.FC = () => {
         <Route path="/shop" element={<Shop />} />
         <Route path="/blog" element={<Blog />} />
         <Route path="/management" element={<Management />} />
+        <Route path="/aboutUs" element={<AboutUs/>} />
         <Route path="/managerAccount" element={<ManagerAccount />}>
           <Route index element={<Account />} />
           <Route path="account" element={<Account />} />
