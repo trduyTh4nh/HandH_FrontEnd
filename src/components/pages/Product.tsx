@@ -9,7 +9,7 @@ import Footer from "../widget/footer";
 import { ImageModelContext } from "../../providers/Providers";
 import { Button } from "../ui/button";
 import { useParams } from "react-router-dom";
-import { getProductById } from "@/apis/products/product-repo";
+import { addToWishlish, getProductById } from "@/apis/products/product-repo";
 import { IProduct } from "@/types/product.type";
 import { AxiosError } from "axios";
 import ErrorView from "../widget/Error.widget";
@@ -23,7 +23,11 @@ import {
 import { Heart, ShoppingCart } from "lucide-react";
 import SkeletonLoadingProduct from "../widget/skeletonLoadingProduct";
 import Recommendations from "../widget/recommendations";
+import { useToast } from "@/hooks/use-toast";
+import { UserContext } from "../contexts/UserContext";
 export default function Product() {
+  const {user} = useContext(UserContext);
+  const {toast} = useToast()
   const { id } = useParams<{ id: string }>();
   const [error, setError] = useState<AxiosError>(null);
   const [productImages, setProductImages] = useState([]);
@@ -40,7 +44,15 @@ export default function Product() {
     //@ts-ignore
     setCateId(response.metadata.product_category);
   }
-
+  async function addFavorite() {
+    const res = await addToWishlish(id);
+    if (res instanceof AxiosError) {
+      console.log(res);
+      return;
+    }
+    toast({title: "Đã thêm sản phẩm vào mục yêu thích.", description: `Đã thêm sản phẩm ${product.product_name} vào mục yêu thích. Vui lòng truy cập 'Hồ Sơ > Mục Yêu Thích' để xem.`})
+    return res
+  }
   useEffect(() => {
     setProduct(null);
     getProduct();
@@ -203,7 +215,7 @@ export default function Product() {
                   <Add />
                 </div>
               </div>
-              <Button variant="secondary">
+              <Button disabled={!user} variant="secondary" onClick={addFavorite}>
                 <Heart width={16} height={16}/>
               </Button>
             </div>

@@ -17,7 +17,7 @@ import { Input } from "../ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog";
 import EditProfileForm from "./editProfileForm";
 import { IUser } from "@/types/user.type";
-import { AxiosError } from "axios";
+import axios, { AxiosError } from "axios";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Button } from "../ui/button";
 import { Cake, CircleUser, Mail, MapPin, Phone } from "lucide-react";
@@ -30,7 +30,20 @@ export const Account: React.FC = () => {
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmNewPassword, setConfirmNewPassword] = useState("");
-
+  const [file, setFile] = useState<File | null>(null);
+  async function handleConvertUrlToFile() {
+    if(!user.avatar) return;
+    try {
+      const response = await axios.get(user.avatar, { responseType: "blob" });
+      const fileName = user.avatar.split("/").pop();
+      const newFile = new File([response.data], fileName, {
+        type: response.data.type,
+      });
+      setFile(newFile);
+    } catch (error) {
+      console.error("Error converting URL to file:", error);
+    }
+  }
   const handleOpenPasswordDialog = () => {
     setOpenPasswordDialog(true);
   };
@@ -119,7 +132,7 @@ export const Account: React.FC = () => {
                 <Cake className="text-black" />
                 <p className="text-gray-700 font-semibold">Ngày sinh:</p>
                 <p className="ml-auto text-gray-800 font-medium">
-                  {user.birthDay != "" && "Không có ngày sinh"}
+                  {user.birthDay ? user.birthDay.toLocaleDateString() != "" && "Không có ngày sinh" : "Không có ngày sinh"}
                 </p>
               </div>
               <div className="flex items-center gap-2 mb-4">
@@ -212,11 +225,9 @@ export const Account: React.FC = () => {
             setOpenEditProfileDialog(e);
           }}
         >
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Chỉnh sửa hồ sơ</DialogTitle>
-            </DialogHeader>
-            <EditProfileForm />
+          <DialogContent className="min-w-[50%]">
+            
+            <EditProfileForm user={{...user, avatar: file}} />
           </DialogContent>
         </Dialog>
       </div>

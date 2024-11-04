@@ -13,7 +13,7 @@ export interface IUser {
   email?: string;
   password?: string;
   name?: string;
-  birthDay?: string;
+  birthDay?: Date;
   phone?: string;
   userAddress?: IUserAddress;
   role?: string;

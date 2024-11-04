@@ -94,6 +94,18 @@ export async function unDraftProduct(id: string) {
     return error;
   }
 }
+export async function addToWishlish(idProd: string) {
+  try {
+    const response = await api.post(`wishlist/addProductToWishList`, {
+      productId: idProd,
+    });
+    return response;
+  } catch (error) {
+    const e = error as AxiosError;
+    console.log(e);
+    return error;
+  }
+}
 export async function unPublishProduct(id: string) {
   try {
     const response = await api.patch(`product/unPublicProduct/${id}`);
