@@ -11,34 +11,68 @@ import {
   changePassword,
   getLoggedInUser,
   UnauthenticatedError,
+  updateAvatarUser,
 } from "@/apis/user/user-repo";
 import { userInfo } from "os";
 import { Input } from "../ui/input";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "../ui/dialog";
 import EditProfileForm from "./editProfileForm";
 import { IUser } from "@/types/user.type";
 import axios, { AxiosError } from "axios";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
-import { Button } from "../ui/button";
-import { Cake, CircleUser, Mail, MapPin, Phone } from "lucide-react";
+import { Button, buttonVariants } from "../ui/button";
+import { Cake, CircleUser, Loader, Mail, MapPin, Phone } from "lucide-react";
 import { UserContext } from "../contexts/UserContext";
+import { Label } from "../ui/label";
+import { cn } from "@/lib/utils";
+import { AspectRatio } from "../ui/aspect-ratio";
+import { profile } from "console";
+import { formatBytes } from "@/utils";
+import API from "@/apis/api";
 
 export const Account: React.FC = () => {
   const [openPasswordDialog, setOpenPasswordDialog] = useState(false);
   const [openEditProfileDialog, setOpenEditProfileDialog] = useState(false);
-  const {user, setUser} = useContext(UserContext);
+  const { user, setUser } = useContext(UserContext);
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmNewPassword, setConfirmNewPassword] = useState("");
   const [file, setFile] = useState<File | null>(null);
+  const [process, setProcess] = useState<{
+    loading: boolean;
+    where?: "password" | "profile" | "avatar";
+    error: AxiosError | null;
+  }>({
+    loading: false,
+    where: null,
+    error: null,
+  });
+  const [profilePic, setProfilePic] = useState<{
+    file: File | null;
+    isOpen: boolean;
+  } | null>({
+    file: null,
+    isOpen: false,
+  });
   async function handleConvertUrlToFile() {
-    if(!user.avatar) return;
+    if (!user.avatar) return;
     try {
-      const response = await axios.get(user.avatar, { responseType: "blob" });
+      const api = new API({ headerType: "json" });
+      const response = await api.get(user.avatar, { responseType: "blob" });
       const fileName = user.avatar.split("/").pop();
+      //@ts-ignore
       const newFile = new File([response.data], fileName, {
+        //@ts-ignore
         type: response.data.type,
       });
+      console.log(newFile.name);
       setFile(newFile);
     } catch (error) {
       console.error("Error converting URL to file:", error);
@@ -80,7 +114,38 @@ export const Account: React.FC = () => {
     }
   };
 
-  const handleSaveProfile = async () => {};
+  const handleSaveProfile = async () => {
+    setProcess({
+      loading: true,
+      where: "avatar",
+      error: null,
+    });
+    const res = await updateAvatarUser(profilePic.file, user._id);
+    setUser({
+      ...user,
+      // @ts-ignore
+      avatar: res.metadata.avatar,
+    });
+    console.log(res);
+    if (res instanceof AxiosError) {
+      console.error(res);
+      setProcess({
+        loading: true,
+        where: "avatar",
+        error: res,
+      });
+      return;
+    }
+    setProcess({
+      loading: false,
+      where: "avatar",
+      error: null,
+    });
+    setProfilePic({
+      file: null,
+      isOpen: false,
+    });
+  };
 
   return (
     <div className="flex justify-center items-center mt-4 px-8">
@@ -96,9 +161,26 @@ export const Account: React.FC = () => {
                   .join("")}
               </AvatarFallback>
             </Avatar>
-            <Button variant="outline" className="text-sm hover:underline">
+            <label
+              htmlFor="avatar-picker"
+              className={cn(buttonVariants({ variant: "outline" }))}
+            >
               Thay đổi ảnh đại diện
-            </Button>
+            </label>
+            <input
+              type="file"
+              className="hidden"
+              accept="image/*"
+              id="avatar-picker"
+              onChange={(e) => {
+                if (e.target.files[0]) {
+                  setProfilePic({
+                    file: e.target.files[0],
+                    isOpen: true,
+                  });
+                }
+              }}
+            />
             <hr className=" border-b-gray-100 w-full" />
             <h1 className="text-3xl font-bold text-gray-800">
               Hồ sơ khách hàng
@@ -132,7 +214,10 @@ export const Account: React.FC = () => {
                 <Cake className="text-black" />
                 <p className="text-gray-700 font-semibold">Ngày sinh:</p>
                 <p className="ml-auto text-gray-800 font-medium">
-                  {user.birthDay ? user.birthDay.toLocaleDateString() != "" && "Không có ngày sinh" : "Không có ngày sinh"}
+                  {user.birthDay
+                    ? user.birthDay.toLocaleDateString() != "" &&
+                      "Không có ngày sinh"
+                    : "Không có ngày sinh"}
                 </p>
               </div>
               <div className="flex items-center gap-2 mb-4">
@@ -226,8 +311,62 @@ export const Account: React.FC = () => {
           }}
         >
           <DialogContent className="min-w-[50%]">
-            
-            <EditProfileForm user={{...user, avatar: file}} />
+            <EditProfileForm defaultValues={{ user: { ...user, avatar: file }, profilePicture: user.avatar }} />
+          </DialogContent>
+        </Dialog>
+        <Dialog
+          open={profilePic.isOpen}
+          onOpenChange={(e) => {
+            setProfilePic({
+              ...profilePic,
+              isOpen: e,
+            });
+          }}
+        >
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Xem trước ảnh đại diện</DialogTitle>
+            </DialogHeader>
+
+            <div className="flex flex-col gap-2 items-center justify-center">
+              <AspectRatio ratio={1} className="w-full">
+                <Avatar className="w-full h-full">
+                  <AvatarImage
+                    src={
+                      profilePic.file
+                        ? URL.createObjectURL(profilePic.file)
+                        : null
+                    }
+                  ></AvatarImage>
+                  <AvatarFallback className="text-8xl font-bold">
+                    {user
+                      ? user.name
+                          .split(" ")
+                          .map((n) => n[0])
+                          .join("")
+                      : "?"}
+                  </AvatarFallback>
+                </Avatar>
+              </AspectRatio>
+              <p>{profilePic.file ? profilePic.file.name : "N/A"}</p>
+              <p>
+                {profilePic.file ? formatBytes(profilePic.file.size) : "N/A"}
+              </p>
+            </div>
+            <DialogFooter className="flex gap-2 w-full">
+              <DialogClose className="flex-1">
+                <Button variant="secondary" className="w-full">
+                  Huỷ
+                </Button>
+              </DialogClose>
+              <Button className="flex-1" onClick={handleSaveProfile}>
+                {process.where == "avatar" && process.loading ? (
+                  <Loader className="animate-spin" />
+                ) : (
+                  "Lưu"
+                )}
+              </Button>
+            </DialogFooter>
           </DialogContent>
         </Dialog>
       </div>

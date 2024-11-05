@@ -3,7 +3,8 @@ import API from "../api";
 import { IUser } from "@/types/user.type";
 
 const api = new API({ headerType: "json" });
-async function login(data) { }
+const formApi = new API({ headerType: "formdata" });
+async function login(data) {}
 export async function logout() {
   try {
     const res = await api.post("access/logout");
@@ -18,22 +19,22 @@ export async function register(data) {
   try {
     const res = await api.post("access/register", {
       ...rest,
-      name: fullName
-    })
-    return res
+      name: fullName,
+    });
+    return res;
   } catch (error) {
     const e = error as AxiosError;
-    console.error(e)
+    console.error(e);
     return e;
   }
 }
 export class UnauthenticatedError extends Error {
-  code: number
+  code: number;
   constructor(message, code) {
-    super()
+    super();
     this.message = message;
     this.name = "USER_UNAUTHENTICATED";
-    this.code = code
+    this.code = code;
   }
 }
 export async function getUsers() {
@@ -42,16 +43,16 @@ export async function getUsers() {
     return res;
   } catch (e) {
     if (e instanceof AxiosError) {
-      return e
+      return e;
     }
   }
 }
 export async function getLoggedInUser() {
-  const userStr = localStorage.getItem("user")
+  const userStr = localStorage.getItem("user");
   if (!userStr) {
-    throw new UnauthenticatedError("Người dùng chưa đăng nhập", 401)
+    throw new UnauthenticatedError("Người dùng chưa đăng nhập", 401);
   }
-  const userObj = JSON.parse(userStr)
+  const userObj = JSON.parse(userStr);
   try {
     const res = await api.get(`access/getUser/${userObj._id}`);
     //@ts-ignore
@@ -76,13 +77,25 @@ export async function changePassword(body) {
     throw error;
   }
 }
+export async function updateAvatarUser(file: File, id: string) {
+  try {
+    const formData = new FormData();
+    formData.append("file", file);
+    const res = await formApi.post(`access/updateImageForUser/${id}`, formData);
+    return res;
+  } catch (e) {
+    if (e instanceof AxiosError) {
+      return e;
+    }
+  }
+}
 export async function getAllUsers() {
   try {
     const res = await api.get("access/getAllUser");
     return res;
   } catch (e) {
     if (e instanceof AxiosError) {
-      return e
+      return e;
     }
   }
 }
@@ -90,11 +103,14 @@ export async function changeInformation(body: IUser) {
   // const userStr = JSON.parse(localStorage.getItem("user"))
   const userStr = localStorage.getItem("user");
   if (!userStr) {
-    throw new UnauthenticatedError("Người dùng chưa đăng nhập", 401)
+    throw new UnauthenticatedError("Người dùng chưa đăng nhập", 401);
   }
-  const userObj = JSON.parse(userStr)
+  const userObj = JSON.parse(userStr);
   try {
-    const res: any = await api.put(`access/updateInformationUser/${userObj._id}`, body);
+    const res: any = await api.put(
+      `access/updateInformationUser/${userObj._id}`,
+      body
+    );
     console.log(userObj._id);
     return res.metadata;
   } catch (err) {

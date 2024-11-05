@@ -1,7 +1,7 @@
 import { IUser } from "@/types/user.type";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
+import { string, z } from "zod";
 import {
   Form,
   FormControl,
@@ -47,13 +47,16 @@ const editProfileSchema = z.object({
 });
 type UserSchema = z.infer<typeof editProfileSchema>;
 type EditProfileFormProps = {
-  user?: UserSchema;
+  defaultValues?: {
+    user: UserSchema;
+    profilePicture?: string;
+  };
   onSubmit?: (user: UserSchema) => void;
 };
 export default function EditProfileForm(props: EditProfileFormProps) {
   const form = useForm<UserSchema>({
     resolver: zodResolver(editProfileSchema),
-    defaultValues: props.user,
+    defaultValues: props.defaultValues?.user,
   });
   const { getDistricts, getWards, districts, wards } = useAddressPicker({});
   return (
@@ -79,7 +82,7 @@ export default function EditProfileForm(props: EditProfileFormProps) {
                           src={
                             field.value
                               ? URL.createObjectURL(field.value)
-                              : null
+                              : props.defaultValues?.profilePicture
                           }
                         ></AvatarImage>
                         <AvatarFallback>
