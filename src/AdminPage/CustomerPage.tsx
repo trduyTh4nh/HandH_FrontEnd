@@ -1,5 +1,5 @@
 import { IUser } from "@/types/user.type";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   IColorProductVariation,
   IProduct,
@@ -24,6 +24,7 @@ import {
   Upload,
   Lock,
   Search,
+  Loader,
 } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -45,43 +46,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-const mockUsers: IUser[] = [
-  {
-    _id: "1",
-    email: "john@example.com",
-    password: "hashed_password",
-    name: "John Doe",
-    birthDay: "1990-01-01",
-    phone: "123-456-7890",
-    role: "customer",
-    avatar: "/placeholder.svg?height=40&width=40",
-    userAddress: {
-      street: "123 Main St",
-      city: "Anytown",
-      state: "CA",
-      country: "USA",
-      zipcode: "12345",
-    },
-  },
-  {
-    _id: "2",
-    email: "jane@example.com",
-    password: "hashed_password",
-    name: "Jane Smith",
-    birthDay: "1992-05-15",
-    phone: "987-654-3210",
-    role: "customer",
-    avatar: "/placeholder.svg?height=40&width=40",
-    userAddress: {
-      street: "456 Elm St",
-      city: "Other City",
-      state: "NY",
-      country: "USA",
-      zipcode: "67890",
-    },
-  },
-  // Add more mock users as needed
-];
+import { getAllUsers } from "@/apis/user/user-repo";
 
 const mockActivityHistory = [
   { id: "1", userId: "1", action: "Login", timestamp: "2023-06-01 10:30:00" },
@@ -101,10 +66,9 @@ const mockActivityHistory = [
 ];
 
 const CustomerPage: React.FC = () => {
-  const [users, setUsers] = React.useState<IUser[]>(mockUsers);
+  const [users, setUsers] = React.useState<IUser[]>(null);
   const [selectedUser, setSelectedUser] = React.useState<IUser | null>(null);
   const [searchTerm, setSearchTerm] = React.useState("");
-
   const handleLockUnlock = (userId: string) => {
     setUsers(
       users.map((user) =>
@@ -114,7 +78,24 @@ const CustomerPage: React.FC = () => {
       )
     );
   };
-
+  const getUsers = async () => {
+    const res = await getAllUsers();
+    if (res instanceof Error) {
+      console.error(res);
+      return;
+    }
+    setUsers(
+      //@ts-ignore
+      res.metadata.filter(
+        (user) =>
+          user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          user.email.toLowerCase().includes(searchTerm.toLowerCase())
+      )
+    );
+  };
+  useEffect(() => {
+    getUsers();
+  }, []);
   const handleRoleChange = (userId: string, newRole: string) => {
     setUsers(
       users.map((user) =>
@@ -122,12 +103,6 @@ const CustomerPage: React.FC = () => {
       )
     );
   };
-
-  const filteredUsers = users.filter(
-    (user) =>
-      user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      user.email.toLowerCase().includes(searchTerm.toLowerCase())
-  );
 
   return (
     <div className="container p-8 w-full h-screen space-y-4">
@@ -148,167 +123,147 @@ const CustomerPage: React.FC = () => {
           <CardTitle>Danh sách khách hàng</CardTitle>
         </CardHeader>
         <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Tên</TableHead>
-                <TableHead>Email</TableHead>
-                <TableHead>Điện thoại</TableHead>
-                <TableHead>Quyền</TableHead>
-                <TableHead>Hành động</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredUsers.map((user) => (
-                <TableRow key={user._id}>
-                  <TableCell className="font-medium">{user.name}</TableCell>
-                  <TableCell>{user.email}</TableCell>
-                  <TableCell>{user.phone}</TableCell>
-                  <TableCell>{user.role}</TableCell>
-                  <TableCell>
-                    <div className="flex space-x-2">
-                      <Dialog>
-                        <DialogTrigger asChild>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => setSelectedUser(user)}
-                          >
-                            <Eye className="h-4 w-4 mr-1" />
-                            Xem chi tiết
-                          </Button>
-                        </DialogTrigger>
-                        <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
-                          <DialogHeader>
-                            <DialogTitle>
-                              Thông tin khách hàng chi tiết
-                            </DialogTitle>
-                          </DialogHeader>
-                          {selectedUser && (
-                            <Tabs defaultValue="details">
-                              <TabsList>
-                                <TabsTrigger value="details">
-                                  Chi tiết
-                                </TabsTrigger>
-                                <TabsTrigger value="activity">
-                                  Lịch sử hoạt động
-                                </TabsTrigger>
-                              </TabsList>
-                              <TabsContent value="details">
-                                <div className="grid grid-cols-2 gap-4">
-                                  <div className="space-y-2">
-                                    <Label>Tên</Label>
-                                    <Input value={selectedUser.name} readOnly />
-                                  </div>
-                                  <div className="space-y-2">
-                                    <Label>Email</Label>
-                                    <Input
-                                      value={selectedUser.email}
-                                      readOnly
-                                    />
-                                  </div>
-                                  <div className="space-y-2">
-                                    <Label>Điện thoại</Label>
-                                    <Input
-                                      value={selectedUser.phone}
-                                      readOnly
-                                    />
-                                  </div>
-                                  <div className="space-y-2">
-                                    <Label>Ngày sinh</Label>
-                                    <Input
-                                      value={selectedUser.birthDay || "N/A"}
-                                      readOnly
-                                    />
-                                  </div>
-                                  <div className="space-y-2 col-span-2">
-                                    <Label>Địa chỉ</Label>
-                                    <Input
-                                      value={`${
-                                        selectedUser.userAddress?.street || ""
-                                      }, ${
-                                        selectedUser.userAddress?.city || ""
-                                      }, ${
-                                        selectedUser.userAddress?.state || ""
-                                      }, ${
-                                        selectedUser.userAddress?.country || ""
-                                      } ${
-                                        selectedUser.userAddress?.zipcode || ""
-                                      }`}
-                                      readOnly
-                                    />
-                                  </div>
-                                </div>
-                              </TabsContent>
-                              <TabsContent value="activity">
-                                <Table>
-                                  <TableHeader>
-                                    <TableRow>
-                                      <TableHead>Hành động</TableHead>
-                                      <TableHead>Thời gian</TableHead>
-                                    </TableRow>
-                                  </TableHeader>
-                                  <TableBody>
-                                    {mockActivityHistory
-                                      .filter(
-                                        (activity) =>
-                                          activity.userId === selectedUser._id
-                                      )
-                                      .map((activity) => (
-                                        <TableRow key={activity.id}>
-                                          <TableCell>
-                                            {activity.action}
-                                          </TableCell>
-                                          <TableCell>
-                                            {activity.timestamp}
-                                          </TableCell>
-                                        </TableRow>
-                                      ))}
-                                  </TableBody>
-                                </Table>
-                              </TabsContent>
-                            </Tabs>
-                          )}
-                        </DialogContent>
-                      </Dialog>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handleLockUnlock(user._id!)}
-                      >
-                        {user.role === "locked" ? (
-                          <>
-                            <Unlock className="h-4 w-4 mr-1" />
-                            Bỏ chặn
-                          </>
-                        ) : (
-                          <>
-                            <Lock className="h-4 w-4 mr-1" />
-                            CHặn
-                          </>
-                        )}
-                      </Button>
-                      <Select
-                        value={user.role}
-                        onValueChange={(value) =>
-                          handleRoleChange(user._id!, value)
-                        }
-                      >
-                        <SelectTrigger className="w-[130px]">
-                          <SelectValue placeholder="Select role" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="customer">Khách hàng</SelectItem>
-                          <SelectItem value="admin">Quản trị viên</SelectItem>
-                          <SelectItem value="manager">Quản lý</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </TableCell>
+          {!users ? (
+            <div className="flex justify-center items-center w-full pt-4 gap-4">
+              <Loader className="animate-spin" />
+              <p>Đang tải...</p>
+            </div>
+          ) : (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Tên</TableHead>
+                  <TableHead>Email</TableHead>
+                  <TableHead>Điện thoại</TableHead>
+                  <TableHead>Quyền</TableHead>
+                  <TableHead>Hành động</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {users.map((user) => (
+                  <TableRow key={user._id}>
+                    <TableCell className="font-medium">{user.name}</TableCell>
+                    <TableCell>{user.email}</TableCell>
+                    <TableCell>{user.phone}</TableCell>
+                    <TableCell>{user.role}</TableCell>
+                    <TableCell>
+                      <div className="flex space-x-2">
+                        <Dialog>
+                          <DialogTrigger asChild>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => setSelectedUser(user)}
+                            >
+                              <Eye className="h-4 w-4 mr-1" />
+                              Xem chi tiết
+                            </Button>
+                          </DialogTrigger>
+                          <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+                            <DialogHeader>
+                              <DialogTitle>
+                                Thông tin khách hàng chi tiết
+                              </DialogTitle>
+                            </DialogHeader>
+                            {selectedUser && (
+                              <Tabs defaultValue="details">
+                                <TabsList>
+                                  <TabsTrigger value="details">
+                                    Chi tiết
+                                  </TabsTrigger>
+                                  <TabsTrigger value="activity">
+                                    Lịch sử hoạt động
+                                  </TabsTrigger>
+                                </TabsList>
+                                <TabsContent value="details">
+                                  <div className="grid grid-cols-2 gap-4">
+                                    <div className="space-y-2">
+                                      <Label>Tên</Label>
+                                      <Input
+                                        value={selectedUser.name}
+                                        readOnly
+                                      />
+                                    </div>
+                                    <div className="space-y-2">
+                                      <Label>Email</Label>
+                                      <Input
+                                        value={selectedUser.email}
+                                        readOnly
+                                      />
+                                    </div>
+                                    <div className="space-y-2">
+                                      <Label>Điện thoại</Label>
+                                      <Input
+                                        value={selectedUser.phone}
+                                        readOnly
+                                      />
+                                    </div>
+                                    <div className="space-y-2">
+                                      <Label>Ngày sinh</Label>
+                                      <Input
+                                        value={selectedUser.birthDay ? selectedUser.birthDay.toLocaleDateString() || "N/A" : "N/A"}
+                                        readOnly
+                                      />
+                                    </div>
+                                    <div className="space-y-2 col-span-2">
+                                      <Label>Địa chỉ</Label>
+                                      <Input
+                                        value={`${
+                                          selectedUser.userAddress?.street || ""
+                                        }, ${
+                                          selectedUser.userAddress?.city || ""
+                                        }, ${
+                                          selectedUser.userAddress?.state || ""
+                                        }, ${
+                                          selectedUser.userAddress?.country ||
+                                          ""
+                                        } ${
+                                          selectedUser.userAddress?.zipcode ||
+                                          ""
+                                        }`}
+                                        readOnly
+                                      />
+                                    </div>
+                                  </div>
+                                </TabsContent>
+                                <TabsContent value="activity">
+                                  <Table>
+                                    <TableHeader>
+                                      <TableRow>
+                                        <TableHead>Hành động</TableHead>
+                                        <TableHead>Thời gian</TableHead>
+                                      </TableRow>
+                                    </TableHeader>
+                                    <TableBody>
+                                      {mockActivityHistory
+                                        .filter(
+                                          (activity) =>
+                                            activity.userId === selectedUser._id
+                                        )
+                                        .map((activity) => (
+                                          <TableRow key={activity.id}>
+                                            <TableCell>
+                                              {activity.action}
+                                            </TableCell>
+                                            <TableCell>
+                                              {activity.timestamp}
+                                            </TableCell>
+                                          </TableRow>
+                                        ))}
+                                    </TableBody>
+                                  </Table>
+                                </TabsContent>
+                              </Tabs>
+                            )}
+                          </DialogContent>
+                        </Dialog>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          )}
         </CardContent>
       </Card>
     </div>

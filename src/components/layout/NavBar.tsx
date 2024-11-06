@@ -1,7 +1,7 @@
 import { NavLink, useNavigate } from "react-router-dom";
 import "../../styles/styles.css";
 
-import React from "react";
+import React, { useEffect } from "react";
 import HeaderComponentSearch from "../widget/headerComponentSearch";
 // import {
 //     Menu,Badge
@@ -13,11 +13,47 @@ import boxCategory from "../widget/boxCategory.widget";
 import PopupComponent from "../widget/popUpComponent";
 import PopupRegister from "../widget/popUpRegister";
 import PopupAdmin from "../widget/popUpAdmin";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "../ui/dialog";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "../ui/dropdown-menu";
+import {
+  ChevronRight,
+  Heart,
+  Loader,
+  LogOut,
+  ReceiptText,
+  Shield,
+  User,
+  UserCircle,
+} from "lucide-react";
+import { Button } from "../ui/button";
+import { logout } from "@/apis/user/user-repo";
+import { AxiosError } from "axios";
+import { useToast } from "@/hooks/use-toast";
+import { UserContext } from "../contexts/UserContext";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 // import { duration } from "@mui/material";
 
 const Navbar: React.FC = () => {
   const navigate = useNavigate();
   const [showCate, setShowCate] = React.useState(false);
+  const [showLogoutConfirm, setShowLogoutConfirm] = React.useState(false);
   const transitions = useTransition(showCate, {
     from: { y: -16, opacity: 0, backgroundColor: "rgba(0, 0, 0, 0)" },
     enter: { y: 0, opacity: 1, backgroundColor: "rgba(0, 0, 0, 0.55)" },
@@ -30,40 +66,86 @@ const Navbar: React.FC = () => {
 
   const [login, setLogin] = React.useState(false);
   const [register, setRegister] = React.useState(false);
-  const[admin,setAdmin]=React.useState(false);
-  const[message,setMessage]=React.useState(false);
-  const [user, setUser] = React.useState(null)
-
+  const [admin, setAdmin] = React.useState(false);
+  const [message, setMessage] = React.useState(false);
+  const { user, setUser, isLoading } = React.useContext(UserContext);
+  const [task, setTask] = React.useState({
+    message: null,
+    shown: false,
+  });
+  const { toast } = useToast();
+  useEffect(() => {
+    if (isLoading) {
+      setTask({
+        message: "Đang tải...",
+        shown: true,
+      });
+    } else {
+      setTask({
+        message: "Đang tải...",
+        shown: false,
+      });
+    }
+  }, [isLoading]);
   function handleChange(isLogin: boolean) {
-    if(isLogin){
+    if (isLogin) {
       const lsUser = localStorage.getItem("user");
       const user = JSON.parse(lsUser as string);
       setUser(user);
     }
     setLogin(false);
-
+  }
+  async function logOut() {
+    setTask({
+      message: "Đang đăng xuất...",
+      shown: true,
+    });
+    const res = await logout();
+    if (res instanceof AxiosError) {
+      console.log(res);
+      //@ts-ignore
+      if (res.response.data.message != "invalid signature") {
+        console.log(res);
+        toast({
+          title: `Lỗi ${res.code}`,
+          description: `Lỗi hệ thống: ${res.message}`,
+        });
+        setTask({
+          message: "Đang đăng xuất...",
+          shown: false,
+        });
+        return;
+      }
+    }
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    setUser(null);
+    window.location.reload();
+    setTask({
+      message: "Đang đăng xuất...",
+      shown: false,
+    });
   }
   function handleChangeRe() {
     setRegister(false);
   }
-  function handleChangeAd(){
+  function handleChangeAd() {
     setAdmin(false);
   }
 
-  function handleChangeMess(){
+  function handleChangeMess() {
     setMessage(false);
   }
 
   function switchToRegister() {
     setLogin(false);
-    setRegister(true); 
+    setRegister(true);
   }
 
-  function switchToLogin(){
+  function switchToLogin() {
     setLogin(true);
     setRegister(false);
   }
-
 
   // </div>
 
@@ -72,9 +154,12 @@ const Navbar: React.FC = () => {
       id="nav-main"
       className=" bg-white fixed w-full top-0 z-30 rounded-b-3xl shadow-md"
     >
-      <div className="flex mx-auto px-20 py-4 justify-between items-center">
-        <div className="flex justify-start gap-4">
-          <div className="flex-shrink-0 flex items-center">
+      <div className="flex mx-auto px-10 md:px-20 py-4 justify-between items-center">
+        <div className="flex justify-start gap-4 items-center">
+          <div className="flex-shrink-0 flex items-center gap-2">
+            <Button variant="ghost" className="block md:hidden bg-transparent">
+              <Menu></Menu>
+            </Button>
             <NavLink to="/">
               <img
                 className="w-auto h-12"
@@ -108,7 +193,7 @@ const Navbar: React.FC = () => {
         </div>
         <HeaderComponentSearch></HeaderComponentSearch>
       </div>
-      <div className="flex px-0 py-0 pb-3  items-center flex-col ">
+      <div className="hidden md:flex px-0 py-0 pb-3  items-center flex-col ">
         {/* <HeaderBottom></HeaderBottom> */}
         <div className="flex items-center justify-between w-full px-20 pb-4 rounded-b-2xl">
           {!showCate ? (
@@ -152,39 +237,165 @@ const Navbar: React.FC = () => {
           )}
 
           <div className="flex gap-6">
-            <NavLink
-              to="/managerAccount"
-              className="text-title-nav hover:underline hover:text-black hover:bg-gray-100 transition-all duration-800 px-3 py-2 rounded-md font-medium"
+            {task.shown ? (
+              <div className="flex gap-2 items-center">
+                <Loader className="animate-spin" />
+                <p>{task.message}</p>
+              </div>
+            ) : user ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger>
+                  <div className="gap-4 cursor-pointer text-title-nav hover:underline hover:text-black hover:bg-gray-100 transition-all duration-800 px-3 py-2 rounded-md font-medium flex justify-center items-center">
+                    Xin chào, {user.name}!
+                    <Avatar className="w-8 h-8">
+                      <AvatarImage src={user.avatar}></AvatarImage>
+                      <AvatarFallback><UserCircle width={16} height={16}/></AvatarFallback>
+                    </Avatar>
+                  </div>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent>
+                  <DropdownMenuLabel>Tuỳ chọn</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuGroup>
+                    <DropdownMenuItem
+                      className="flex gap-2"
+                      onClick={() => {
+                        navigate("/ManagerAccount");
+                      }}
+                    >
+                      <User className="w-4 h-4" />
+                      <p className="flex-1">Hồ sơ</p>
+                      <ChevronRight className="w-4 h-4" />
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      className="flex gap-2"
+                      onClick={() => {
+                        navigate("/ManagerAccount/favoriteProduct");
+                      }}
+                    >
+                      <Heart className="w-4 h-4" />
+                      <p className="flex-1">Sản phẩm yêu thích</p>
+                      <ChevronRight className="w-4 h-4" />
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      className="flex gap-2"
+                      onClick={() => {
+                        navigate("/ManagerAccount/paymentHistory");
+                      }}
+                    >
+                      <ReceiptText className="w-4 h-4" />
+                      <p className="flex-1">Lịch sử mua hàng</p>
+                      <ChevronRight className="w-4 h-4" />
+                    </DropdownMenuItem>
+                    {user.role == '3107' ? (
+                      <DropdownMenuItem
+                        className="flex gap-2"
+                        onClick={() => {
+                          navigate("/admin");
+                        }}
+                      >
+                        <Shield className="w-4 h-4" />
+                        <p className="flex-1">Quản lý</p>
+                        <ChevronRight className="w-4 h-4" />
+                      </DropdownMenuItem>
+                    ) : null}
+                  </DropdownMenuGroup>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuGroup>
+                    <DropdownMenuItem
+                      className="flex gap-2"
+                      onClick={() => {
+                        setShowLogoutConfirm(true);
+                      }}
+                    >
+                      <LogOut className="w-4 h-4" />
+                      <p className="flex-1">Đăng xuất</p>
+                      <ChevronRight className="w-4 h-4" />
+                    </DropdownMenuItem>
+                  </DropdownMenuGroup>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : null}
+            <Dialog
+              open={showLogoutConfirm}
+              onOpenChange={(o) => {
+                setShowLogoutConfirm(o);
+              }}
             >
-              Xin chào, User!
-            </NavLink>
-            <div>
-              <input
-                onClick={() => setLogin(!login)}
-                className="font-bold underline  hover:text-black hover:bg-gray-100 transition-all duration-800 ease-linear hover:cursor-pointer px-4 py-3 rounded-2xl"
-                type="button"
-                value="Đăng nhập"
-              />
-            </div>
-            <div>
-              <input
-                onClick={() => setRegister(!register)}
-                className="font-bold underline  hover:text-black hover:bg-gray-100 transition-all duration-800 ease-linear hover:cursor-pointer px-4 py-3 rounded-2xl"
-                type="button"
-                value="Đăng kí"
-              />
-            </div>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Đăng xuất</DialogTitle>
+                </DialogHeader>
+                <DialogDescription>
+                  <p>Bạn có muốn đăng xuất khỏi tài khoản này?</p>
+                </DialogDescription>
+                <DialogFooter>
+                  <DialogClose>
+                    <Button variant="secondary">Huỷ</Button>
+                  </DialogClose>
+                  <DialogClose>
+                    <Button onClick={logOut}>Đồng ý</Button>
+                  </DialogClose>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+            {!user && !task.shown ? (
+              <>
+                <div>
+                  <Dialog
+                    open={login}
+                    onOpenChange={(o) => {
+                      setLogin(o);
+                    }}
+                  >
+                    <DialogTrigger asChild>
+                      <input
+                        className="font-bold underline  hover:text-black hover:bg-gray-100 transition-all duration-800 ease-linear hover:cursor-pointer px-4 py-3 rounded-2xl"
+                        type="button"
+                        value="Đăng nhập"
+                      />
+                    </DialogTrigger>
+                    <DialogContent className="min-w-[45%]">
+                      <PopupComponent
+                        handleChange={(e) => {
+                          handleChange(e);
+                          window.location.reload();
+                        }}
+                        switchToRegister={switchToRegister}
+                      ></PopupComponent>
+                    </DialogContent>
+                  </Dialog>
+                </div>
+                <div>
+                  <Dialog
+                    open={register}
+                    onOpenChange={(o) => {
+                      setRegister(o);
+                    }}
+                  >
+                    <DialogTrigger>
+                      <input
+                        onClick={() => setRegister(!register)}
+                        className="font-bold underline  hover:text-black hover:bg-gray-100 transition-all duration-800 ease-linear hover:cursor-pointer px-4 py-3 rounded-2xl"
+                        type="button"
+                        value="Đăng kí"
+                      />
+                    </DialogTrigger>
+                    <DialogContent className="min-w-[45%]">
+                      <PopupRegister
+                        handleChange={handleChangeRe}
+                        switchToLogin={switchToLogin}
+                      ></PopupRegister>
+                    </DialogContent>
+                  </Dialog>
+                </div>
+              </>
+            ) : null}
           </div>
         </div>
       </div>
-      {login && <PopupComponent handleChange={(e) => {
-        console.log(e);
-        handleChange(e);
-      }} switchToRegister={switchToRegister}></PopupComponent>}
-      {register && (
-        <PopupRegister handleChange={handleChangeRe}  switchToLogin={switchToLogin}></PopupRegister>
-      )}
-      {admin&&(<PopupAdmin handleChangeAd={handleChangeAd} ></PopupAdmin>)}
+
+      {admin && <PopupAdmin handleChangeAd={handleChangeAd}></PopupAdmin>}
 
       {transitions(
         (style, isOpen) =>
