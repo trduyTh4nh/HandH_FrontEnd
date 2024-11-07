@@ -45,6 +45,8 @@ import AboutUs from "./components/pages/AboutUs";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { UserContext } from "./components/contexts/UserContext";
 import { IUser } from "./types/user.type";
+import PurchaseProcess from "./components/pages/purchase/PurchaseProcess";
+import PurchaseFinish from "./components/pages/purchase/PurchaseFinish";
 const queryClient = new QueryClient();
 const AdminRoute: React.FC = () => {
   const [isUserValid, setUserValid] = useState(false);
@@ -150,8 +152,8 @@ const UserRoute: React.FC = () => {
         <Route path="/payment" element={<PurchaseLayout />}>
           <Route path="/payment/" element={<PurchaseReview />} />
           <Route path="/payment/choose" element={<PurchaseChoose />} />
-          <Route path="/payment/process" element={<PurchaseChoose />} />
-          <Route path="/payment/status" element={<PurchaseChoose />} />
+          <Route path="/payment/process" element={<PurchaseProcess />} />
+          <Route path="/payment/status" element={<PurchaseFinish />} />
         </Route>
         <Route path="/test" element={<Test />} />
       </Routes>

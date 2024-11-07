@@ -69,11 +69,7 @@ const SideBar = (props: SideBarProps) => {
                   path: "/admin/customersManage",
                   icon: UsersIcon,
                 },
-                {
-                  name: "Tài chính",
-                  path: "/admin/financeManage",
-                  icon: DollarSignIcon,
-                },
+                
                 {
                   name: "Biển quảng cáo",
                   path: "/admin/bannerManage",

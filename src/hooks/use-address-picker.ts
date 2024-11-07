@@ -5,7 +5,6 @@ type AddressPickerProps = {
     defaultValues?: any;
 }
 export default function useAddressPicker(props: AddressPickerProps) {
-    console.log(props.defaultValues)
   const [districts, setDistricts] = useState([]);
   const [wards, setWards] = useState([]);
   async function getDistricts() {
