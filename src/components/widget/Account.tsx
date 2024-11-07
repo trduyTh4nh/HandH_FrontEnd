@@ -109,11 +109,11 @@ export const Account: React.FC = () => {
               <p className="text-gray-700 font-semibold">Số điện thoại:</p>
               <p className="ml-auto text-gray-800 font-medium">{phone}</p>
             </div>
-            {/* <div className="flex items-center gap-2 mb-4">
+            <div className="flex items-center gap-2 mb-4">
               <AttachEmailOutlined className="text-black" />
               <p className="text-gray-700 font-semibold">Email:</p>
               <p className="ml-auto text-gray-800 font-medium">{email}</p>
-            </div> */}
+            </div>
             <div className="flex items-center gap-2 mb-4">
               <CakeOutlined className="text-black" />
               <p className="text-gray-700 font-semibold">Ngày sinh:</p>
