@@ -13,15 +13,26 @@ const navLinks = [
     display: "Tài khoản",
   },
   {
+    path: "favoriteProduct",
+    icon: <Heart />,
+    display: "Sản phẩm yêu thích",
+  },
+  {
     path: "paymentHistory",
     icon: <ReceiptText />,
     display: "Lịch sử mua hàng",
   },
   {
-    path: "favoriteProduct",
-    icon: <Heart />,
-    display: "Sản phẩm yêu thích",
+    path: "pendingOrder",
+    icon: <ReceiptText />,
+    display: "Đơn hàng đang chờ thanh toán",
   },
+  {
+    path: "pendingOrder",
+    icon: <ReceiptText />,
+    display: "Đơn hàng đang được xử lý",
+  },
+  
 ];
 export const ManagerAccount: React.FC = () => {
   return (

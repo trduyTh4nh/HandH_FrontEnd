@@ -23,7 +23,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "../ui/dialog";
-import EditProfileForm from "./editProfileForm";
+import EditProfileForm, { UserSchema } from "./editProfileForm";
 import { IUser } from "@/types/user.type";
 import axios, { AxiosError } from "axios";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
@@ -61,22 +61,44 @@ export const Account: React.FC = () => {
     file: null,
     isOpen: false,
   });
-  async function handleConvertUrlToFile() {
-    if (!user.avatar) return;
-    try {
-      const api = new API({ headerType: "json" });
-      const response = await api.get(user.avatar, { responseType: "blob" });
-      const fileName = user.avatar.split("/").pop();
-      //@ts-ignore
-      const newFile = new File([response.data], fileName, {
-        //@ts-ignore
-        type: response.data.type,
-      });
-      console.log(newFile.name);
-      setFile(newFile);
-    } catch (error) {
-      console.error("Error converting URL to file:", error);
+  async function onSaveProfile(data: UserSchema) {
+    setProcess({
+      loading: true,
+      where: "profile",
+      error: null,
+    })
+    const updatedUser: IUser = {
+      ...data,
+      _id: user._id, 
+      userAddress: {
+        street: data.street,
+        city: data.ward + data.city,
+        state: data.state,
+        country: data.country,
+        apartmentNumber: data.apartmentNumber,
+      }
     }
+    const res = await changeInformation(updatedUser);
+    if(res instanceof AxiosError) {
+      console.error(res);
+      setProcess({
+        loading: false,
+        where: "profile",
+        error: res,
+      })
+      setOpenEditProfileDialog(false);
+      return
+    }
+    setProcess({
+      loading: false,
+      where: "profile",
+      error: null,
+    })
+    setOpenEditProfileDialog(false);
+    setUser({
+      ...updatedUser,
+      avatar: updatedUser.avatar instanceof File ? URL.createObjectURL(updatedUser.avatar) : updatedUser.avatar as string,
+    })
   }
   const handleOpenPasswordDialog = () => {
     setOpenPasswordDialog(true);
@@ -153,7 +175,7 @@ export const Account: React.FC = () => {
         {user ? (
           <div className="flex flex-col items-center gap-4  ">
             <Avatar className="bg-primary-light w-24 h-24">
-              <AvatarImage src={user ? user.avatar : null}></AvatarImage>
+              <AvatarImage src={user ? user.avatar as string : null}></AvatarImage>
               <AvatarFallback className="text-2xl font-bold">
                 {user.name
                   .split(" ")
@@ -311,7 +333,10 @@ export const Account: React.FC = () => {
           }}
         >
           <DialogContent className="min-w-[50%]">
-            <EditProfileForm defaultValues={{ user: { ...user, avatar: file }, profilePicture: user.avatar }} />
+            <DialogHeader className="hidden">
+              <DialogTitle>Chỉnh sửa người dùng</DialogTitle>
+            </DialogHeader>
+            <EditProfileForm loading={process.loading && process.where == "profile"} onSubmit={onSaveProfile} defaultValues={{ user: { ...user, avatar: file }, profilePicture: user ? user.avatar as string : null }} />
           </DialogContent>
         </Dialog>
         <Dialog

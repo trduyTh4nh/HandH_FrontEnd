@@ -248,7 +248,7 @@ const Navbar: React.FC = () => {
                   <div className="gap-4 cursor-pointer text-title-nav hover:underline hover:text-black hover:bg-gray-100 transition-all duration-800 px-3 py-2 rounded-md font-medium flex justify-center items-center">
                     Xin chào, {user.name}!
                     <Avatar className="w-8 h-8">
-                      <AvatarImage src={user.avatar}></AvatarImage>
+                      <AvatarImage src={user.avatar as string}></AvatarImage>
                       <AvatarFallback><UserCircle width={16} height={16}/></AvatarFallback>
                     </Avatar>
                   </div>
@@ -265,7 +265,6 @@ const Navbar: React.FC = () => {
                     >
                       <User className="w-4 h-4" />
                       <p className="flex-1">Hồ sơ</p>
-                      <ChevronRight className="w-4 h-4" />
                     </DropdownMenuItem>
                     <DropdownMenuItem
                       className="flex gap-2"
@@ -275,7 +274,6 @@ const Navbar: React.FC = () => {
                     >
                       <Heart className="w-4 h-4" />
                       <p className="flex-1">Sản phẩm yêu thích</p>
-                      <ChevronRight className="w-4 h-4" />
                     </DropdownMenuItem>
                     <DropdownMenuItem
                       className="flex gap-2"
@@ -285,7 +283,6 @@ const Navbar: React.FC = () => {
                     >
                       <ReceiptText className="w-4 h-4" />
                       <p className="flex-1">Lịch sử mua hàng</p>
-                      <ChevronRight className="w-4 h-4" />
                     </DropdownMenuItem>
                     {user.role == '3107' ? (
                       <DropdownMenuItem
@@ -296,7 +293,6 @@ const Navbar: React.FC = () => {
                       >
                         <Shield className="w-4 h-4" />
                         <p className="flex-1">Quản lý</p>
-                        <ChevronRight className="w-4 h-4" />
                       </DropdownMenuItem>
                     ) : null}
                   </DropdownMenuGroup>
@@ -310,7 +306,6 @@ const Navbar: React.FC = () => {
                     >
                       <LogOut className="w-4 h-4" />
                       <p className="flex-1">Đăng xuất</p>
-                      <ChevronRight className="w-4 h-4" />
                     </DropdownMenuItem>
                   </DropdownMenuGroup>
                 </DropdownMenuContent>

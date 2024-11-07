@@ -100,6 +100,7 @@ export async function getAllUsers() {
   }
 }
 export async function changeInformation(body: IUser) {
+  const {avatar, ...rest} = body
   // const userStr = JSON.parse(localStorage.getItem("user"))
   const userStr = localStorage.getItem("user");
   if (!userStr) {
@@ -109,13 +110,14 @@ export async function changeInformation(body: IUser) {
   try {
     const res: any = await api.put(
       `access/updateInformationUser/${userObj._id}`,
-      body
+      rest
     );
     console.log(userObj._id);
     return res.metadata;
   } catch (err) {
     console.error("Lỗi xảy ra:", err);
     if (err instanceof AxiosError && err.response) {
+      return err
       console.error("Chi tiết lỗi:", err.response.data); // Kiểm tra thông tin lỗi
     }
   }

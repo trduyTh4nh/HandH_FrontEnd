@@ -9,7 +9,7 @@ export default function PurchaseLayout() {
     {
       step: 1,
       title: "Điền thông tin cá nhân",
-      isFinished: false,
+      isFinished: true,
       guide:
         "Hãy xem lại các sản phẩm mà bạn đã chọn mua, nếu mọi thứ đều ổn thì vui lòng điền thông tin cá nhân vào thanh bên và ấn “Tiếp theo”.",
       path: "/payment",
@@ -17,7 +17,7 @@ export default function PurchaseLayout() {
     {
       step: 2,
       title: "Chọn phương thức thanh toán",
-      isFinished: false,
+      isFinished: true,
       guide:
         "Vui lòng chọn 1 trong những phương thức thanh toán dưới đây. Đối với thanh toán bằng tiền mặt thì vui lòng chọn “Thanh toán khi nhận hàng”",
       path: "/payment/choose",
@@ -25,19 +25,19 @@ export default function PurchaseLayout() {
     {
       step: 3,
       title: "Xem lại đơn hàng",
-      isFinished: false,
+      isFinished: true,
       path: "/payment/process",
     },
     {
       step: 4,
       title: "Xử lý thanh toán",
-      isFinished: false,
+      isFinished: true,
       path: "/payment/process",
     },
     {
       step: 5,
       title: "Đặt hàng thành công",
-      isFinished: false,
+      isFinished: true,
       path: "/payment/status",
     },
   ]);
