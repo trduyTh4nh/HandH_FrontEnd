@@ -1,7 +1,9 @@
-import React from "react";
+import React, { useContext } from "react";
 import { Link } from "react-router-dom";
+import { UserContext } from "../contexts/UserContext";
 
 function Footer() {
+  const { user, setUser } = useContext(UserContext);
   return (
     <div className="px-20 py-4 bg-primary-light flex flex-col gap-4">
       <div className="w-full flex justify-between">
@@ -10,10 +12,19 @@ function Footer() {
       <div className="flex gap-32">
         <div className="flex flex-col gap-2">
           <b>Tài khoản</b>
-          <a>Hồ sơ</a>
-          <a>Sản phẩm yêu thích</a>
-          <a>Lịch sử mua hàng</a>
-          <a>Đăng xuất</a>
+          {user ? (
+            <>
+              <a>Hồ sơ</a>
+              <a>Sản phẩm yêu thích</a>
+              <a>Lịch sử mua hàng</a>
+              <a>Đăng xuất</a>
+            </>
+          ) : (
+            <>
+              <a>Đăng nhập</a>
+              <a>Đăng ký</a>
+            </>
+          )}
         </div>
         <div className="flex flex-col gap-2">
           <b>Đơn hàng</b>
@@ -31,16 +42,15 @@ function Footer() {
       <b>
         Đ/C: K20 Cư Xá Vĩnh Hội, Phường 6, Quận 4, TP. Hồ Chí Minh{" - "}
         <span>
-
-            Liên hệ:{" "}
-            <span>
-              <a
-                href="https://zaloapp.com/qr/p/1utkheobwdyv8"
-                className="text-black"
-              >
-                0981734937
-              </a>
-            </span>
+          Liên hệ:{" "}
+          <span>
+            <a
+              href="https://zaloapp.com/qr/p/1utkheobwdyv8"
+              className="text-black"
+            >
+              0981734937
+            </a>
+          </span>
         </span>
       </b>
 

@@ -15,6 +15,7 @@ import { SelectValue } from "@radix-ui/react-select";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 import { getProduct } from "@/apis/products/product-repo";
+import PaginationControls from "../widget/PaginationsControl";
 type PriceFilter = {
   id: number;
   price: number;
@@ -125,8 +126,8 @@ const Shop: React.FC = () => {
   const [listFilter, setListFilter] = React.useState<PriceFilter[]>(dataFilter);
 
   const [priceFilter, setPriceFilter] = React.useState<TypeFilterPice>({
-    priceFilter: 0,
-    isHigher: false,
+    price: 0,
+    isUp: false,
   });
   const handlePickPrice = (id: number) => {
     const updateFilter = listFilter.map((item) =>
@@ -135,8 +136,8 @@ const Shop: React.FC = () => {
     setListFilter(updateFilter);
 
     setPriceFilter({
-      priceFilter: listFilter[id - 1].price,
-      isHigher: listFilter[id - 1].isHigher,
+      price: listFilter[id - 1].price,
+      isUp: listFilter[id - 1].isHigher,
     });
   };
 
@@ -180,11 +181,11 @@ const Shop: React.FC = () => {
   });
 
   const [objPrice, setObjPrice] = React.useState<TypeObjPrice>({
-    lowPrice: 0,
-    highPrice: 0,
+    lowPrice: undefined,
+    highPrice: undefined,
   });
 
-  const [isLowHigh, setIsLowHigh] = React.useState<number>(3);
+  const [isLowHigh, setIsLowHigh] = React.useState<number>(undefined);
 
   enum PriceOrder {
     LowToHigh = 1,
@@ -194,10 +195,28 @@ const Shop: React.FC = () => {
 
   const [arrSize, setArrSize] = React.useState<string[]>([]);
   const [pickerColor, setPickerColor] = React.useState<string>("");
+
+  const deleteFilter = () => {
+    setArrSize([]);
+    setIsLowHigh(undefined);
+    setPriceFilter(null);
+    setLowPrice(null);
+    setHighPrice(null);
+    setObjPrice({
+      lowPrice: undefined,
+      highPrice: undefined,
+    });
+
+    console.log("Delete filter");
+  };
+
+  const [page, setPage] = React.useState(0);
+  const [take, setTake] = React.useState(9);
+
   return (
     <>
       <div
-        className={`shop ${
+        className={`shop pb-20 ${
           showNav ? "pl-20" : "pl-4"
         } transition-all pr-20 w-screen`}
       >
@@ -210,9 +229,9 @@ const Shop: React.FC = () => {
             //     flex: showNav ? 1 : 0
             // }}
           >
-            <div className="shop-filter_wrap box-border fixed z-10 flex top-0 flex-col w-[15%] gap-2 h-full overflow-auto pt-[11.2rem] pb-4">
+            <div className="shop-filter_wrap box-border fixed z-10 flex top-0 flex-col w-[15%] gap-2  overflow-auto pt-[11.2rem] pb-4">
               <div
-                className={`filer-hide-btn h-full ${
+                className={`filer-hide-btn ${
                   showNav ? "w-full" : "w-fit"
                 }
                             gap-4 items-center 
@@ -239,10 +258,7 @@ const Shop: React.FC = () => {
               {transition(
                 (styles, showNav) =>
                   showNav && (
-                    <animated.div
-                      style={styles}
-                      className="Sidebar"
-                    >
+                    <animated.div style={styles} className="Sidebar">
                       <div className="fliter-body bg-white flex flex-col gap-4 pr-4 border-r border-r-gray-300">
                         <div className="child-title text-[1.2rem] font-bold">
                           <p>Giá</p>
@@ -377,7 +393,7 @@ const Shop: React.FC = () => {
                           <p>Màu sắc</p>
                         </div>
 
-                        <div className="pick-color flex gap-4 flex-wrap">
+                        {/* <div className="pick-color flex gap-4 flex-wrap">
                           {colors.map((e: any) => (
                             <ColorChip
                               active={e.enabled}
@@ -391,13 +407,24 @@ const Shop: React.FC = () => {
                               tooltip={e.tooltip}
                             />
                           ))}
+                        </div> */}
+
+                        <div className="wrap-btn-action flex gap-4">
+                          {/* <Button
+                            variant="default"
+                            className="w-full transition-all"
+                          >
+                            Áp dụng
+                          </Button> */}
+
+                          <Button
+                            onClick={deleteFilter}
+                            variant="secondary"
+                            className="w-full transition-all"
+                          >
+                            Xoá bộ lọc
+                          </Button>
                         </div>
-                        <Button
-                          variant="secondary"
-                          className="w-full transition-all"
-                        >
-                          Xoá bộ lọc
-                        </Button>
                       </div>
                     </animated.div>
                   )
@@ -405,13 +432,16 @@ const Shop: React.FC = () => {
             </div>
           </div>
 
-          <div className="shop-product h-screen">
+          <div className="shop-product h- screen">
             <ProductComponentShop
+              take={take}
+              skip={page}
               highLowPrice={objPrice}
               size={arrSize}
               color={pickerColor}
               LowToHigh={isLowHigh}
               priceFilter={priceFilter}
+              onPageChange={setPage}
             ></ProductComponentShop>
           </div>
         </div>

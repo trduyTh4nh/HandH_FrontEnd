@@ -70,6 +70,11 @@
     text-align: center;
 }
 
+.divider-cart{
+    height: 100%;
+    width: 0;
+    border-bottom: 1px solid #F0F0F0;
+    }
 .cart-item_wrap-infomation {
     flex: 1;
     /* width: 80%; */

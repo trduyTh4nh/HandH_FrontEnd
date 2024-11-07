@@ -5,5 +5,8 @@ export interface IBanner {
   content: string;
   link: string;
   isActive: boolean;
+  isPublished: boolean;
+  imageUrl: string;
   type: "main" | "sub";
+  isMain: boolean;
 }

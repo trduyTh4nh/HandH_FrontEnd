@@ -57,7 +57,7 @@ class API {
     );
   }
   public async get<T>(url: string, params?: object): Promise<T> {
-    console.log(params)
+    console.log(params);
     const response = await this.axiosInstance.get<T>(url, { params });
     return response.data;
   }
@@ -78,10 +78,18 @@ class API {
     return response.data;
   }
 
-  public async put<T>(url: string, data?: object, headersConfig?: { "Content-Type"?: string } | any): Promise<T> {
+  public async put<T>(
+    url: string,
+    data?: object,
+    headersConfig?: { "Content-Type"?: string } | any
+  ): Promise<T> {
     const response = await this.axiosInstance.put<T>(url, data, {
-      headers: headersConfig
+      headers: headersConfig,
     });
+    return response.data;
+  }
+  public async patch<T>(url: string, data?: object): Promise<T> {
+    const response = await this.axiosInstance.patch<T>(url, data);
     return response.data;
   }
 }

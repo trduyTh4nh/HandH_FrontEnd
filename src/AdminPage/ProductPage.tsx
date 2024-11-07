@@ -17,9 +17,16 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import {
+  Book,
+  BookDashed,
+  Circle,
+  CircleDashed,
   CircleX,
   Eye,
   EyeOff,
+  File,
+  FilePen,
+  FilePenLine,
   Filter,
   Image,
   Info,
@@ -29,6 +36,7 @@ import {
   Pencil,
   Plus,
   Search,
+  TextSearch,
   Trash2,
   TriangleAlert,
   Upload,
@@ -48,6 +56,8 @@ import { TableBody } from "@mui/material";
 import { Switch } from "@/components/ui/switch";
 import { convertMoney } from "@/utils";
 import {
+  addColorsToProduct,
+  addImageToProduct,
   createProduct,
   deleteProduct,
   getProduct,
@@ -69,7 +79,20 @@ import {
 } from "@/components/ui/tooltip";
 import { TooltipTrigger } from "@radix-ui/react-tooltip";
 import { useToast } from "@/hooks/use-toast";
-
+import { Badge } from "@/components/ui/badge";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { EyeClosedIcon } from "@radix-ui/react-icons";
+import { Progress } from "@/components/ui/progress";
+type UploadProcess = {
+  message: string;
+  isRunning: boolean;
+  progress?: number;
+};
 const ProductPage: React.FC = () => {
   const { toast } = useToast();
   const [product, setProduct] = React.useState([]);
@@ -163,16 +186,17 @@ const ProductPage: React.FC = () => {
       reader.readAsDataURL(file);
     }
   };
-  const [process, setProcess] = useState({
+  const [process, setProcess] = useState<UploadProcess>({
     message: "Không có quá trình nào",
     isRunning: false,
   });
   async function uploadProduct(data: IProduct) {
-    const { product_thumb, ...rest } = data;
+    const { product_thumb, product_images, product_colors, ...rest } = data;
     try {
       setProcess({
         message: "Đang đăng tải sản phẩm...",
         isRunning: true,
+        progress: 5,
       });
       let id = "";
       let res;
@@ -186,6 +210,7 @@ const ProductPage: React.FC = () => {
         setProcess({
           message: "Đang đăng tải sản phẩm...",
           isRunning: false,
+          progress: 5
         });
         return;
       }
@@ -193,19 +218,66 @@ const ProductPage: React.FC = () => {
       setProcess({
         message: "Đang đăng tải hình ảnh của sản phẩm...",
         isRunning: true,
+        progress: 25
       });
       const res2 = await updateImageToProduct(id, product_thumb as File);
       if (res2 instanceof AxiosError) {
-        setError(res);
+        setError(res2);
         setProcess({
           message: "Đang đăng tải hình ảnh của sản phẩm...",
           isRunning: false,
+          progress: 25
+        });
+        return;
+      }
+      if (product_images.length > 0) {
+        setProcess({
+          message: "Đang đăng tải hình ảnh của sản phẩm...",
+          isRunning: true,
+          progress: 50
+        });
+        const res3 = await addImageToProduct(id, product_images as File[], (n) => {
+          setProcess({
+            message: "Đang đăng tải hình ảnh của sản phẩm...",
+            isRunning: true,
+            progress: process.progress + n / 50
+          });
+        });
+        if (res3 instanceof AxiosError) {
+          setError(res3);
+          setProcess({
+            message: "Đang đăng tải hình ảnh của sản phẩm...",
+            isRunning: false,
+            progress: 50
+          });
+          return;
+        }
+      }
+      setProcess({
+        message: "Đang đăng tải hình ảnh của sản phẩm...",
+        isRunning: true,
+        progress: 75
+      });
+      const res4 = await addColorsToProduct(id, product_colors as IColorProductVariation[], (progress) => {
+        setProcess({
+          message: "Đang đăng tải hình ảnh của sản phẩm...",
+          isRunning: true,
+          progress: process.progress + progress / 75
+        });
+      })
+      if(res4 instanceof AxiosError) {
+        setError(res4);
+        setProcess({
+          message: "Đang đăng tải hình ảnh của sản phẩm...",
+          isRunning: false,
+          progress: 0
         });
         return;
       }
       setProcess({
         message: "Đang đăng tải hình ảnh của sản phẩm...",
         isRunning: false,
+        progress: 0
       });
     } catch (e) {
       console.error(e);
@@ -253,6 +325,12 @@ const ProductPage: React.FC = () => {
             <div className="flex flex-col gap-2 justify-center items-center">
               <Loader className="animate-spin" />
               <p className="text-lg">{process.message}</p>
+              {process.progress && (
+                <div className="flex gap-2 items-center w-full">
+                  <Progress className="flex-1" value={process.progress} />
+                  <p>{process.progress}%</p>
+                </div>
+              )}
             </div>
           </DialogContent>
         </Dialog>
@@ -372,9 +450,18 @@ const ProductPage: React.FC = () => {
                     <TableCell>
                       <TooltipProvider>
                         <Tooltip>
-                          <TooltipTrigger>
-                            <div className="flex items-center gap-2">
-                              {!product.isDraft ? "Đang hiển thị" : "Đã ẩn"}
+                          <TooltipTrigger className="w-full">
+                            <div className="flex items-center gap-2 w-full">
+                              <div className="flex items-center gap-2 flex-1">
+                                <Badge variant="secondary">
+                                  {product.isDraft ? "Bản nháp" : "Bản chính"}
+                                </Badge>
+                                <Badge variant="secondary">
+                                  {product.isPublished
+                                    ? "Hiển thị"
+                                    : "Không hiển thị"}
+                                </Badge>
+                              </div>
                               <Info width={16} height={16} />
                             </div>
                           </TooltipTrigger>
@@ -397,23 +484,14 @@ const ProductPage: React.FC = () => {
                           size="sm"
                           onClick={() => handleEdit(product)}
                         >
-                          <Pencil className="h-4 w-4 mr-1" />
-                          Chỉnh sửa
+                          <Pencil className="h-4 w-4" />
                         </Button>
                         {/* New button  */}
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleEdit(product)}
-                        >
-                          <MoreHorizontalIcon className="h-4 w-4 mr-1" />
-                          Chi tiết
-                        </Button>
+
                         <Dialog>
                           <DialogTrigger asChild>
                             <Button variant="outline" size="sm">
-                              <Trash2 className="h-4 w-4 mr-1" />
-                              Xóa
+                              <Trash2 className="h-4 w-4" />
                             </Button>
                           </DialogTrigger>
                           <DialogContent>
@@ -442,25 +520,46 @@ const ProductPage: React.FC = () => {
                             </DialogFooter>
                           </DialogContent>
                         </Dialog>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() =>
-                            handleTogglePublish(product.product_slug!)
-                          }
-                        >
-                          {product.isPublished ? (
-                            <>
-                              <EyeOff className="h-4 w-4 mr-1" />
-                              Không hiển thị
-                            </>
-                          ) : (
-                            <>
-                              <Eye className="h-4 w-4 mr-1" />
-                              Hiển thị
-                            </>
-                          )}
-                        </Button>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger>
+                            <Button variant="outline" size="sm">
+                              <MoreHorizontalIcon className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent>
+                            <DropdownMenuItem
+                              disabled={product.isDraft}
+                              className="flex gap-2"
+                            >
+                              {product.isPublished ? (
+                                <EyeOff width={16} height={16}></EyeOff>
+                              ) : (
+                                <Eye width={16} height={16}></Eye>
+                              )}
+                              <p>
+                                {product.isPublished
+                                  ? "Ẩn sản phẩm"
+                                  : "Hiển thị sản phẩm"}
+                              </p>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem className="flex gap-2">
+                              {product.isDraft ? (
+                                <File width={16} height={16}></File>
+                              ) : (
+                                <FilePen width={16} height={16}></FilePen>
+                              )}
+                              <p>
+                                {product.isDraft
+                                  ? "Chuyển thành bản chính"
+                                  : "Chuyển thành nháp"}
+                              </p>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem className="flex gap-2">
+                              <TextSearch width={16} height={16}></TextSearch>
+                              <p>Xem chi tiết</p>
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
                       </div>
                     </TableCell>
                   </TableRow>

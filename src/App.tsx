@@ -1,7 +1,7 @@
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import "./App.css";
 import Navbar from "./components/layout/NavBar";
-import {Helmet} from "react-helmet";
+import { Helmet } from "react-helmet";
 import SideBar from "./components/layout/SideBar"; // Chỉ sử dụng cho Admin
 import Dashboard from "./AdminPage/Dashboard";
 import ProductPage from "./AdminPage/ProductPage";
@@ -33,7 +33,7 @@ import BannerPage from "./AdminPage/BannerPage";
 import CategoryPage from "./AdminPage/CategoryPage";
 import Test from "./components/pages/Test";
 import Blog from "./components/pages/Blog";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import ErrorView from "./components/widget/Error.widget";
 import { Button } from "./components/ui/button";
 import { Link } from "react-router-dom";
@@ -41,30 +41,26 @@ import { Dialog, DialogContent, DialogTrigger } from "./components/ui/dialog";
 import PopupComponent from "./components/widget/popUpComponent";
 import { getLoggedInUser, UnauthenticatedError } from "./apis/user/user-repo";
 import { AxiosError } from "axios";
+import AboutUs from "./components/pages/AboutUs";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { UserContext } from "./components/contexts/UserContext";
+import { IUser } from "./types/user.type";
+import PurchaseProcess from "./components/pages/purchase/PurchaseProcess";
+import PurchaseFinish from "./components/pages/purchase/PurchaseFinish";
+const queryClient = new QueryClient();
 const AdminRoute: React.FC = () => {
-  const user = localStorage.getItem("user");
   const [isUserValid, setUserValid] = useState(false);
   const [login, setLogin] = useState(false);
-  const [checkingAuth, setCheckingAuth] = useState(false);
+  const [checkingAuth, setCheckingAuth] = useState(true);
   const [loginStatus, setLoginStatus] = useState(false);
+  const {user, setUser} = useContext(UserContext);
   async function checkUser() {
-    setCheckingAuth(true);
-    try {
-      const res = await getLoggedInUser();
-      const user = res;
-      console.log(user);
-      setUserValid(user.role[0] == "3107");
-      setCheckingAuth(false);
-    } catch (e) {
-      console.log(e);
-      setUserValid(false);
-      setCheckingAuth(false);
-    }
-    setCheckingAuth(false);
+      setUserValid(user && user.role[0] == "3107");
+      setCheckingAuth(false)
   }
   useEffect(() => {
     checkUser();
-  }, [loginStatus]);
+  }, [user]);
   return (
     <>
       <Helmet>
@@ -135,6 +131,7 @@ const UserRoute: React.FC = () => {
         <Route path="/shop" element={<Shop />} />
         <Route path="/blog" element={<Blog />} />
         <Route path="/management" element={<Management />} />
+        <Route path="/aboutUs" element={<AboutUs/>} />
         <Route path="/managerAccount" element={<ManagerAccount />}>
           <Route index element={<Account />} />
           <Route path="account" element={<Account />} />
@@ -155,8 +152,8 @@ const UserRoute: React.FC = () => {
         <Route path="/payment" element={<PurchaseLayout />}>
           <Route path="/payment/" element={<PurchaseReview />} />
           <Route path="/payment/choose" element={<PurchaseChoose />} />
-          <Route path="/payment/process" element={<PurchaseChoose />} />
-          <Route path="/payment/status" element={<PurchaseChoose />} />
+          <Route path="/payment/process" element={<PurchaseProcess />} />
+          <Route path="/payment/status" element={<PurchaseFinish />} />
         </Route>
         <Route path="/test" element={<Test />} />
       </Routes>
@@ -164,16 +161,47 @@ const UserRoute: React.FC = () => {
   );
 };
 const App = () => {
+  const [user, setUser] = useState<IUser>(null);
+  const [loading, setLoading] = useState<boolean>(false);
+  async function getUser() {
+    try {
+      setLoading(true);
+      const user = await getLoggedInUser();
+      setUser(user);
+    } catch (e) {
+      if (e instanceof AxiosError) {
+        setLoading(false)
+        return;
+      }
+      if (e instanceof UnauthenticatedError) {
+        setLoading(false)
+        return;
+      }
+      setLoading(false)
+      return;
+    }
+    setLoading(false)
+  }
+  useEffect(() => {
+    getUser();
+  }, [])
   return (
-    <Router>
-      <div className="flex flex-col min-h-screen w-full">
-        <Routes>
-          {/* Routes cho người dùng */}
-          <Route path="/*" element={<UserRoute />} /> {/* Routes cho admin */}
-          <Route path="/admin/*" element={<AdminRoute />} />{" "}
-        </Routes>
-      </div>
-    </Router>
+    <QueryClientProvider client={queryClient}>
+      <UserContext.Provider value={{
+        user: user,
+        setUser: setUser,
+        isLoading: loading
+      }}>
+        <Router>
+          <div className="flex flex-col min-h-screen w-full">
+            <Routes>
+              <Route path="/*" element={<UserRoute />} />
+              <Route path="/admin/*" element={<AdminRoute />} />{" "}
+            </Routes>
+          </div>
+        </Router>
+      </UserContext.Provider>
+    </QueryClientProvider>
   );
 };
 

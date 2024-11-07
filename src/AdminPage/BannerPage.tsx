@@ -37,45 +37,23 @@ import {
 import { IBanner } from "@/types/banner.type";
 import HomeBanner from "@/components/widget/homeBanner";
 
-const initialBanners: IBanner[] = [
-  {
-    id: "1",
-    title: "Banner trang chủ",
-    imageUrl:
-      "https://img.freepik.com/free-vector/illustration-gallery-icon_53876-27002.jpg?size=626&ext=jpg&ga=GA1.1.2008272138.1728432000&semt=ais_hybrid",
-    link: "/",
-    isPublished: true,
-    type: "main",
-  },
-  {
-    id: "2",
-    title: "Lễ hội mùa hè",
-    imageUrl: "https://static.thenounproject.com/png/261694-200.png",
-    link: "/summer-sale",
-    isPublished: true,
-    type: "sub",
-  },
-  {
-    id: "3",
-    title: "Bộ sưu tập độc đáo",
-    imageUrl: "https://static.thenounproject.com/png/261694-200.png",
-    link: "/new-collection",
-    isPublished: false,
-    type: "sub",
-  },
-];
-
 import {
   createBanner,
   deleteBanner,
   getAllBanner,
   publishBanner,
   unPublishBanner,
+  updateModeBanner,
 } from "@/apis/banner/banner-repo";
 import { AxiosError } from "axios";
 import { IProduct } from "@/types/product.type";
 
 type togglePublish = {
+  loading?: boolean;
+  id?: string;
+};
+
+type toggleBannerMode = {
   loading?: boolean;
   id?: string;
 };
@@ -89,9 +67,14 @@ const BannerPage: React.FC = () => {
   const [error, setError] = React.useState<AxiosError>(null);
   const [loading, setLoading] = React.useState(false);
   const [loadingDelete, setLoadingDelete] = React.useState(false);
+  const [loadingBannerMode, setLoadingBannerMode] =
+    React.useState<toggleBannerMode>({
+      loading: false,
+      id: null,
+    });
   const [banner, setBanner] = React.useState([]);
   const [stateIdDelete, setStateIdDelete] = React.useState("");
-
+  const [checkMain, setCheckMain] = React.useState(false);
   const [togglePublish, setTogglePublish] = useState<togglePublish>({
     loading: false,
     id: "",
@@ -336,7 +319,7 @@ const BannerPage: React.FC = () => {
                           {banner.isActive ? "Công khai" : "Ẩn"}
                         </TableCell>
                         <TableCell>
-                          <div className="flex space-x-2">
+                          <div className="flex space-x-2 justify-between">
                             <Dialog>
                               {/* <DialogTrigger asChild>
                                 <Button
@@ -414,6 +397,47 @@ const BannerPage: React.FC = () => {
                                 )
 } */}
                             </Button>
+                            <div className="wrap-switch-checkmain flex items-center gap-4">
+                              <Label>Banner mode</Label>
+                              {loadingBannerMode.id === banner._id &&
+                              loadingBannerMode.loading ? (
+                                <Loader className="animate-spin" />
+                              ) : (
+                                <Switch
+                                  id="isPublished"
+                                  checked={banner.isMain}
+                                  onCheckedChange={async (checked) => {
+                                    setLoadingBannerMode({
+                                      loading: true,
+                                      id: banner._id,
+                                    });
+
+                                    const result = await updateModeBanner(
+                                      banner._id,
+                                      checked
+                                    );
+
+                                    setBanner((prevBanners: any) =>
+                                      prevBanners.map((bannerItem) =>
+                                        bannerItem._id === banner._id
+                                          ? {
+                                              ...bannerItem,
+                                              isMain: !result.metadata.isMain,
+                                            }
+                                          : bannerItem
+                                      )
+                                    );
+
+                                    setLoadingBannerMode({
+                                      loading: false,
+                                      id: banner._id,
+                                    });
+
+                                    console.log(result.metadata);
+                                  }}
+                                />
+                              )}
+                            </div>
                           </div>
                         </TableCell>
                       </TableRow>
@@ -505,16 +529,16 @@ function BannerForm({ banner, onSubmit }: BannerFormProps) {
           required
         /> */}
       </div>
-      <div className="flex items-center space-x-2">
-        {/* <Switch
+      {/* <div className="flex items-center space-x-2">
+        <Switch
           id="isPublished"
           checked={formData.isPublished}
           onCheckedChange={(checked) =>
             setFormData((prev) => ({ ...prev, isPublished: checked }))
           }
-        /> */}
-        {/* <Label htmlFor="isPublished">Published</Label> */}
-      </div>
+        />
+        <Label htmlFor="isPublished">Bạn có muốn </Label>
+      </div> */}
       <Button type="submit">
         {loadingUpload ? (
           <Loader className="animate-spin" />

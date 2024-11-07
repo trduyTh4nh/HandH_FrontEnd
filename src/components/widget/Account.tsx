@@ -1,36 +1,105 @@
-import React, { useState } from 'react';
+import React, { useContext, useEffect, useState } from "react";
 import {
-  BadgeOutlined, CallOutlined, AttachEmailOutlined, CakeOutlined, LocationOnOutlined
+  BadgeOutlined,
+  CallOutlined,
+  AttachEmailOutlined,
+  CakeOutlined,
+  LocationOnOutlined,
 } from "@mui/icons-material";
-import { Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField } from '@mui/material';
-import { changeInformation, changePassword } from '@/apis/user/user-repo';
-import { userInfo } from 'os';
+import {
+  changeInformation,
+  changePassword,
+  getLoggedInUser,
+  UnauthenticatedError,
+  updateAvatarUser,
+} from "@/apis/user/user-repo";
+import { userInfo } from "os";
+import { Input } from "../ui/input";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "../ui/dialog";
+import EditProfileForm, { UserSchema } from "./editProfileForm";
+import { IUser } from "@/types/user.type";
+import axios, { AxiosError } from "axios";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+import { Button, buttonVariants } from "../ui/button";
+import { Cake, CircleUser, Loader, Mail, MapPin, Phone } from "lucide-react";
+import { UserContext } from "../contexts/UserContext";
+import { Label } from "../ui/label";
+import { cn } from "@/lib/utils";
+import { AspectRatio } from "../ui/aspect-ratio";
+import { profile } from "console";
+import { formatBytes } from "@/utils";
+import API from "@/apis/api";
 
 export const Account: React.FC = () => {
   const [openPasswordDialog, setOpenPasswordDialog] = useState(false);
   const [openEditProfileDialog, setOpenEditProfileDialog] = useState(false);
-
-  const [currentPassword, setCurrentPassword] = useState('');
-  const [newPassword, setNewPassword] = useState('');
-  const [confirmNewPassword, setConfirmNewPassword] = useState('');
-
-  const [name, setName] = useState('Tiêu Trí Quang Test');
-  const [phone, setPhone] = useState('0828907967');
-  const [email, setEmail] = useState('quangrain2014@gmail.com');
-  const [birthday, setBirthday] = useState('2003-08-27');
-  const [street, setStreet] = useState('');
-  const [city, setCity] = useState('');
-  const [address, setAddress] = useState('');
-  const [state, setState] = useState('');
-  const [country, setCountry] = useState('');
-  const [zipcode, setZipcode] = useState('');
-  const [apartmentNumber, setApartmentNumber] = useState('');
-  const [nameEdit, setNameEdit] = useState(name);
-  const [phoneEdit, setPhoneEdit] = useState('0828907967');
-  const [emailEdit, setEmailEdit] = useState('quangrain2014@gmail.com');
-  const [birthdayEdit, setBirthdayEdit] = useState('2003-08-27');
-  const [addressEdit, setAddressEdit] = useState('00 Example Street, Phường 0, Quận 0, Tỉnh Example');
-
+  const { user, setUser } = useContext(UserContext);
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmNewPassword, setConfirmNewPassword] = useState("");
+  const [file, setFile] = useState<File | null>(null);
+  const [process, setProcess] = useState<{
+    loading: boolean;
+    where?: "password" | "profile" | "avatar";
+    error: AxiosError | null;
+  }>({
+    loading: false,
+    where: null,
+    error: null,
+  });
+  const [profilePic, setProfilePic] = useState<{
+    file: File | null;
+    isOpen: boolean;
+  } | null>({
+    file: null,
+    isOpen: false,
+  });
+  async function onSaveProfile(data: UserSchema) {
+    setProcess({
+      loading: true,
+      where: "profile",
+      error: null,
+    })
+    const updatedUser: IUser = {
+      ...data,
+      _id: user._id, 
+      userAddress: {
+        street: data.street,
+        city: data.ward + data.city,
+        state: data.state,
+        country: data.country,
+        apartmentNumber: data.apartmentNumber,
+      }
+    }
+    const res = await changeInformation(updatedUser);
+    if(res instanceof AxiosError) {
+      console.error(res);
+      setProcess({
+        loading: false,
+        where: "profile",
+        error: res,
+      })
+      setOpenEditProfileDialog(false);
+      return
+    }
+    setProcess({
+      loading: false,
+      where: "profile",
+      error: null,
+    })
+    setOpenEditProfileDialog(false);
+    setUser({
+      ...updatedUser,
+      avatar: updatedUser.avatar instanceof File ? URL.createObjectURL(updatedUser.avatar) : updatedUser.avatar as string,
+    })
+  }
   const handleOpenPasswordDialog = () => {
     setOpenPasswordDialog(true);
   };
@@ -53,91 +122,169 @@ export const Account: React.FC = () => {
         alert("Mật khẩu mới và xác nhận mật khẩu không khớp!");
         return;
       }
-      const user: any = JSON.parse(localStorage.getItem('user'))
+      const user: any = JSON.parse(localStorage.getItem("user"));
       await changePassword({
         newPass: newPassword,
         confirmPass: confirmNewPassword,
         currentPass: currentPassword,
-        email: user.email
+        email: user.email,
       });
-      alert("Mật khẩu đã được cập nhật")
+      alert("Mật khẩu đã được cập nhật");
     } catch (err) {
-      console.error(err)
+      console.error(err);
       alert(err);
     }
   };
 
   const handleSaveProfile = async () => {
-    const user: any = JSON.parse(localStorage.getItem('user'))
-    try {
-      await changeInformation({
-        name: name,
-        birthDay: birthday,
-        userAddress: {
-          street: street,
-          city: city,
-          state: state,
-          country: country,
-          zipcode: zipcode,
-          apartmentNumber: apartmentNumber,
-        }
+    setProcess({
+      loading: true,
+      where: "avatar",
+      error: null,
+    });
+    const res = await updateAvatarUser(profilePic.file, user._id);
+    setUser({
+      ...user,
+      // @ts-ignore
+      avatar: res.metadata.avatar,
+    });
+    console.log(res);
+    if (res instanceof AxiosError) {
+      console.error(res);
+      setProcess({
+        loading: true,
+        where: "avatar",
+        error: res,
       });
-      console.log(user);
-      alert("thông tin đã được cập nhật");
-    } catch (error) {
-      console.error(error);
+      return;
     }
-    alert('Thông tin cá nhân đã được cập nhật!');
-    handleCloseEditProfileDialog();
+    setProcess({
+      loading: false,
+      where: "avatar",
+      error: null,
+    });
+    setProfilePic({
+      file: null,
+      isOpen: false,
+    });
   };
 
   return (
-    <div className="flex justify-center items-center mt-10">
-      <div className="bg-white shadow-lg rounded-lg w-full max-w-2xl p-8">
-        <div className="flex flex-col items-center">
-          <img className="h-32 w-32 rounded-full object-cover mb-4 border-4 border-[#ffecc4]" src="/src/assets/image/logo_header.png" alt="Profile" />
-          <button className="text-blue-600 text-sm hover:underline mb-4">Thay đổi ảnh đại diện</button>
-          <h1 className="text-3xl font-bold text-gray-800 mb-6">Hồ sơ khách hàng</h1>
-          <div className="w-full">
-            <div className="flex items-center gap-2 mb-4">
-              <BadgeOutlined className="text-black" />
-              <p className="text-gray-700 font-semibold">Họ tên:</p>
-              <p className="ml-auto text-gray-800 font-medium">{name}</p>
-            </div>
-            <div className="flex items-center gap-2 mb-4">
-              <BadgeOutlined className="text-black" />
-              <p className="text-gray-700 font-semibold">Số điện thoại:</p>
-              <p className="ml-auto text-gray-800 font-medium">{phone}</p>
-            </div>
-            <div className="flex items-center gap-2 mb-4">
+    <div className="flex justify-center items-center mt-4 px-8">
+      <div className="bg-white border border-gray-100 rounded-2xl w-full p-8">
+        {user ? (
+          <div className="flex flex-col items-center gap-4  ">
+            <Avatar className="bg-primary-light w-24 h-24">
+              <AvatarImage src={user ? user.avatar as string : null}></AvatarImage>
+              <AvatarFallback className="text-2xl font-bold">
+                {user.name
+                  .split(" ")
+                  .map((n) => n[0])
+                  .join("")}
+              </AvatarFallback>
+            </Avatar>
+            <label
+              htmlFor="avatar-picker"
+              className={cn(buttonVariants({ variant: "outline" }))}
+            >
+              Thay đổi ảnh đại diện
+            </label>
+            <input
+              type="file"
+              className="hidden"
+              accept="image/*"
+              id="avatar-picker"
+              onChange={(e) => {
+                if (e.target.files[0]) {
+                  setProfilePic({
+                    file: e.target.files[0],
+                    isOpen: true,
+                  });
+                }
+              }}
+            />
+            <hr className=" border-b-gray-100 w-full" />
+            <h1 className="text-3xl font-bold text-gray-800">
+              Hồ sơ khách hàng
+            </h1>
+            <div className="w-full">
+              <div className="flex items-center gap-2 mb-4">
+                <CircleUser className="text-black" />
+                <p className="text-gray-700 font-semibold">Họ tên:</p>
+                <p className="ml-auto text-gray-800 font-medium">{user.name}</p>
+              </div>
+              <div className="flex items-center gap-2 mb-4">
+                <Phone className="text-black" />
+                <p className="text-gray-700 font-semibold">Số điện thoại:</p>
+                <p className="ml-auto text-gray-800 font-medium">
+                  {user.phone}
+                </p>
+              </div>
+              {/* <div className="flex items-center gap-2 mb-4">
               <AttachEmailOutlined className="text-black" />
               <p className="text-gray-700 font-semibold">Email:</p>
               <p className="ml-auto text-gray-800 font-medium">{email}</p>
-            </div>
-            <div className="flex items-center gap-2 mb-4">
-              <CakeOutlined className="text-black" />
-              <p className="text-gray-700 font-semibold">Ngày sinh:</p>
-              <p className="ml-auto text-gray-800 font-medium">{birthday}</p>
-            </div>
-            <div className="flex items-center gap-2 mb-4">
-              <LocationOnOutlined className="text-black" />
-              <p className="text-gray-700 font-semibold">Địa chỉ:</p>
-              <p className="ml-auto text-gray-800 font-medium">{street + ' ' + city + ' ' + state + ' ' + country + ' ' + zipcode + ' ' + apartmentNumber}</p>
-            </div>
+              </div> */}
+              <div className="flex items-center gap-2 mb-4">
+                <Mail className="text-black" />
+                <p className="text-gray-700 font-semibold">Email:</p>
+                <p className="ml-auto text-gray-800 font-medium">
+                  {user.email}
+                </p>
+              </div>
+              <div className="flex items-center gap-2 mb-4">
+                <Cake className="text-black" />
+                <p className="text-gray-700 font-semibold">Ngày sinh:</p>
+                <p className="ml-auto text-gray-800 font-medium">
+                  {user.birthDay
+                    ? user.birthDay.toLocaleDateString() != "" &&
+                      "Không có ngày sinh"
+                    : "Không có ngày sinh"}
+                </p>
+              </div>
+              <div className="flex items-center gap-2 mb-4">
+                <MapPin className="text-black" />
+                <p className="text-gray-700 font-semibold">Địa chỉ:</p>
+                <p className="ml-auto text-gray-800 font-medium">
+                  {user.userAddress
+                    ? `${user.userAddress.street}, ${user.userAddress.city}, ${user.userAddress.state}`
+                    : "Không có địa chỉ"}
+                </p>
+              </div>
 
-            <div className="flex w-full justify-between mt-6">
-              <button onClick={handleOpenEditProfileDialog} className="bg-[#FFF7E6] text-black py-2 px-6 rounded-lg hover:bg-[#ffecc4] transition-colors duration-300">Chỉnh sửa hồ sơ</button>
-              <button onClick={handleOpenPasswordDialog} className="bg-[#FFF7E6] text-black py-2 px-6 rounded-lg hover:bg-[#ffecc4] transition-colors duration-300">Đổi mật khẩu</button>
+              <div className="flex w-full justify-between mt-6">
+                <button
+                  onClick={handleOpenEditProfileDialog}
+                  className="bg-[#FFF7E6] text-black py-2 px-6 rounded-lg hover:bg-[#ffecc4] transition-colors duration-300"
+                >
+                  Chỉnh sửa hồ sơ
+                </button>
+                <button
+                  onClick={handleOpenPasswordDialog}
+                  className="bg-[#FFF7E6] text-black py-2 px-6 rounded-lg hover:bg-[#ffecc4] transition-colors duration-300"
+                >
+                  Đổi mật khẩu
+                </button>
+              </div>
             </div>
           </div>
-        </div>
+        ) : (
+          <div>Đang tải...</div>
+        )}
 
         {/* change pass */}
         {openPasswordDialog && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-30">
             <div className="bg-white p-8 rounded-xl shadow-lg w-full max-w-md relative transition-transform transform scale-100 duration-300">
-              <h2 className="text-2xl font-bold mb-6 text-gray-800 text-center">Đổi mật khẩu</h2>
-              <button onClick={handleClosePasswordDialog} className="absolute top-4 right-4 text-gray-500 hover:text-gray-800 text-xl">✕</button>
+              <h2 className="text-2xl font-bold mb-6 text-gray-800 text-center">
+                Đổi mật khẩu
+              </h2>
+              <button
+                onClick={handleClosePasswordDialog}
+                className="absolute top-4 right-4 text-gray-500 hover:text-gray-800 text-xl"
+              >
+                ✕
+              </button>
               <div className="space-y-4">
                 <input
                   type="password"
@@ -145,7 +292,7 @@ export const Account: React.FC = () => {
                   value={currentPassword}
                   onChange={(e) => setCurrentPassword(e.target.value)}
                   placeholder="Mật khẩu hiện tại"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#ffecc4] transition duration-300"
+                  className=""
                   required
                 />
                 <input
@@ -166,7 +313,11 @@ export const Account: React.FC = () => {
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#ffecc4] transition duration-300"
                   required
                 />
-                <button onClick={handleChangePassword} type="submit" className="w-full bg-gradient-to-r from-[#FFF7E6] to-[#ffecc4] text-black py-3 rounded-lg hover:bg-gradient-to-l hover:from-[#FFF7E6] hover:to-[#ffecc4] transition duration-300">
+                <button
+                  onClick={handleChangePassword}
+                  type="submit"
+                  className="w-full bg-gradient-to-r from-[#FFF7E6] to-[#ffecc4] text-black py-3 rounded-lg hover:bg-gradient-to-l hover:from-[#FFF7E6] hover:to-[#ffecc4] transition duration-300"
+                >
                   Xác nhận
                 </button>
               </div>
@@ -174,90 +325,75 @@ export const Account: React.FC = () => {
           </div>
         )}
         {/* edit hồ sơ */}
-        {openEditProfileDialog && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-30">
-            <div className="bg-white p-8 rounded-xl shadow-lg w-full max-w-md relative transition-transform transform scale-100 duration-300">
-              <h2 className="text-2xl font-bold mb-6 text-gray-800 text-center">Chỉnh sửa hồ sơ</h2>
-              <button onClick={handleCloseEditProfileDialog} className="absolute top-4 right-4 text-gray-500 hover:text-gray-800 text-xl">✕</button>
-              <div className="space-y-4">
-                <input
-                  type="text"
-                  name="name"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  placeholder="Họ tên"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#ffecc4] transition duration-300"
-                  required
-                />
-                <input
-                  type="date"
-                  name="birthday"
-                  value={birthday}
-                  onChange={(e) => setBirthday(e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#ffecc4] transition duration-300"
-                  required
-                />
-                <input
-                  type="text"
-                  name="street"
-                  value={street}
-                  onChange={(e) => setStreet(e.target.value)}
-                  placeholder="Địa chỉ"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FFF7E6] transition duration-300"
-                  required
-                />
-                <input
-                  type="text"
-                  name="city"
-                  value={city}
-                  onChange={(e) => setCity(e.target.value)}
-                  placeholder="Địa chỉ"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FFF7E6] transition duration-300"
-                  required
-                />
-                <input
-                  type="text"
-                  name="state"
-                  value={state}
-                  onChange={(e) => setState(e.target.value)}
-                  placeholder="Địa chỉ"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FFF7E6] transition duration-300"
-                  required
-                />
-                <input
-                  type="text"
-                  name="country"
-                  value={country}
-                  onChange={(e) => setCountry(e.target.value)}
-                  placeholder="Địa chỉ"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FFF7E6] transition duration-300"
-                  required
-                />
-                <input
-                  type="text"
-                  name="zipcode"
-                  value={zipcode}
-                  onChange={(e) => setZipcode(e.target.value)}
-                  placeholder="Địa chỉ"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FFF7E6] transition duration-300"
-                  required
-                />
-                <input
-                  type="text"
-                  name="apartmentNumber"
-                  value={apartmentNumber}
-                  onChange={(e) => setApartmentNumber(e.target.value)}
-                  placeholder="Địa chỉ"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FFF7E6] transition duration-300"
-                  required
-                />
-                <button onClick={handleSaveProfile} type="submit" className="w-full bg-gradient-to-r from-[#FFF7E6] to-[#ffecc4] text-black py-3 rounded-lg hover:bg-gradient-to-l hover:from-[#FFF7E6] hover:to-[#ffecc4] transition duration-300">
-                  Lưu
-                </button>
-              </div>
+
+        <Dialog
+          open={openEditProfileDialog}
+          onOpenChange={(e) => {
+            setOpenEditProfileDialog(e);
+          }}
+        >
+          <DialogContent className="min-w-[50%]">
+            <DialogHeader className="hidden">
+              <DialogTitle>Chỉnh sửa người dùng</DialogTitle>
+            </DialogHeader>
+            <EditProfileForm loading={process.loading && process.where == "profile"} onSubmit={onSaveProfile} defaultValues={{ user: { ...user, avatar: file }, profilePicture: user ? user.avatar as string : null }} />
+          </DialogContent>
+        </Dialog>
+        <Dialog
+          open={profilePic.isOpen}
+          onOpenChange={(e) => {
+            setProfilePic({
+              ...profilePic,
+              isOpen: e,
+            });
+          }}
+        >
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Xem trước ảnh đại diện</DialogTitle>
+            </DialogHeader>
+
+            <div className="flex flex-col gap-2 items-center justify-center">
+              <AspectRatio ratio={1} className="w-full">
+                <Avatar className="w-full h-full">
+                  <AvatarImage
+                    src={
+                      profilePic.file
+                        ? URL.createObjectURL(profilePic.file)
+                        : null
+                    }
+                  ></AvatarImage>
+                  <AvatarFallback className="text-8xl font-bold">
+                    {user
+                      ? user.name
+                          .split(" ")
+                          .map((n) => n[0])
+                          .join("")
+                      : "?"}
+                  </AvatarFallback>
+                </Avatar>
+              </AspectRatio>
+              <p>{profilePic.file ? profilePic.file.name : "N/A"}</p>
+              <p>
+                {profilePic.file ? formatBytes(profilePic.file.size) : "N/A"}
+              </p>
             </div>
-          </div>
-        )}
+            <DialogFooter className="flex gap-2 w-full">
+              <DialogClose className="flex-1">
+                <Button variant="secondary" className="w-full">
+                  Huỷ
+                </Button>
+              </DialogClose>
+              <Button className="flex-1" onClick={handleSaveProfile}>
+                {process.where == "avatar" && process.loading ? (
+                  <Loader className="animate-spin" />
+                ) : (
+                  "Lưu"
+                )}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </div>
     </div>
   );
