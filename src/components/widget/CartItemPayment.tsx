@@ -2,7 +2,7 @@ import React from "react";
 import { ICartDetail } from "../../types/cart.type";
 import { Add, Remove } from "@mui/icons-material";
 
-const CartItem: React.FC<ICartDetail> = (props) => {
+const CartItemPayMent: React.FC<ICartDetail> = (props) => {
     const { product, quantity, colorPicked, sizePicked } = props;
     
     return (
@@ -33,23 +33,20 @@ const CartItem: React.FC<ICartDetail> = (props) => {
                 </div>
 
                 <div className="cart-item_wrap-right flex flex-col md:flex-row gap-4 items-center">
-                    <div className="cart-item_price flex gap-1 items-center ">
+                <div className="flex gap-1 items-center rounded-full  ">
+                        {/* <input type="text" className="hover:cursor-pointer w-10 text-center text-[#50d71e]" value={quantity} readOnly /> */}
+                        <p className="w-12 text-center">x{quantity}</p>
+                    </div>
+                    <div className="cart-item_price flex gap-1 items-center px-4 py-3">
                         <p className="text-xl md:text-[24px] font-bold">{(product.product_price * quantity)}</p>
                         <span className="text-xl md:text-[24px] font-bold">đồng</span>
                     </div>
-                    <div className="cart-item_fluctuation flex gap-1 items-center rounded-full px-4 py-3 bg-[#E8E8E8] ">
-                        <button className="hover:cursor-pointer"><Remove /></button>
-                        {/* <input type="text" className="hover:cursor-pointer w-10 text-center text-[#50d71e]" value={quantity} readOnly /> */}
-                        <p className="w-12 text-center">{quantity}</p>
-                        <button className="hover:cursor-pointer"><Add /></button>
-                    </div>
-                    <div className="cart-item-deletebtn">
-                        <button className="rounded-full bg-[#E8E8E8] py-2 px-8 font-bold">Xóa</button>
-                    </div>
+                   
+                    
                 </div>
             </div>
         </div>
     );
 }
 
-export default CartItem;
+export default CartItemPayMent;
