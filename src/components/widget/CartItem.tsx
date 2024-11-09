@@ -10,7 +10,7 @@ const CartItem: React.FC<ICartDetail> = (props) => {
             <div className="cart-item_wrap flex flex-col md:flex-row items-center justify-between px-2 gap-4 md:gap-0 -z-10">
                 <div className="cart-item_wrap-left flex items-center gap-4 w-full">
                     <div className="cart-item_wrap-image py-4 ">
-                        <img src={product.product_thumb} className=" md:w-40 " alt="" />
+                        <img src={product.product_thumb as string} className=" md:w-40 " alt="" />
                     </div>
                     <div className="wrap-mid-cart-info flex w-full flex-col">
                         <div className="cart-item_wrap-infomation">

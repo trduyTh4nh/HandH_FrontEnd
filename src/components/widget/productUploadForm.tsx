@@ -104,7 +104,7 @@ const schema = z
     product_price: true,
     product_category: true,
   });
-type ProductUploadFormProps = {
+export type ProductUploadFormProps = {
   onSubmit: (data: IProduct) => void;
   defaultValue?: IProduct;
   readOnly?: boolean;
@@ -231,7 +231,15 @@ export default function ProductUploadForm(props: ProductUploadFormProps) {
     useState<string>(null);
   const form = useForm<z.infer<typeof schema>>({
     resolver: zodResolver(schema),
-    defaultValues: {
+    defaultValues: props.defaultValue ? {
+      product_name: props.defaultValue.product_name,
+      product_description: props.defaultValue.product_description,
+      product_price: props.defaultValue.product_price,
+      product_thumb: null,
+      product_category: props.defaultValue.product_category,
+      isPublished: props.defaultValue.isPublished,
+      isDraft: props.defaultValue.isDraft,
+    } : {
       product_price: 0,
       isDraft: true,
     },

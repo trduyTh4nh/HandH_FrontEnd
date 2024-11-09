@@ -10,12 +10,12 @@ export interface IUserAddress {
 
 export interface IUser {
   _id?: string;
-  email: string;
-  password: string;
-  name: string;
-  birthDay?: string;
-  phone: string;
+  email?: string;
+  password?: string;
+  name?: string;
+  birthDay?: Date;
+  phone?: string;
   userAddress?: IUserAddress;
   role?: string;
-  avatar?: string;
+  avatar?: string | File;
 }

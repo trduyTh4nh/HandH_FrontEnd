@@ -47,43 +47,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { getAllUsers } from "@/apis/user/user-repo";
-const mockUsers: IUser[] = [
-  {
-    _id: "1",
-    email: "john@example.com",
-    password: "hashed_password",
-    name: "John Doe",
-    birthDay: "1990-01-01",
-    phone: "123-456-7890",
-    role: "customer",
-    avatar: "/placeholder.svg?height=40&width=40",
-    userAddress: {
-      street: "123 Main St",
-      city: "Anytown",
-      state: "CA",
-      country: "USA",
-      zipcode: "12345",
-    },
-  },
-  {
-    _id: "2",
-    email: "jane@example.com",
-    password: "hashed_password",
-    name: "Jane Smith",
-    birthDay: "1992-05-15",
-    phone: "987-654-3210",
-    role: "customer",
-    avatar: "/placeholder.svg?height=40&width=40",
-    userAddress: {
-      street: "456 Elm St",
-      city: "Other City",
-      state: "NY",
-      country: "USA",
-      zipcode: "67890",
-    },
-  },
-  // Add more mock users as needed
-];
 
 const mockActivityHistory = [
   { id: "1", userId: "1", action: "Login", timestamp: "2023-06-01 10:30:00" },
@@ -238,7 +201,7 @@ const CustomerPage: React.FC = () => {
                                     <div className="space-y-2">
                                       <Label>Ngày sinh</Label>
                                       <Input
-                                        value={selectedUser.birthDay || "N/A"}
+                                        value={selectedUser.birthDay ? selectedUser.birthDay.toLocaleDateString() || "N/A" : "N/A"}
                                         readOnly
                                       />
                                     </div>

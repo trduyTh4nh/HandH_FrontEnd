@@ -35,7 +35,7 @@ const HistoryDetail: React.FC<OrderItemProps> = ({
   };
 
   return (
-    <div className="border rounded-lg mb-4 p-4 shadow-sm w-4/5">
+    <div className="border rounded-lg mb-4 p-4 shadow-sm w-full">
       <div className="flex justify-between items-center">
         <div>
           <h2 className="text-lg font-semibold">Đơn hàng {date}</h2>
@@ -212,7 +212,7 @@ const AllHis: React.FC = () => {
   ];
 
   return (
-    <div className="p-6">
+    <div>
       {orders.map((order, index) => (
         <HistoryDetail key={index} {...order} />
       ))}

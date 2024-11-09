@@ -64,6 +64,58 @@ export async function updateImageToProduct(id: string, image: File) {
     return error;
   }
 }
+export async function publishProduct(id: string) {
+  try {
+    const response = await api.patch(`product/publicProduct/${id}`);
+    return response;
+  } catch (error) {
+    const e = error as AxiosError;
+    console.log(e);
+    return error;
+  }
+}
+export async function draftProduct(id: string) {
+  try {
+    const response = await api.patch(`product/draftProduct/${id}`);
+    return response;
+  } catch (error) {
+    const e = error as AxiosError;
+    console.log(e);
+    return error;
+  }
+}
+export async function unDraftProduct(id: string) {
+  try {
+    const response = await api.patch(`product/unDaftProduct/${id}`);
+    return response;
+  } catch (error) {
+    const e = error as AxiosError;
+    console.log(e);
+    return error;
+  }
+}
+export async function addToWishlish(idProd: string) {
+  try {
+    const response = await api.post(`wishlist/addProductToWishList`, {
+      productId: idProd,
+    });
+    return response;
+  } catch (error) {
+    const e = error as AxiosError;
+    console.log(e);
+    return error;
+  }
+}
+export async function unPublishProduct(id: string) {
+  try {
+    const response = await api.patch(`product/unPublicProduct/${id}`);
+    return response;
+  } catch (error) {
+    const e = error as AxiosError;
+    console.log(e);
+    return error;
+  }
+}
 export async function addImageToProduct(
   id: string,
   image: File[],
