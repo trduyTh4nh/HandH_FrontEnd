@@ -69,7 +69,8 @@ export const Account: React.FC = () => {
     })
     const updatedUser: IUser = {
       ...data,
-      _id: user._id, 
+      _id: user._id,
+      email: user.email, 
       userAddress: {
         street: data.street,
         city: data.ward + data.city,

@@ -56,7 +56,7 @@ const editProfileSchema = z
       })
       .optional()
       .nullable(),
-    birthDay: z.date().optional(),
+    birthDay: z.date({ required_error: "Ngày sinh không được để trống" }).optional().nullable(),
   })
   .required({
     name: true,

@@ -100,7 +100,8 @@ export async function getAllUsers() {
   }
 }
 export async function changeInformation(body: IUser) {
-  const {avatar, ...rest} = body
+  const {avatar, email, ...rest} = body
+  console.log(rest)
   // const userStr = JSON.parse(localStorage.getItem("user"))
   const userStr = localStorage.getItem("user");
   if (!userStr) {
@@ -110,7 +111,9 @@ export async function changeInformation(body: IUser) {
   try {
     const res: any = await api.put(
       `access/updateInformationUser/${userObj._id}`,
-      rest
+      {
+        user: rest
+      }
     );
     console.log(userObj._id);
     return res.metadata;
