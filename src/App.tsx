@@ -47,6 +47,8 @@ import { UserContext } from "./components/contexts/UserContext";
 import { IUser } from "./types/user.type";
 import PurchaseProcess from "./components/pages/purchase/PurchaseProcess";
 import PurchaseFinish from "./components/pages/purchase/PurchaseFinish";
+import TermsAndConditions from "@/components/pages/TermsAndConditions";
+
 const queryClient = new QueryClient();
 const AdminRoute: React.FC = () => {
   const [isUserValid, setUserValid] = useState(false);
@@ -147,6 +149,8 @@ const UserRoute: React.FC = () => {
           </Route>
           <Route path="favoriteProduct" element={<FavoriteProduct />} />
         </Route>
+        <Route path="/termAndConditions" element={<TermsAndConditions/>}/>
+
         <Route path="/product/:id" element={<Product />} />
         <Route path="/cart" element={<CartPage />} />
         <Route path="/payment" element={<PurchaseLayout />}>
