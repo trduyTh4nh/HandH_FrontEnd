@@ -36,6 +36,7 @@ import { AspectRatio } from "../ui/aspect-ratio";
 import { profile } from "console";
 import { formatBytes } from "@/utils";
 import API from "@/apis/api";
+import { Skeleton } from "../ui/skeleton";
 
 export const Account: React.FC = () => {
   const [openPasswordDialog, setOpenPasswordDialog] = useState(false);
@@ -66,40 +67,45 @@ export const Account: React.FC = () => {
       loading: true,
       where: "profile",
       error: null,
-    })
+    });
     const updatedUser: IUser = {
       ...data,
       _id: user._id,
-      email: user.email, 
+      email: user.email,
+      avatar: user.avatar,
+      birthDay: data.birthDay ? data.birthDay.toLocaleDateString() : null,
       userAddress: {
         street: data.street,
         city: data.ward + data.city,
         state: data.state,
         country: data.country,
         apartmentNumber: data.apartmentNumber,
-      }
-    }
+      },
+    };
     const res = await changeInformation(updatedUser);
-    if(res instanceof AxiosError) {
+    if (res instanceof AxiosError) {
       console.error(res);
       setProcess({
         loading: false,
         where: "profile",
         error: res,
-      })
+      });
       setOpenEditProfileDialog(false);
-      return
+      return;
     }
     setProcess({
       loading: false,
       where: "profile",
       error: null,
-    })
+    });
     setOpenEditProfileDialog(false);
     setUser({
       ...updatedUser,
-      avatar: updatedUser.avatar instanceof File ? URL.createObjectURL(updatedUser.avatar) : updatedUser.avatar as string,
-    })
+      avatar:
+        updatedUser.avatar instanceof File
+          ? URL.createObjectURL(updatedUser.avatar)
+          : (updatedUser.avatar as string),
+    });
   }
   const handleOpenPasswordDialog = () => {
     setOpenPasswordDialog(true);
@@ -174,9 +180,11 @@ export const Account: React.FC = () => {
     <div className="flex justify-center items-center mt-4 px-8">
       <div className="bg-white border border-gray-100 rounded-2xl w-full p-8">
         {user ? (
-          <div className="flex flex-col items-center gap-4  ">
+          <div className="flex flex-col items-center gap-4">
             <Avatar className="bg-primary-light w-24 h-24">
-              <AvatarImage src={user ? user.avatar as string : null}></AvatarImage>
+              <AvatarImage
+                src={user ? (user.avatar as string) : null}
+              ></AvatarImage>
               <AvatarFallback className="text-2xl font-bold">
                 {user.name
                   .split(" ")
@@ -238,8 +246,7 @@ export const Account: React.FC = () => {
                 <p className="text-gray-700 font-semibold">Ngày sinh:</p>
                 <p className="ml-auto text-gray-800 font-medium">
                   {user.birthDay
-                    ? user.birthDay.toLocaleDateString() != "" &&
-                      "Không có ngày sinh"
+                    ? new Date(user.birthDay as string).toLocaleDateString()
                     : "Không có ngày sinh"}
                 </p>
               </div>
@@ -270,61 +277,85 @@ export const Account: React.FC = () => {
             </div>
           </div>
         ) : (
-          <div>Đang tải...</div>
-        )}
-
-        {/* change pass */}
-        {openPasswordDialog && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-30">
-            <div className="bg-white p-8 rounded-xl shadow-lg w-full max-w-md relative transition-transform transform scale-100 duration-300">
-              <h2 className="text-2xl font-bold mb-6 text-gray-800 text-center">
-                Đổi mật khẩu
-              </h2>
-              <button
-                onClick={handleClosePasswordDialog}
-                className="absolute top-4 right-4 text-gray-500 hover:text-gray-800 text-xl"
-              >
-                ✕
-              </button>
-              <div className="space-y-4">
-                <input
-                  type="password"
-                  name="currentPassword"
-                  value={currentPassword}
-                  onChange={(e) => setCurrentPassword(e.target.value)}
-                  placeholder="Mật khẩu hiện tại"
-                  className=""
-                  required
-                />
-                <input
-                  type="password"
-                  name="newPassword"
-                  value={newPassword}
-                  onChange={(e) => setNewPassword(e.target.value)}
-                  placeholder="Mật khẩu mới"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#ffecc4] transition duration-300"
-                  required
-                />
-                <input
-                  type="password"
-                  name="confirmNewPassword"
-                  value={confirmNewPassword}
-                  onChange={(e) => setConfirmNewPassword(e.target.value)}
-                  placeholder="Xác nhận mật khẩu mới"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#ffecc4] transition duration-300"
-                  required
-                />
-                <button
-                  onClick={handleChangePassword}
-                  type="submit"
-                  className="w-full bg-gradient-to-r from-[#FFF7E6] to-[#ffecc4] text-black py-3 rounded-lg hover:bg-gradient-to-l hover:from-[#FFF7E6] hover:to-[#ffecc4] transition duration-300"
-                >
-                  Xác nhận
-                </button>
-              </div>
+          <div className="flex flex-col items-center gap-4">
+            <Skeleton className="w-24 h-24 rounded-full"/>
+            <Skeleton className="w-[11.04125rem] h-9 rounded-full"></Skeleton>
+            <hr className=" border-b-gray-100 w-full" />
+            <Skeleton className="w-56 h-9"/>
+            <div className="w-full flex gap-2 items-center">
+              <Skeleton className="w-8 h-8"/>
+              <Skeleton className="w-36 h-9"/>
+              <Skeleton className="w-36 h-9 ml-auto"/>
+            </div>
+            <div className="w-full flex gap-2 items-center">
+              <Skeleton className="w-8 h-8"/>
+              <Skeleton className="w-48 h-9"/>
+              <Skeleton className="w-40 h-9 ml-auto"/>
+            </div>
+            <div className="w-full flex gap-2 items-center">
+              <Skeleton className="w-8 h-8"/>
+              <Skeleton className="w-28 h-9"/>
+              <Skeleton className="w-44 h-9 ml-auto"/>
+            </div>
+            <div className="w-full flex gap-2 items-center">
+              <Skeleton className="w-8 h-8"/>
+              <Skeleton className="w-36 h-9"/>
+              <Skeleton className="w-36 h-9 ml-auto"/>
+            </div>
+            <div className="w-full flex gap-2 items-center">
+              <Skeleton className="w-8 h-8"/>
+              <Skeleton className="w-36 h-9"/>
+              <Skeleton className="w-36 h-9 ml-auto"/>
             </div>
           </div>
         )}
+        
+        {/* change pass */}
+
+        <Dialog open={openPasswordDialog} onOpenChange={setOpenPasswordDialog}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Đổi mật khẩu</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4">
+              <Input
+                type="password"
+                name="currentPassword"
+                value={currentPassword}
+                onChange={(e) => setCurrentPassword(e.target.value)}
+                placeholder="Mật khẩu hiện tại"
+                className=""
+                required
+              />
+              <Input
+                type="password"
+                name="newPassword"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                placeholder="Mật khẩu mới"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#ffecc4] transition duration-300"
+                required
+              />
+              <Input
+                type="password"
+                name="confirmNewPassword"
+                value={confirmNewPassword}
+                onChange={(e) => setConfirmNewPassword(e.target.value)}
+                placeholder="Xác nhận mật khẩu mới"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#ffecc4] transition duration-300"
+                required
+              />
+              <Button
+                onClick={handleChangePassword}
+                type="submit"
+                className="w-full bg-gradient-to-r from-[#FFF7E6] to-[#ffecc4] text-black py-3 rounded-lg hover:bg-gradient-to-l hover:from-[#FFF7E6] hover:to-[#ffecc4] transition duration-300"
+              >
+                Xác nhận
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+
         {/* edit hồ sơ */}
 
         <Dialog
@@ -337,7 +368,14 @@ export const Account: React.FC = () => {
             <DialogHeader className="hidden">
               <DialogTitle>Chỉnh sửa người dùng</DialogTitle>
             </DialogHeader>
-            <EditProfileForm loading={process.loading && process.where == "profile"} onSubmit={onSaveProfile} defaultValues={{ user: { ...user, avatar: file }, profilePicture: user ? user.avatar as string : null }} />
+            <EditProfileForm
+              loading={process.loading && process.where == "profile"}
+              onSubmit={onSaveProfile}
+              defaultValues={{
+                user: { ...user, avatar: file, birthDay: user && user.birthDay ? new Date(user.birthDay) : null },
+                profilePicture: user ? (user.avatar as string) : null,
+              }}
+            />
           </DialogContent>
         </Dialog>
         <Dialog

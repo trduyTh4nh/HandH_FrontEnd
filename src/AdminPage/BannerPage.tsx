@@ -33,6 +33,8 @@ import {
   AwardIcon,
   Loader,
   AlertTriangle,
+  Image,
+  ImageUp,
 } from "lucide-react";
 import { IBanner } from "@/types/banner.type";
 import HomeBanner from "@/components/widget/homeBanner";
@@ -47,6 +49,17 @@ import {
 } from "@/apis/banner/banner-repo";
 import { AxiosError } from "axios";
 import { IProduct } from "@/types/product.type";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormMessage,
+} from "@/components/ui/form";
+import { z } from "zod";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { AspectRatio } from "@/components/ui/aspect-ratio";
 
 type togglePublish = {
   loading?: boolean;
@@ -155,7 +168,7 @@ const BannerPage: React.FC = () => {
     return (
       <form onSubmit={handleConfirmDelete} className="space-y-4">
         <div className="space-y-2">
-          <Label>Mày có chắc muốn xóa?</Label>
+          <Label>Bạn có chắc muốn xóa?</Label>
         </div>
         <div className=" flex justify-end gap-4">
           <Button
@@ -264,7 +277,7 @@ const BannerPage: React.FC = () => {
                     Thêm banner
                   </Button>
                 </DialogTrigger>
-                <DialogContent>
+                <DialogContent className="min-w-[50%]">
                   <DialogHeader>
                     <DialogTitle>Thêm banner</DialogTitle>
                   </DialogHeader>
@@ -455,100 +468,198 @@ const BannerPage: React.FC = () => {
   );
 };
 
+const bannerSchema = z.object({
+  title: z.string({ required_error: "Tiêu đề không được để trống" }),
+  content: z.string({ required_error: "Nội dung không được để trống" }),
+  file: z
+    .instanceof(File, { message: "Hình ảnh không được để trống" })
+    .refine((x) => x.size < 104857600, {
+      message: "kích cỡ file không được vượt quá 100MB",
+    }),
+});
+
 interface BannerFormProps {
   banner?: IBanner;
   onSubmit: (banner: IBanner) => void;
 }
 
 function BannerForm({ banner, onSubmit }: BannerFormProps) {
-  const [formData, setFormData] = useState<any>({
-    title: banner?.title || "",
-    imageUrl: banner?.imageUrl || "",
-    link: banner?.link || "",
-    isPublished: banner?.isPublished || false,
-    type: banner?.type || "sub",
-  });
-
   const [image, setImage] = useState<File | null>(null);
   const [loadingUpload, setLoadingUpload] = React.useState(false);
-
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    const { name, value, files } = e.target as HTMLInputElement;
-    console.log("name", name);
-    if (name === "imageUrl" && files && files.length > 0) {
-      setImage(files[0]);
-      setFormData((prev) => ({ ...prev, [name]: value }));
-    } else {
-      setFormData((prev) => ({ ...prev, [name]: value }));
-    }
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    console.log("Data update: ", formData);
+  async function handleSubmit(e: z.infer<typeof bannerSchema>) {
+    console.log("Data update: ", e);
     console.log("Image update", image);
     setLoadingUpload(true);
-    const response = await createBanner(formData, image);
+    const {file, ...rest} = e;
+    const response = await createBanner({
+      ...rest,
+      type: "sub"
+    }, file);
     setLoadingUpload(false);
     console.log("CHECK DONE: ", response);
-    onSubmit(banner ? { ...formData, id: banner.id } : formData);
-  };
-
+    onSubmit(banner ? { ...e, id: banner.id, type: "sub" } : {...e, type: "sub", imageUrl: URL.createObjectURL(file)});
+  }
+  // const handleSubmit = async (e: React.FormEvent) => {
+  //   e.preventDefault();
+  //   console.log("Data update: ", formData);
+  //   console.log("Image update", image);
+  //   setLoadingUpload(true);
+  //   const response = await createBanner(formData, image);
+  //   setLoadingUpload(false);
+  //   console.log("CHECK DONE: ", response);
+  //   onSubmit(banner ? { ...formData, id: banner.id } : formData);
+  // };
+  const form = useForm({
+    resolver: zodResolver(bannerSchema),
+  });
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <div className="space-y-2">
-        <Label htmlFor="title">Nội dung</Label>
-        <Input
-          id="title"
+    <Form {...form}>
+      <form
+        onSubmit={form.handleSubmit(handleSubmit)}
+        className="w-full flex flex-col gap-2"
+      >
+        <FormField
+          control={form.control}
+          name="file"
+          render={({ field }) => (
+            <>
+              <AspectRatio ratio={3}>
+                <Label
+                  className="cursor-pointer w-full h-full relative group"
+                  htmlFor="avatar-input"
+                >
+                  {field.value ? (
+                    <>
+                      <div className="absolute left-[50%] top-[50%] -translate-x-[50%] -translate-y-[50%] p-4 scale-100 bg-white/85 backdrop-blur-lg opacity-1 rounded-2xl group-hover:opacity-0 group-hover:scale-90 group-hover:blur-sm transition-all flex flex-col gap-2 items-center">
+                        <ImageUp/>
+                        <p>Ấn vào để thay đổi hình ảnh</p>
+                      </div>
+                      <img
+                        src={URL.createObjectURL(field.value)}
+                        className="w-full h-full object-cover rounded-lg shadow-lg"
+                      />
+                    </>
+                  ) : (
+                    <Card className="flex flex-col justify-center p-4 items-center gap-2 w-full h-full">
+                      <Image />
+                      <p className="text-sm">
+                        Đăng tải hình ảnh cho bảng quảng cáo{" "}
+                        <span className="text-red-400">*</span>
+                      </p>
+                    </Card>
+                  )}
+                </Label>
+              </AspectRatio>
+              <FormControl>
+                <Input
+                  id="avatar-input"
+                  type="file"
+                  className="hidden"
+                  accept="image/*"
+                  onChange={(e) => {
+                    if (e.target.files[0]) {
+                      field.onChange(e.target.files[0]);
+                    }
+                  }}
+                />
+              </FormControl>
+              <FormMessage />
+            </>
+          )}
+        />
+        <FormField
+          control={form.control}
           name="title"
-          value={formData.title}
-          onChange={handleChange}
-          required
+          render={({ field }) => (
+            <FormItem>
+              <Label>
+                Tiêu đề <span className="text-red-400">*</span>
+              </Label>
+              <FormControl>
+                <Input {...field} placeholder="Bắt buộc" />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
         />
-      </div>
-      <div className="space-y-2">
-        <Label htmlFor="imageUrl">URL hình ảnh</Label>
-        <Input
-          type="file"
-          id="imageUrl"
-          name="imageUrl"
-          value={formData.imageUrl}
-          onChange={handleChange}
-          required
+        <FormField
+          control={form.control}
+          name="content"
+          render={({ field }) => (
+            <FormItem>
+              <Label>
+                Nội dung <span className="text-red-400">*</span>
+              </Label>
+              <FormControl>
+                <Textarea {...field} placeholder="Bắt buộc" />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
         />
-      </div>
-      <div className="space-y-2">
-        {/* <Label htmlFor="link">Link</Label>
-        <Input
-          id="link"
-          name="link"
-          value={formData.link}
-          onChange={handleChange}
-          required
-        /> */}
-      </div>
-      {/* <div className="flex items-center space-x-2">
-        <Switch
-          id="isPublished"
-          checked={formData.isPublished}
-          onCheckedChange={(checked) =>
-            setFormData((prev) => ({ ...prev, isPublished: checked }))
-          }
-        />
-        <Label htmlFor="isPublished">Bạn có muốn </Label>
-      </div> */}
-      <Button type="submit">
-        {loadingUpload ? (
-          <Loader className="animate-spin" />
-        ) : banner ? (
-          "Update Banner"
-        ) : (
-          "Add Banner"
-        )}
-      </Button>
-    </form>
+        <Button type="submit">
+          {loadingUpload ? (
+            <Loader className="animate-spin" />
+          ) : banner ? (
+            "Update Banner"
+          ) : (
+            "Thêm Bảng quảng cáo"
+          )}
+        </Button>
+      </form>
+    </Form>
+    // <form onSubmit={handleSubmit} className="space-y-4">
+    //   <div className="space-y-2">
+    //     <Label htmlFor="title">Nội dung</Label>
+    //     <Input
+    //       id="title"
+    //       name="title"
+    //       value={formData.title}
+    //       onChange={handleChange}
+    //       required
+    //     />
+    //   </div>
+    //   <div className="space-y-2">
+    //     <Label htmlFor="imageUrl">URL hình ảnh</Label>
+    //     <Input
+    //       type="file"
+    //       id="imageUrl"
+    //       name="imageUrl"
+    //       value={formData.imageUrl}
+    //       onChange={handleChange}
+    //       required
+    //     />
+    //   </div>
+    //   <div className="space-y-2">
+    //     {/* <Label htmlFor="link">Link</Label>
+    //     <Input
+    //       id="link"
+    //       name="link"
+    //       value={formData.link}
+    //       onChange={handleChange}
+    //       required
+    //     /> */}
+    //   </div>
+    //   {/* <div className="flex items-center space-x-2">
+    //     <Switch
+    //       id="isPublished"
+    //       checked={formData.isPublished}
+    //       onCheckedChange={(checked) =>
+    //         setFormData((prev) => ({ ...prev, isPublished: checked }))
+    //       }
+    //     />
+    //     <Label htmlFor="isPublished">Bạn có muốn </Label>
+    //   </div> */}
+    //   <Button type="submit">
+    //     {loadingUpload ? (
+    //       <Loader className="animate-spin" />
+    //     ) : banner ? (
+    //       "Update Banner"
+    //     ) : (
+    //       "Add Banner"
+    //     )}
+    //   </Button>
+    // </form>
   );
 }
 

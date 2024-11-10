@@ -132,7 +132,7 @@ const UserRoute: React.FC = () => {
         <Route path="/blog" element={<Blog />} />
         <Route path="/management" element={<Management />} />
         <Route path="/aboutUs" element={<AboutUs/>} />
-        <Route path="/managerAccount" element={<ManagerAccount />}>
+        <Route path="/user" element={<ManagerAccount />}>
           <Route index element={<Account />} />
           <Route path="account" element={<Account />} />
           <Route path="paymentHistory" element={<PaymentHistory />}>

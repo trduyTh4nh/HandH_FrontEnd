@@ -317,7 +317,7 @@ export default function EditProfileForm(props: EditProfileFormProps) {
               />
             </div>
           </div>
-          <div className="flex gap-2">
+          <DialogFooter>
             <DialogClose>
               <Button type="button" variant="secondary">
                 Hủy
@@ -326,7 +326,7 @@ export default function EditProfileForm(props: EditProfileFormProps) {
             <Button type="submit" disabled={props.loading}>
               {props.loading ? <Loader className="animate-spin" /> : "Lưu"}
             </Button>
-          </div>
+          </DialogFooter>
         </form>
       </Form>
     </div>

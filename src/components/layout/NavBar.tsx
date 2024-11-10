@@ -152,7 +152,7 @@ const Navbar: React.FC = () => {
   return (
     <nav
       id="nav-main"
-      className=" bg-white fixed w-full top-0 z-30 rounded-b-3xl shadow-md"
+      className=" bg-white/90 backdrop-blur-xl fixed w-full top-0 z-30 rounded-b-3xl shadow-md"
     >
       <div className="flex mx-auto px-10 md:px-20 py-4 justify-between items-center">
         <div className="flex justify-start gap-4 items-center">
@@ -260,7 +260,7 @@ const Navbar: React.FC = () => {
                     <DropdownMenuItem
                       className="flex gap-2"
                       onClick={() => {
-                        navigate("/ManagerAccount");
+                        navigate("/user/account");
                       }}
                     >
                       <User className="w-4 h-4" />
@@ -269,7 +269,7 @@ const Navbar: React.FC = () => {
                     <DropdownMenuItem
                       className="flex gap-2"
                       onClick={() => {
-                        navigate("/ManagerAccount/favoriteProduct");
+                        navigate("/user/favoriteProduct");
                       }}
                     >
                       <Heart className="w-4 h-4" />
@@ -278,7 +278,7 @@ const Navbar: React.FC = () => {
                     <DropdownMenuItem
                       className="flex gap-2"
                       onClick={() => {
-                        navigate("/ManagerAccount/paymentHistory");
+                        navigate("/user/paymentHistory");
                       }}
                     >
                       <ReceiptText className="w-4 h-4" />

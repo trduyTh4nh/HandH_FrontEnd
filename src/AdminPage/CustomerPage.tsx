@@ -201,7 +201,7 @@ const CustomerPage: React.FC = () => {
                                     <div className="space-y-2">
                                       <Label>Ngày sinh</Label>
                                       <Input
-                                        value={selectedUser.birthDay ? selectedUser.birthDay.toLocaleDateString() || "N/A" : "N/A"}
+                                        value={selectedUser.birthDay ? selectedUser.birthDay as string || "N/A" : "N/A"}
                                         readOnly
                                       />
                                     </div>
