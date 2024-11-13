@@ -20,8 +20,8 @@ export default function PurchaseReview() {
   const [formMode, setFormMode] = useState(0);
   return (
     <div className="flex h-full">
-      <div className="flex justify-center items-center w-2/3 flex-1">
-        <div className="cart-body_left w-full mt-6">
+      <div className="flex justify-center items-center w-2/3 flex-1 overflow-y-auto max-h-[80vh]">
+        <div className="w-full mt-6">
                     <div className=" h-px bg-[#E8E8E8]"></div>
                         {
                             cartSample.cart_products.map((cartDetail) => (

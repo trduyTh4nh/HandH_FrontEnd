@@ -23,6 +23,7 @@ import Delivering from "./components/cpn_history/Delivering";
 import Delivered from "./components/cpn_history/Delivered";
 import Received from "./components/cpn_history/Received";
 import Canceled from "./components/cpn_history/Canceled";
+import PurchaseFailed from "./components/pages/purchase/PurchaseFailed";
 import Product from "./components/pages/Product";
 import CartPage from "./components/pages/Cart";
 import PurchaseLayout from "./components/pages/purchase/PurchaseLayout";
@@ -158,6 +159,7 @@ const UserRoute: React.FC = () => {
           <Route path="/payment/choose" element={<PurchaseChoose />} />
           <Route path="/payment/process" element={<PurchaseProcess />} />
           <Route path="/payment/status" element={<PurchaseFinish />} />
+          <Route path="/payment/failed" element={<PurchaseFailed />} />
         </Route>
         <Route path="/test" element={<Test />} />
       </Routes>

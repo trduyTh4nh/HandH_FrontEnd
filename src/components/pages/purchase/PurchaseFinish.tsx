@@ -15,9 +15,9 @@ export default function PurchaseFinish() {
 
             </div>
             <p className="py-2 text-opacity-[0.55] text-black">Mã đơn hàng: 69jang420sn</p>
-            <div className='flex flex-row w-full justify-evenly gap-x-4'>
+            <div className='flex px-7 flex-row w-full justify-evenly gap-x-4'>
                 <Button className="font-bold w-full " type="submit">Xem đơn hàng</Button>
-                    <Button variant={"secondary"} className="transition-all w-full">
+                    <Button variant={"secondary"} className="transition-all w-full font-bold">
                         Tiếp tục mua hàng
                     </Button>
             </div>
