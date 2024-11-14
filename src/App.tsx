@@ -47,6 +47,7 @@ import { UserContext } from "./components/contexts/UserContext";
 import { IUser } from "./types/user.type";
 import PurchaseProcess from "./components/pages/purchase/PurchaseProcess";
 import PurchaseFinish from "./components/pages/purchase/PurchaseFinish";
+import BlogPage from "./AdminPage/BlogPage";
 const queryClient = new QueryClient();
 const AdminRoute: React.FC = () => {
   const [isUserValid, setUserValid] = useState(false);
@@ -73,6 +74,7 @@ const AdminRoute: React.FC = () => {
           <Routes>
             <Route path="/" element={<Dashboard />} />
             <Route path="/productsManage" element={<ProductPage />} />
+            <Route path="/blog" element={<BlogPage />} />
             <Route path="/ordersManage" element={<OrderPage />} />
             <Route path="/customersManage" element={<CustomerPage />} />
             <Route path="/financeManage" element={<FinancePage />} />
@@ -132,7 +134,7 @@ const UserRoute: React.FC = () => {
         <Route path="/blog" element={<Blog />} />
         <Route path="/management" element={<Management />} />
         <Route path="/aboutUs" element={<AboutUs/>} />
-        <Route path="/managerAccount" element={<ManagerAccount />}>
+        <Route path="/user" element={<ManagerAccount />}>
           <Route index element={<Account />} />
           <Route path="account" element={<Account />} />
           <Route path="paymentHistory" element={<PaymentHistory />}>

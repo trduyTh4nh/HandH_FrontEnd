@@ -48,6 +48,7 @@ import { AxiosError } from "axios";
 import { useToast } from "@/hooks/use-toast";
 import { UserContext } from "../contexts/UserContext";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+import { getCate } from "@/apis/cate/cate-repo";
 // import { duration } from "@mui/material";
 
 const Navbar: React.FC = () => {
@@ -63,7 +64,7 @@ const Navbar: React.FC = () => {
       friction: 14,
     },
   });
-
+  const [cates, setCates] = React.useState<ICategory[]>(null);
   const [login, setLogin] = React.useState(false);
   const [register, setRegister] = React.useState(false);
   const [admin, setAdmin] = React.useState(false);
@@ -74,6 +75,10 @@ const Navbar: React.FC = () => {
     shown: false,
   });
   const { toast } = useToast();
+  async function getCategories() {
+    const res = await getCate()
+    setCates(res.metadata)
+  }
   useEffect(() => {
     if (isLoading) {
       setTask({
@@ -87,6 +92,9 @@ const Navbar: React.FC = () => {
       });
     }
   }, [isLoading]);
+  useEffect(() => {
+    getCategories();
+  }, []);
   function handleChange(isLogin: boolean) {
     if (isLogin) {
       const lsUser = localStorage.getItem("user");
@@ -152,7 +160,7 @@ const Navbar: React.FC = () => {
   return (
     <nav
       id="nav-main"
-      className=" bg-white fixed w-full top-0 z-30 rounded-b-3xl shadow-md"
+      className=" bg-white/90 backdrop-blur-xl fixed w-full top-0 z-30 rounded-b-3xl shadow-md"
     >
       <div className="flex mx-auto px-10 md:px-20 py-4 justify-between items-center">
         <div className="flex justify-start gap-4 items-center">
@@ -163,7 +171,7 @@ const Navbar: React.FC = () => {
             <NavLink to="/">
               <img
                 className="w-auto h-12"
-                src="\src\assets\image\logo_header.svg"
+                src="/src/assets/image/logo_header.svg"
                 alt="Logo"
               />
             </NavLink>
@@ -260,7 +268,7 @@ const Navbar: React.FC = () => {
                     <DropdownMenuItem
                       className="flex gap-2"
                       onClick={() => {
-                        navigate("/ManagerAccount");
+                        navigate("/user/account");
                       }}
                     >
                       <User className="w-4 h-4" />
@@ -269,7 +277,7 @@ const Navbar: React.FC = () => {
                     <DropdownMenuItem
                       className="flex gap-2"
                       onClick={() => {
-                        navigate("/ManagerAccount/favoriteProduct");
+                        navigate("/user/favoriteProduct");
                       }}
                     >
                       <Heart className="w-4 h-4" />
@@ -278,7 +286,7 @@ const Navbar: React.FC = () => {
                     <DropdownMenuItem
                       className="flex gap-2"
                       onClick={() => {
-                        navigate("/ManagerAccount/paymentHistory");
+                        navigate("/user/paymentHistory");
                       }}
                     >
                       <ReceiptText className="w-4 h-4" />
@@ -402,7 +410,7 @@ const Navbar: React.FC = () => {
               {transitions((style1, isOpen) => (
                 <animated.div style={{ y: style.y, opacity: style.opacity }}>
                   <div className="bg-white absolute left-20 mt-4 w-80 p-4 rounded-3xl">
-                    {sampleCategories.map((category: ICategory, index) => (
+                    {cates.map((category: ICategory, index) => (
                       <div key={index}>{boxCategory(category)}</div>
                     ))}
                   </div>

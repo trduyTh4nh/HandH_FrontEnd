@@ -2,7 +2,7 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import { findById, findLevel1ById } from 'dvhcvn'
 type AddressPickerProps = {
-    defaultValues?: any;
+    defaultDistrict?: string;
 }
 export default function useAddressPicker(props: AddressPickerProps) {
   const [districts, setDistricts] = useState([]);
@@ -17,6 +17,9 @@ export default function useAddressPicker(props: AddressPickerProps) {
   }
   useEffect(() => {
     getDistricts();
+    if(props.defaultDistrict){
+      getWards(props.defaultDistrict) 
+    }
   }, []);
   return {
     districts,
