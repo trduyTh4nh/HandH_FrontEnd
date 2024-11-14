@@ -3,7 +3,7 @@ import { IUser } from "./user.type";
 export interface IBlogPost {
     _id: string,
     content: string,
-    author: IUser,
+    author: IUser | string,
     images: string[],
     datePosted: string,
     dateEdited?: string

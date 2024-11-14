@@ -16,6 +16,7 @@ import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 import { getProduct } from "@/apis/products/product-repo";
 import PaginationControls from "../widget/PaginationsControl";
+import Footer from "../widget/footer";
 type PriceFilter = {
   id: number;
   price: number;
@@ -445,6 +446,7 @@ const Shop: React.FC = () => {
             ></ProductComponentShop>
           </div>
         </div>
+      <Footer/>
       </div>
     </>
   );

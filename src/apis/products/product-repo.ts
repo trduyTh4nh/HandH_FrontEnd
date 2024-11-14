@@ -222,3 +222,12 @@ export async function getProductPage(skip: number, take: number) {
     return error;
   }
 }
+export async function getAllProInWishList() {
+  try {
+    const response = await api.get("wishlist/getAllProWishlist");
+    return response;
+  } catch (error) {
+    const e = error as AxiosError;
+    return error;
+  }
+}

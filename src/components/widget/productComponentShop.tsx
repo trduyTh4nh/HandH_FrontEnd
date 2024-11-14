@@ -12,9 +12,11 @@ import SkeletonLoadingProductGrid from "./SkeletonGridLoading";
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "../ui/button";
 import { ArrowLeft, ArrowRight } from "lucide-react";
+import ProductErrorView from "./productError.widget";
 // import { forEach } from "@splidejs/splide/src/js/utils";
 
 export default function ProductComponentShop({
+  cate,
   priceFilter,
   color,
   size,
@@ -24,6 +26,7 @@ export default function ProductComponentShop({
   take,
   onPageChange,
 }: {
+  cate?: string;
   priceFilter: TypeFilterPice;
   color: string;
   size: string[];
@@ -124,16 +127,12 @@ export default function ProductComponentShop({
           productDatas.map((product: IProduct) => (
             <div className="wrap-product" key={product._id}>
               <ProductItem
-                _id={product._id}
-                product_name={product.product_name}
-                product_price={product.product_price}
-                product_thumb={product.product_thumb}
-                product_variations={product.product_variations}
+                {...product}
               />
             </div>
           ))
         ) : (
-          <h1>Không có sản phẩm nào</h1>
+          <ProductErrorView className="flex-1" mini title="Không có sản phẩm nào" count={4} message="Không có sản phẩm nào ở trang này. Vui lòng quay lại." icon="notfound"/>
         )}
       </div>
       <div className="pagination-controls fixed  bottom-0 flex w-[70%] pb-4 justify-between">
@@ -152,7 +151,7 @@ export default function ProductComponentShop({
         ) : (
           <button
             className="bg-white hover:bg-gray-100 text-gray-800 font-semibold py-2 px-4 border border-gray-400 rounded shadow"
-            onClick={() => onPageChange(skip + 1)}
+            onClick={() => onPageChange(skip +  1)}
           >
             <div className="inner-button flex gap-2">
               {/* <span>Trang tiếp theo</span> */}
