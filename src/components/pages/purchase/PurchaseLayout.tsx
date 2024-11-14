@@ -3,7 +3,7 @@ import { AspectRatio } from "../../ui/aspect-ratio";
 import { Outlet, useLocation } from "react-router-dom";
 import StepNumber from "@/components/widget/stepNumber.widget";
 
-export default function PurchaseLayout() {
+export default function   PurchaseLayout() {
   const location = useLocation();
   const [steps, setSteps] = useState([
     {
