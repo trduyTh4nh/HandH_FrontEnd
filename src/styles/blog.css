@@ -54,7 +54,8 @@
   transform: scale(1.05);
 } */
   .containe-center{
-    padding: 10pt;
+    padding-left: 150pt;
+    padding-right: 150pt;
   }
 
   .circle-image {

@@ -37,6 +37,18 @@ export const cartSample: ICart = {
             quantity: 2,
             colorPicked: "#000",
             sizePicked: "XL"
+        },
+        {
+            product: productList[4],
+            quantity: 2,
+            colorPicked: "#000",
+            sizePicked: "XL"
+        },
+        {
+            product: productList[4],
+            quantity: 2,
+            colorPicked: "#000",
+            sizePicked: "XL"
         }
     ],
     cart_count: 3,
