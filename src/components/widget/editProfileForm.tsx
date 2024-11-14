@@ -77,7 +77,7 @@ export default function EditProfileForm(props: EditProfileFormProps) {
     resolver: zodResolver(editProfileSchema),
     defaultValues: {...props.defaultValues?.user, birthDay: props.defaultValues?.user.birthDay ? new Date(props.defaultValues?.user.birthDay) : null, state: "Thành phố Hồ Chí Minh", country: "Việt Nam"},
   });
-  const { getDistricts, getWards, districts, wards } = useAddressPicker({});
+  const { getDistricts, getWards, districts, wards } = useAddressPicker({defaultDistrict: props.defaultValues && props.defaultValues?.user.city});
   return (
     <div className="space-y-4">
       <Form {...form}>
@@ -256,6 +256,7 @@ export default function EditProfileForm(props: EditProfileFormProps) {
                         onValueChange={(e) => {
                           getWards(e);
                           field.onChange(e);
+                          form.setValue("ward", wards[0].name);
                         }}
                       >
                         <SelectTrigger>

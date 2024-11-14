@@ -76,7 +76,7 @@ export const Account: React.FC = () => {
       birthDay: data.birthDay ? data.birthDay.toLocaleDateString() : null,
       userAddress: {
         street: data.street,
-        city: data.ward + data.city,
+        city: data.ward + ", " + data.city,
         state: data.state,
         country: data.country,
         apartmentNumber: data.apartmentNumber,
@@ -154,6 +154,8 @@ export const Account: React.FC = () => {
       ...user,
       // @ts-ignore
       avatar: res.metadata.avatar,
+      // @ts-ignore
+      role: user.role,
     });
     console.log(res);
     if (res instanceof AxiosError) {
@@ -372,7 +374,7 @@ export const Account: React.FC = () => {
               loading={process.loading && process.where == "profile"}
               onSubmit={onSaveProfile}
               defaultValues={{
-                user: { ...user, avatar: file, birthDay: user && user.birthDay ? new Date(user.birthDay) : null },
+                user: { ...user, avatar: file, birthDay: user && user.birthDay ? new Date(user.birthDay) : null, street: user.userAddress.street, ward: user.userAddress.city.split(", ")[0], city: user.userAddress.city.split(", ")[1], state: user.userAddress.state, country: user.userAddress.country, apartmentNumber: user.userAddress.apartmentNumber },
                 profilePicture: user ? (user.avatar as string) : null,
               }}
             />

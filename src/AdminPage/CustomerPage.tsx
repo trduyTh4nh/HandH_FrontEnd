@@ -47,6 +47,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { getAllUsers } from "@/apis/user/user-repo";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 const mockActivityHistory = [
   { id: "1", userId: "1", action: "Login", timestamp: "2023-06-01 10:30:00" },
@@ -132,6 +133,7 @@ const CustomerPage: React.FC = () => {
             <Table>
               <TableHeader>
                 <TableRow>
+                  <TableHead>Avatar</TableHead>
                   <TableHead>Tên</TableHead>
                   <TableHead>Email</TableHead>
                   <TableHead>Điện thoại</TableHead>
@@ -142,6 +144,17 @@ const CustomerPage: React.FC = () => {
               <TableBody>
                 {users.map((user) => (
                   <TableRow key={user._id}>
+                    <TableCell>
+                      <Avatar>
+                        <AvatarImage src={user.avatar as string} />
+                        <AvatarFallback>
+                          {user.name
+                            .split(" ")
+                            .map((n) => n[0])
+                            .join("").toUpperCase()}
+                        </AvatarFallback>
+                      </Avatar>
+                    </TableCell>
                     <TableCell className="font-medium">{user.name}</TableCell>
                     <TableCell>{user.email}</TableCell>
                     <TableCell>{user.phone}</TableCell>
@@ -171,9 +184,6 @@ const CustomerPage: React.FC = () => {
                                   <TabsTrigger value="details">
                                     Chi tiết
                                   </TabsTrigger>
-                                  <TabsTrigger value="activity">
-                                    Lịch sử hoạt động
-                                  </TabsTrigger>
                                 </TabsList>
                                 <TabsContent value="details">
                                   <div className="grid grid-cols-2 gap-4">
@@ -201,7 +211,12 @@ const CustomerPage: React.FC = () => {
                                     <div className="space-y-2">
                                       <Label>Ngày sinh</Label>
                                       <Input
-                                        value={selectedUser.birthDay ? selectedUser.birthDay as string || "N/A" : "N/A"}
+                                        value={
+                                          selectedUser.birthDay
+                                            ? (selectedUser.birthDay as string) ||
+                                              "N/A"
+                                            : "N/A"
+                                        }
                                         readOnly
                                       />
                                     </div>

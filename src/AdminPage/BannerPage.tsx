@@ -86,6 +86,7 @@ const BannerPage: React.FC = () => {
       id: null,
     });
   const [banner, setBanner] = React.useState([]);
+  const [mainBanner, setMainBanner] = React.useState(null);
   const [stateIdDelete, setStateIdDelete] = React.useState("");
   const [checkMain, setCheckMain] = React.useState(false);
   const [togglePublish, setTogglePublish] = useState<togglePublish>({
@@ -110,7 +111,9 @@ const BannerPage: React.FC = () => {
   useEffect(() => {
     fetch();
   }, []);
-
+  useEffect(() => {
+    setMainBanner(banner.find((ban) => ban.isMain));
+  }, [banner])
   const handleAddBanner = (newBanner: IBanner) => {
     console.log("add banner new", newBanner);
 
@@ -204,65 +207,10 @@ const BannerPage: React.FC = () => {
               <CardTitle>Banner chính</CardTitle>
             </CardHeader>
             <CardContent>
-              {/* {banners
-                .filter((banner) => banner.type === "main")
-                .map((banner) => (
-                  <div key={banner.id} className="space-y-4">
-                    <p>Xem trước banner</p>
-                    <HomeBanner
-                      image={banner.imageUrl}
-                      title={banner.title}
-                      description={banner.title}
-                      link={banner.link}
-                      button="Mua ngay"
-                    />
-                    <div className="flex justify-between items-center">
-                      <h3 className="text-lg font-semibold">{banner.title}</h3>
-                      <div className="flex space-x-2">
-                        <Dialog>
-                          <DialogTrigger asChild>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => setEditingBanner(banner)}
-                            >
-                              <Pencil className="h-4 w-4 mr-1" />
-                              Edit
-                            </Button>
-                          </DialogTrigger>
-                          <DialogContent>
-                            <DialogHeader>
-                              <DialogTitle>Chỉnh sửa banner</DialogTitle>
-                            </DialogHeader>
-                            <BannerForm
-                              banner={banner}
-                              onSubmit={handleEditBanner}
-                            />
-                          </DialogContent>
-                        </Dialog>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() =>
-                            handleTogglePublish(banner.id, banner.isPublished)
-                          }
-                        >
-                          {banner.isPublished ? (
-                            <>
-                              <EyeOff className="h-4 w-4 mr-1" />
-                              Unpublish
-                            </>
-                          ) : (
-                            <>
-                              <Eye className="h-4 w-4 mr-1" />
-                              Publish
-                            </>
-                          )}
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-                ))} */}
+              {
+                mainBanner &&
+                <HomeBanner title={mainBanner.title} description={mainBanner.content} image={mainBanner.url} link="" button=""/>
+              }
             </CardContent>
           </Card>
         </TabsContent>

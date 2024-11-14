@@ -5,7 +5,7 @@ import { UserContext } from "../contexts/UserContext";
 function Footer() {
   const { user, setUser } = useContext(UserContext);
   return (
-    <div className="px-20 py-4 bg-primary-light flex flex-col gap-4">
+    <div className="relative z-30 px-20 py-4 bg-primary-light flex flex-col gap-4">
       <div className="w-full flex justify-between">
         <img src="/logo_header.svg" className="h-12" />
       </div>
