@@ -56,7 +56,7 @@ const AdminRoute: React.FC = () => {
   const [login, setLogin] = useState(false);
   const [checkingAuth, setCheckingAuth] = useState(true);
   const [loginStatus, setLoginStatus] = useState(false);
-  const {user, setUser} = useContext(UserContext);
+  const {user, setUser, isLoading} = useContext(UserContext);
   async function checkUser() {
       setUserValid(user && user.role[0] == "3107");
       setCheckingAuth(false)
@@ -87,18 +87,18 @@ const AdminRoute: React.FC = () => {
           <ErrorView
             className="h-screen"
             title={
-              !checkingAuth
+              !isLoading
                 ? "Bạn không có quyền truy cập vào trang này"
                 : "Đang kiểm tra quyền của bạn..."
             }
             message={
-              !checkingAuth
+              !isLoading
                 ? "Vui lòng đăng nhập với tư cách là quản trị viên để có thể truy cập."
                 : "Đợi chút nhé, chúng tôi đang kiểm tra quyền hạn của bạn..."
             }
-            icon={!checkingAuth ? "notallowed" : "loading"}
+            icon={!isLoading ? "notallowed" : "loading"}
           >
-            {!checkingAuth ? (
+            {!isLoading ? (
               <div className="flex gap-2">
                 <Link to={"/"}>
                   <Button>Quay lại</Button>

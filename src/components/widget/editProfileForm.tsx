@@ -256,7 +256,7 @@ export default function EditProfileForm(props: EditProfileFormProps) {
                         onValueChange={(e) => {
                           getWards(e);
                           field.onChange(e);
-                          form.setValue("ward", wards[0].name);
+                          form.setValue("ward", wards[0].name); 
                         }}
                       >
                         <SelectTrigger>
