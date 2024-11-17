@@ -7,9 +7,9 @@ import {
     CallOutlined,
     StoreOutlined,
   } from "@mui/icons-material";
-import PostAbout from "../widget/PostAbout";
 import '../../styles/aboutUs.css'
 import Footer from "../widget/footer";
+import PostAbout from "../widget/postAbout";
 
 
 

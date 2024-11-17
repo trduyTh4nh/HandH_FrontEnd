@@ -20,9 +20,13 @@ import {
 import { Card, CardContent } from "@/components/ui/card";
 import { IBlogPost } from "@/types/blog.type";
 import { getPosts } from "@/apis/blog/blog-repo";
+import BlogPostForm from "@/components/widget/blogPostForm";
+import { useToast } from "@/hooks/use-toast";
 export default function BlogPage() {
   const [displayMode, setDisplayMode] = useState("table");
   const [posts, setPosts] = useState<IBlogPost[]>([]);
+  const [selectedPost, setSelectedPost] = useState<IBlogPost | null>(null);
+  const [isImagesDialogOpen, setIsImagesDialogOpen] = useState(false);
   async function getBlogPosts() {
     const res = await getPosts();
     console.log(res);
@@ -35,11 +39,13 @@ export default function BlogPage() {
   useEffect(() => {
     getBlogPosts();
   }, []);
+  const {toast} = useToast();
+  const [openUploadDialog, setOpenUploadDialog] = useState(false);
   return (
     <div className="space-y-6 w-full p-8 h-screen">
       <div className="flex justify-between items-center">
         <h2 className="text-3xl font-bold tracking-tight">Quản lý bài đăng</h2>
-        <Dialog>
+        <Dialog open={openUploadDialog} onOpenChange={setOpenUploadDialog}>
           <DialogTrigger asChild>
             <Button>
               <Plus className="mr-2 h-4 w-4" /> Đăng bài
@@ -49,6 +55,10 @@ export default function BlogPage() {
             <DialogHeader>
               <DialogTitle>Đăng bài mới</DialogTitle>
             </DialogHeader>
+            <BlogPostForm onSubmit={(e) => {
+              console.log(e);
+              setOpenUploadDialog(false);
+            }}/>
           </DialogContent>
         </Dialog>
       </div>
@@ -82,31 +92,63 @@ export default function BlogPage() {
               {posts.map((post, index) => (
                 <TableRow>
                   <TableCell>{index + 1}</TableCell>
-                  <TableCell className="flex gap-1">
+                  <TableCell className="flex gap-1 cursor-pointer" onClick={() => {
+                    setSelectedPost(post);
+                    setIsImagesDialogOpen(true);
+                  }}>
                     {post.images.slice(0, 3).map((image, imgIndex) => (
                       <img
                         key={imgIndex}
                         src={image}
                         alt={`image-${imgIndex}`}
-                        className={`w-12 h-12 object-cover rounded-md`}
+                        className={`h-12 object-cover rounded-md`}
                       />
                     ))}
                     {post.images.length > 3 && (
                       <div
-                        className={`w-12 h-12 object-cover rounded-md bg-gray-100`}
+                        className={`w-12 h-12 object-cover rounded-md bg-gray-100 flex justify-center items-center`}
                       >
                         +{post.images.length - 3}
                       </div>
                     )}
                   </TableCell>
                   <TableCell>{post.content}</TableCell>
-                  <TableCell>:)</TableCell>
+                  <TableCell>
+                    {new Date(post.createdAt).toLocaleDateString()}
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex gap-2">
+                      <Button variant="outline">Sửa</Button>
+                      <Button variant="outline">Xoá</Button>
+                    </div>
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>
           </Table>
         </CardContent>
       </Card>
+      <Dialog open={isImagesDialogOpen} onOpenChange={setIsImagesDialogOpen}>
+        <DialogContent className="min-w-[75%]">
+            <DialogHeader>
+                <DialogTitle>Hình ảnh bài viết</DialogTitle>
+            </DialogHeader>
+            <p>{selectedPost && selectedPost.images.length} hình ảnh</p>
+            <div className="flex gap-2 w-full overflow-auto justify-start items-start rounded-2xl">
+            {
+                selectedPost &&
+                selectedPost.images.map((image, index) => (
+                    <img
+                        key={index}
+                        src={image}
+                        alt={`image-${index}`}
+                        className="h-80 rounded-sm"
+                    />
+                ))
+            }
+            </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

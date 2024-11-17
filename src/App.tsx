@@ -48,18 +48,24 @@ import { UserContext } from "./components/contexts/UserContext";
 import { IUser } from "./types/user.type";
 import PurchaseProcess from "./components/pages/purchase/PurchaseProcess";
 import PurchaseFinish from "./components/pages/purchase/PurchaseFinish";
+import { Provider } from "react-redux";
+import { CartProvider } from "./providers/CartContext";
+
 import TermsAndConditions from "@/components/pages/TermsAndConditions";
 import BlogPage from "./AdminPage/BlogPage";
+import { useTransition, animated } from "react-spring";
+import SelectionButton from "./components/widget/selectionButton.widget";
+import { AccountBalanceOutlined } from "@mui/icons-material";
 const queryClient = new QueryClient();
 const AdminRoute: React.FC = () => {
   const [isUserValid, setUserValid] = useState(false);
   const [login, setLogin] = useState(false);
   const [checkingAuth, setCheckingAuth] = useState(true);
   const [loginStatus, setLoginStatus] = useState(false);
-  const {user, setUser} = useContext(UserContext);
+  const {user, setUser, isLoading} = useContext(UserContext);
   async function checkUser() {
-      setUserValid(user && user.role[0] == "3107");
-      setCheckingAuth(false)
+    setUserValid(user && user.role[0] == "3107");
+    setCheckingAuth(false);
   }
   useEffect(() => {
     checkUser();
@@ -87,18 +93,18 @@ const AdminRoute: React.FC = () => {
           <ErrorView
             className="h-screen"
             title={
-              !checkingAuth
+              !isLoading
                 ? "Bạn không có quyền truy cập vào trang này"
                 : "Đang kiểm tra quyền của bạn..."
             }
             message={
-              !checkingAuth
+              !isLoading
                 ? "Vui lòng đăng nhập với tư cách là quản trị viên để có thể truy cập."
                 : "Đợi chút nhé, chúng tôi đang kiểm tra quyền hạn của bạn..."
             }
-            icon={!checkingAuth ? "notallowed" : "loading"}
+            icon={!isLoading ? "notallowed" : "loading"}
           >
-            {!checkingAuth ? (
+            {!isLoading ? (
               <div className="flex gap-2">
                 <Link to={"/"}>
                   <Button>Quay lại</Button>
@@ -170,6 +176,21 @@ const UserRoute: React.FC = () => {
 const App = () => {
   const [user, setUser] = useState<IUser>(null);
   const [loading, setLoading] = useState<boolean>(false);
+  const [showTooltip, setShowTooltip] = useState(false);
+  const [showGrayComponent, setShowGrayComponent] = useState(false);
+  const transitions = useTransition(showTooltip, {
+    from: { opacity: 0, transform: "translateY(10px)" },
+    enter: { opacity: 1, transform: "translateY(0px)" },
+    leave: { opacity: 0, transform: "translateY(10px)" },
+    config: { tension: 170, friction: 20 },
+  });
+  // Transition cho Component màu xám khi click
+  // const grayComponentTransitions = useTransition(showGrayComponent, {
+  //   from: { opacity: 0 },
+  //   enter: { opacity: 1 },
+  //   leave: { opacity: 0 },
+  //   config: { tension: 170, friction: 20 },
+  // });
   async function getUser() {
     try {
       setLoading(true);
@@ -177,36 +198,82 @@ const App = () => {
       setUser(user);
     } catch (e) {
       if (e instanceof AxiosError) {
-        setLoading(false)
+        setLoading(false);
         return;
       }
       if (e instanceof UnauthenticatedError) {
-        setLoading(false)
+        setLoading(false);
         return;
       }
-      setLoading(false)
+      setLoading(false);
       return;
     }
-    setLoading(false)
+    setLoading(false);
   }
   useEffect(() => {
     getUser();
-  }, [])
+  }, []);
   return (
     <QueryClientProvider client={queryClient}>
-      <UserContext.Provider value={{
-        user: user,
-        setUser: setUser,
-        isLoading: loading
-      }}>
-        <Router>
-          <div className="flex flex-col min-h-screen w-full">
-            <Routes>
-              <Route path="/*" element={<UserRoute />} />
-              <Route path="/admin/*" element={<AdminRoute />} />{" "}
-            </Routes>
+
+      <UserContext.Provider
+        value={{
+          user: user,
+          setUser: setUser,
+          isLoading: loading,
+        }}
+      >
+        <CartProvider>
+          <Router>
+            <div className="flex flex-col min-h-screen w-full">
+              <Routes>
+                <Route path="/*" element={<UserRoute />} />
+                <Route path="/admin/*" element={<AdminRoute />} />{" "}
+              </Routes>
+            </div>
+            <div className="fixed h-24 w-24 bottom-4 left-4 z-50 p-4 cursor-pointer group"
+             onClick={() =>window.location.href = "https://zalo.me/0856478995"}
+          >
+            <img 
+              src="src/assets/image/icon_zalo.png" 
+              className="w-full h-full object-cover transition-transform duration-200 transform group-hover:scale-110" 
+              alt="Zalo Icon" 
+            />
+            <div className="absolute  text-black bg-white rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+              Tư vấn
+            </div>
+             {/* Component màu xám hiển thị khi click */}
+              {/* {grayComponentTransitions(
+                (style, item) =>
+                  item && (
+                    <animated.div
+                      style={style}
+                      className="absolute bottom-32 right-4 bg-white shadow-lg opacity-75  w-80 h-auto rounded-xl z-40"
+                    >
+                      <div className="bg-[#ffecc4] rounded-t-xl p-4">
+                        <img src="src/assets/image/logo_header.svg"/>
+                        <h2>Xin chào</h2>
+                        <p>Rất vui khi được tư vấn quý khách</p>
+                      </div>
+                      <div className="p-4  w-full">
+                           <div className="pt-20 pb-20">
+                              <SelectionButton onClick={() => window.location.href = "https://zalo.me/0856478995"}>
+                                <>
+                                  <b>Chat bằng Zalo</b>
+                                </>
+                              </SelectionButton>
+                           </div>
+                           <div className="divider"></div>
+                           <div className="pt-5">
+                            <p className="text-xs">Đ/C: K20 Cư Xá Vĩnh Hội, Phường 6, Quận 4, TP. Hồ Chí Minh</p>
+                           </div>
+                      </div>
+                    </animated.div>
+                  )
+              )} */}
           </div>
-        </Router>
+          </Router>
+        </CartProvider>
       </UserContext.Provider>
     </QueryClientProvider>
   );

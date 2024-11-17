@@ -45,7 +45,7 @@ type RegisterPersonalProps = {
   defaultValues?: any;
 };
 export default function RegisterAddress(props: RegisterPersonalProps) {
-  const address = useAddressPicker({ defaultValues: props.defaultValues });
+  const address = useAddressPicker({ defaultDistrict: props.defaultValues });
   const form = useForm<z.infer<typeof registerSchema>>({
     resolver: zodResolver(registerSchema),
     defaultValues: props.defaultValues || {

@@ -20,11 +20,12 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "../ui/accordion";
-import { Heart, ShoppingCart } from "lucide-react";
+import { Heart, Loader, ShoppingCart } from "lucide-react";
 import SkeletonLoadingProduct from "../widget/skeletonLoadingProduct";
 import Recommendations from "../widget/recommendations";
 import { useToast } from "@/hooks/use-toast";
 import { UserContext } from "../contexts/UserContext";
+import { useCart } from "@/providers/CartContext";
 export default function Product() {
   const { user } = useContext(UserContext);
   const { toast } = useToast();
@@ -65,6 +66,7 @@ export default function Product() {
   const [cateId, setCateId] = useState<string>(null);
   useEffect(() => {
     if (product) {
+
       if (colors.length == 0) {
         const selectedPrice = product.product_colors.find(
           (e) => e.color_isPicked
@@ -131,6 +133,31 @@ export default function Product() {
       };
     });
   }
+
+  const { cart, addProduct, getCart } = useCart();
+  const [loadingCart, setLoadingCart] = useState(false);
+
+  const addProductToCart = async (proId: string) => {
+    setLoadingCart(true);
+    try {
+      const currentUser = JSON.parse(localStorage.getItem("user"));
+      await getCart(currentUser._id);
+      await addProduct(
+        cart._id,
+        proId,
+        sizes[0].name,
+        colors[0].color,
+        currentUser._id
+      );
+      alert("Thêm vào giỏ hàng thành công!");
+    } catch (error) {
+      console.error(error);
+      alert("Thêm sản phẩm thất bại.");
+    } finally {
+      setLoadingCart(false);
+    }
+  };
+
   return error ? (
     <ErrorView
       title={`Sản phẩm không hợp lệ`}
@@ -231,45 +258,17 @@ export default function Product() {
               </div>
             </div>
             <div className="flex gap-2">
-              <Button className="flex items-center gap-4">
-                <ShoppingCart width={18} height={18} />
-                Thêm vào giỏ
-              </Button>
-              <div className=" flex items-center gap-6 px-4 bg-gray-100 rounded-full cursor-default">
-                <div
-                  onClick={() => {
-                    setQuantity((prev) => {
-                      const tmpPrice = product.product_price + colors.find((e) => e.enabled).price +
-                      sizes.find((e) => e.enabled).price;
-
-                      if (quantity > 1) {
-                        setPrice(
-                          price - tmpPrice
-                        );
-                        return prev - 1;
-                      }
-                      return prev;
-                    });
-                  }}
+              {!loadingCart ? (
+                <Button
+                  onClick={() => addProductToCart(product._id)}
+                  className="flex items-center gap-4"
                 >
-                  <RemoveOutlined />
-                </div>
-                <p>{quantity}</p>
-                <div
-                  onClick={() => {
-                    setQuantity((prev) => {
-                      const tmpPrice =
-                        product.product_price +
-                        colors.find((e) => e.enabled).price +
-                        sizes.find((e) => e.enabled).price;
-                      setPrice((prev) => prev + tmpPrice);
-                      return prev + 1;
-                    });
-                  }}
-                >
-                  <Add />
-                </div>
-              </div>
+                  <ShoppingCart width={18} height={18} />
+                  Thêm vào giỏ hàng
+                </Button>
+              ) : (
+                <Loader className="animate-spin" />
+              )}
               <Button
                 disabled={!user}
                 variant="secondary"
