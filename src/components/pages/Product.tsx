@@ -269,41 +269,6 @@ export default function Product() {
               ) : (
                 <Loader className="animate-spin" />
               )}
-              <div className=" flex items-center gap-6 px-4 bg-gray-100 rounded-full cursor-default">
-                <div
-                  onClick={() => {
-                    setQuantity((prev) => {
-                      const tmpPrice = product.product_price + colors.find((e) => e.enabled).price +
-                      sizes.find((e) => e.enabled).price;
-
-                      if (quantity > 1) {
-                        setPrice(
-                          price - tmpPrice
-                        );
-                        return prev - 1;
-                      }
-                      return prev;
-                    });
-                  }}
-                >
-                  <RemoveOutlined />
-                </div>
-                <p>{quantity}</p>
-                <div
-                  onClick={() => {
-                    setQuantity((prev) => {
-                      const tmpPrice =
-                        product.product_price +
-                        colors.find((e) => e.enabled).price +
-                        sizes.find((e) => e.enabled).price;
-                      setPrice((prev) => prev + tmpPrice);
-                      return prev + 1;
-                    });
-                  }}
-                >
-                  <Add />
-                </div>
-              </div>
               <Button
                 disabled={!user}
                 variant="secondary"

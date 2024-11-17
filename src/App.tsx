@@ -48,7 +48,6 @@ import { UserContext } from "./components/contexts/UserContext";
 import { IUser } from "./types/user.type";
 import PurchaseProcess from "./components/pages/purchase/PurchaseProcess";
 import PurchaseFinish from "./components/pages/purchase/PurchaseFinish";
-import store from "./providers/redux/store";
 import { Provider } from "react-redux";
 import { CartProvider } from "./providers/CartContext";
 
@@ -232,7 +231,7 @@ const App = () => {
                 <Route path="/admin/*" element={<AdminRoute />} />{" "}
               </Routes>
             </div>
-            <div className="fixed h-24 w-24 bottom-4 right-4 z-50 p-4 cursor-pointer group"
+            <div className="fixed h-24 w-24 bottom-4 left-4 z-50 p-4 cursor-pointer group"
              onClick={() =>window.location.href = "https://zalo.me/0856478995"}
           >
             <img 
