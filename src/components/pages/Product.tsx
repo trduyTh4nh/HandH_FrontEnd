@@ -10,7 +10,7 @@ import { ImageModelContext } from "../../providers/Providers";
 import { Button } from "../ui/button";
 import { useParams } from "react-router-dom";
 import { addToWishlish, getProductById } from "@/apis/products/product-repo";
-import { IProduct } from "@/types/product.type";
+import { IColorProductVariation, IProduct } from "@/types/product.type";
 import { AxiosError } from "axios";
 import ErrorView from "../widget/Error.widget";
 import { Link } from "react-router-dom";
@@ -32,6 +32,7 @@ export default function Product() {
   const { id } = useParams<{ id: string }>();
   const [error, setError] = useState<AxiosError>(null);
   const [productImages, setProductImages] = useState([]);
+  const [price, setPrice] = useState<number>(0);
   async function getProduct() {
     console.log(id);
     const response = await getProductById(decodeURI(id));
@@ -65,27 +66,46 @@ export default function Product() {
   const [cateId, setCateId] = useState<string>(null);
   useEffect(() => {
     if (product) {
-      setColors(
-        product.product_colors.map((e) => {
-          return {
-            image: e.image_product_col,
-            tooltip: e.color_name,
-            color: e.color_code,
-            enabled: e.color_isPicked,
-          };
-        })
-      );
-      setSizes(
-        product.product_sizes.map((e) => {
-          return {
-            name: e.size_name,
-            enabled: e.size_isPicked,
-          };
-        })
-      );
+
+      if (colors.length == 0) {
+        const selectedPrice = product.product_colors.find(
+          (e) => e.color_isPicked
+        );
+        setPrice(product.product_price + selectedPrice.color_price);
+        setColors(
+          product.product_colors.map((e) => {
+            return {
+              image: e.image_product_col,
+              tooltip: e.color_name,
+              color: e.color_code,
+              enabled: e.color_isPicked,
+              price: e.color_price,
+            };
+          })
+        );
+      }
+      if (sizes.length == 0) {
+        const selectedSize = product.product_sizes.find((e) => e.size_isPicked);
+        setPrice((prev) => prev + selectedSize.size_price);
+        setSizes(
+          product.product_sizes.map((e) => {
+            return {
+              name: e.size_name,
+              enabled: e.size_isPicked,
+              price: e.size_price,
+            };
+          })
+        );
+      }
       console.log(product.product_category);
     }
   }, [product]);
+  useEffect(() => {
+    if (product) {
+      setColors([])
+      setSizes([])
+    }
+  }, [id])
   useEffect(() => {
     if (product) {
       const half = Math.ceil(product.product_images.length / 2);
@@ -98,6 +118,7 @@ export default function Product() {
   const [quantity, setQuantity] = useState(1);
   const [sizes, setSizes] = useState([]);
   const [colors, setColors] = useState([]);
+  useEffect(() => {}, [quantity]);
   function changeSelected(element: any, array: Array<any>, value: boolean) {
     return array.map((e) => {
       if (e == element) {
@@ -183,7 +204,7 @@ export default function Product() {
           <div>
             <h1>{product.product_name}</h1>
             <h2 className="text-3xl font-light">
-              {product.product_price.toLocaleString()} đồng
+              {price.toLocaleString()} đồng
             </h2>
           </div>
           <div className="flex flex-col gap-4">
@@ -194,6 +215,14 @@ export default function Product() {
                   enabled={e.enabled}
                   onClick={(enabled) => {
                     setSizes(() => changeSelected(e, sizes, enabled));
+                    const selectedPrice = colors.find((e) => e.enabled);
+                    setPrice(
+                      (prev) =>
+                        (product.product_price +
+                          selectedPrice.price +
+                          e.price) *
+                        quantity
+                    );
                   }}
                 >
                   {e.name}
@@ -209,7 +238,19 @@ export default function Product() {
                     active={e.enabled}
                     color={e.color}
                     onClick={(selected) => {
+                      const selectedSize = sizes.find((e) => e.enabled);
                       setColors(() => changeSelected(e, colors, selected));
+                      setPrice(
+                        (prev) =>
+                          (product.product_price +
+                            e.price +
+                            selectedSize.price) *
+                          quantity
+                      );
+                      setProduct({
+                        ...product,
+                        product_thumb: e.image,
+                      });
                     }}
                     tooltip={e.tooltip}
                   />
@@ -232,10 +273,16 @@ export default function Product() {
                 <div
                   onClick={() => {
                     setQuantity((prev) => {
+                      const tmpPrice = product.product_price + colors.find((e) => e.enabled).price +
+                      sizes.find((e) => e.enabled).price;
+
                       if (quantity > 1) {
-                        return quantity - 1;
+                        setPrice(
+                          price - tmpPrice
+                        );
+                        return prev - 1;
                       }
-                      return quantity;
+                      return prev;
                     });
                   }}
                 >
@@ -244,7 +291,14 @@ export default function Product() {
                 <p>{quantity}</p>
                 <div
                   onClick={() => {
-                    setQuantity(() => quantity + 1);
+                    setQuantity((prev) => {
+                      const tmpPrice =
+                        product.product_price +
+                        colors.find((e) => e.enabled).price +
+                        sizes.find((e) => e.enabled).price;
+                      setPrice((prev) => prev + tmpPrice);
+                      return prev + 1;
+                    });
                   }}
                 >
                   <Add />

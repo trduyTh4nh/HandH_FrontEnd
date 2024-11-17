@@ -23,6 +23,7 @@ import Delivering from "./components/cpn_history/Delivering";
 import Delivered from "./components/cpn_history/Delivered";
 import Received from "./components/cpn_history/Received";
 import Canceled from "./components/cpn_history/Canceled";
+import PurchaseFailed from "./components/pages/purchase/PurchaseFailed";
 import Product from "./components/pages/Product";
 import CartPage from "./components/pages/Cart";
 import PurchaseLayout from "./components/pages/purchase/PurchaseLayout";
@@ -51,13 +52,16 @@ import store from "./providers/redux/store";
 import { Provider } from "react-redux";
 import { CartProvider } from "./providers/CartContext";
 
+import TermsAndConditions from "@/components/pages/TermsAndConditions";
+import BlogPage from "./AdminPage/BlogPage";
 const queryClient = new QueryClient();
 const AdminRoute: React.FC = () => {
   const [isUserValid, setUserValid] = useState(false);
   const [login, setLogin] = useState(false);
   const [checkingAuth, setCheckingAuth] = useState(true);
   const [loginStatus, setLoginStatus] = useState(false);
-  const { user, setUser } = useContext(UserContext);
+
+  const {user, setUser, isLoading} = useContext(UserContext);
   async function checkUser() {
     setUserValid(user && user.role[0] == "3107");
     setCheckingAuth(false);
@@ -77,6 +81,7 @@ const AdminRoute: React.FC = () => {
           <Routes>
             <Route path="/" element={<Dashboard />} />
             <Route path="/productsManage" element={<ProductPage />} />
+            <Route path="/blog" element={<BlogPage />} />
             <Route path="/ordersManage" element={<OrderPage />} />
             <Route path="/customersManage" element={<CustomerPage />} />
             <Route path="/financeManage" element={<FinancePage />} />
@@ -87,18 +92,18 @@ const AdminRoute: React.FC = () => {
           <ErrorView
             className="h-screen"
             title={
-              !checkingAuth
+              !isLoading
                 ? "Bạn không có quyền truy cập vào trang này"
                 : "Đang kiểm tra quyền của bạn..."
             }
             message={
-              !checkingAuth
+              !isLoading
                 ? "Vui lòng đăng nhập với tư cách là quản trị viên để có thể truy cập."
                 : "Đợi chút nhé, chúng tôi đang kiểm tra quyền hạn của bạn..."
             }
-            icon={!checkingAuth ? "notallowed" : "loading"}
+            icon={!isLoading ? "notallowed" : "loading"}
           >
-            {!checkingAuth ? (
+            {!isLoading ? (
               <div className="flex gap-2">
                 <Link to={"/"}>
                   <Button>Quay lại</Button>
@@ -135,8 +140,8 @@ const UserRoute: React.FC = () => {
         <Route path="/shop" element={<Shop />} />
         <Route path="/blog" element={<Blog />} />
         <Route path="/management" element={<Management />} />
-        <Route path="/aboutUs" element={<AboutUs />} />
-        <Route path="/managerAccount" element={<ManagerAccount />}>
+        <Route path="/aboutUs" element={<AboutUs/>} />
+        <Route path="/user" element={<ManagerAccount />}>
           <Route index element={<Account />} />
           <Route path="account" element={<Account />} />
           <Route path="paymentHistory" element={<PaymentHistory />}>
@@ -151,6 +156,8 @@ const UserRoute: React.FC = () => {
           </Route>
           <Route path="favoriteProduct" element={<FavoriteProduct />} />
         </Route>
+        <Route path="/termAndConditions" element={<TermsAndConditions/>}/>
+
         <Route path="/product/:id" element={<Product />} />
         <Route path="/cart" element={<CartPage />} />
         <Route path="/payment" element={<PurchaseLayout />}>
@@ -158,6 +165,7 @@ const UserRoute: React.FC = () => {
           <Route path="/payment/choose" element={<PurchaseChoose />} />
           <Route path="/payment/process" element={<PurchaseProcess />} />
           <Route path="/payment/status" element={<PurchaseFinish />} />
+          <Route path="/payment/failed" element={<PurchaseFailed />} />
         </Route>
         <Route path="/test" element={<Test />} />
       </Routes>

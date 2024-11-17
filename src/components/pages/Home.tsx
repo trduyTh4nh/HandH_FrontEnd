@@ -122,6 +122,7 @@ const Home: React.FC = () => {
                 className="flex-1 min-w-[2.5%] max-w-[25%] flex-shrink-0"
                 >
                 <HomeCategory
+                  id={category._id}
                   name={category.category_name}
                   image={category.category_image}
                 />
