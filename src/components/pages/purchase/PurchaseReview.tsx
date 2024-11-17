@@ -7,7 +7,6 @@ import {
   SelectItem,
 } from "../../ui/select";
 import { Button } from "../../ui/button";
-import { cartSample } from "@/types/cart.type";
 import { Link } from "react-router-dom";
 import GuestPurchaseForm from "@/components/widget/guestPurchaseForm.widget";
 import { useToast } from "@/hooks/use-toast";
@@ -23,17 +22,17 @@ export default function PurchaseReview() {
       <div className="flex justify-center items-center w-2/3 flex-1 overflow-y-auto max-h-[80vh]">
         <div className="w-full mt-6">
                     <div className=" h-px bg-[#E8E8E8]"></div>
-                        {
-                            cartSample.cart_products.map((cartDetail) => (
-                                <CartItemPayment
+                        {/* {
+                            [].map((cartDetail) => (
+                                // <CartItemPayment
                                     
-                                    product={cartDetail.product}
-                                    quantity={cartDetail.quantity}
-                                    colorPicked={cartDetail.colorPicked}
-                                    sizePicked={cartDetail.sizePicked}
-                                />
+                                //     product={cartDetail.product}
+                                //     quantity={cartDetail.quantity}
+                                //     colorPicked={cartDetail.colorPicked}
+                                //     sizePicked={cartDetail.sizePicked}
+                                // />
                             ))
-                        }
+                        } */}
                     </div>
 
       </div>

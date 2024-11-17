@@ -48,7 +48,6 @@ import { UserContext } from "./components/contexts/UserContext";
 import { IUser } from "./types/user.type";
 import PurchaseProcess from "./components/pages/purchase/PurchaseProcess";
 import PurchaseFinish from "./components/pages/purchase/PurchaseFinish";
-import store from "./providers/redux/store";
 import { Provider } from "react-redux";
 import { CartProvider } from "./providers/CartContext";
 
