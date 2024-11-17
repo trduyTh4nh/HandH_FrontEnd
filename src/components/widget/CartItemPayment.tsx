@@ -3,7 +3,7 @@ import { ICartDetail } from "../../types/cart.type";
 import { Add, Remove } from "@mui/icons-material";
 
 const CartItemPayMent: React.FC<ICartDetail> = (props) => {
-    const { product, quantity, colorPicked, sizePicked } = props;
+    const { product, quantity, colorPicked, sizePicked }: any = props;
     
     return (
         <div className="cart-item border-b py-4 -z-10">
