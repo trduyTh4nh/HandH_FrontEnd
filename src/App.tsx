@@ -184,12 +184,12 @@ const App = () => {
     config: { tension: 170, friction: 20 },
   });
   // Transition cho Component màu xám khi click
-  const grayComponentTransitions = useTransition(showGrayComponent, {
-    from: { opacity: 0 },
-    enter: { opacity: 1 },
-    leave: { opacity: 0 },
-    config: { tension: 170, friction: 20 },
-  });
+  // const grayComponentTransitions = useTransition(showGrayComponent, {
+  //   from: { opacity: 0 },
+  //   enter: { opacity: 1 },
+  //   leave: { opacity: 0 },
+  //   config: { tension: 170, friction: 20 },
+  // });
   async function getUser() {
     try {
       setLoading(true);
@@ -227,7 +227,7 @@ const App = () => {
             </Routes>
           </div>
           <div className="fixed h-24 w-24 bottom-4 right-4 z-50 p-4 cursor-pointer group"
-             onClick={() => setShowGrayComponent((prev) => !prev)}
+             onClick={() =>window.location.href = "https://zalo.me/0856478995"}
           >
             <img 
               src="src/assets/image/icon_zalo.png" 
@@ -238,7 +238,7 @@ const App = () => {
               Tư vấn
             </div>
              {/* Component màu xám hiển thị khi click */}
-              {grayComponentTransitions(
+              {/* {grayComponentTransitions(
                 (style, item) =>
                   item && (
                     <animated.div
@@ -254,7 +254,6 @@ const App = () => {
                            <div className="pt-20 pb-20">
                               <SelectionButton onClick={() => window.location.href = "https://zalo.me/0856478995"}>
                                 <>
-                                
                                   <b>Chat bằng Zalo</b>
                                 </>
                               </SelectionButton>
@@ -266,7 +265,7 @@ const App = () => {
                       </div>
                     </animated.div>
                   )
-              )}
+              )} */}
           </div>
           
         </Router>
