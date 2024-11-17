@@ -374,7 +374,7 @@ export const Account: React.FC = () => {
               loading={process.loading && process.where == "profile"}
               onSubmit={onSaveProfile}
               defaultValues={{
-                user: { ...user, avatar: file, birthDay: user && user.birthDay ? new Date(user.birthDay) : null, street: user.userAddress.street, ward: user.userAddress.city.split(", ")[0], city: user.userAddress.city.split(", ")[1], state: user.userAddress.state, country: user.userAddress.country, apartmentNumber: user.userAddress.apartmentNumber },
+                user: user ? { ...user, avatar: file, birthDay: user && user.birthDay ? new Date(user.birthDay) : null, street: user.userAddress ? user.userAddress.street : "", ward: user.userAddress ? user.userAddress.city.split(", ")[0] : "", city: user.userAddress ? user.userAddress.city.split(", ")[1] : "", state: user.userAddress.state, country: user.userAddress.country, apartmentNumber: user.userAddress.apartmentNumber } : null,
                 profilePicture: user ? (user.avatar as string) : null,
               }}
             />
