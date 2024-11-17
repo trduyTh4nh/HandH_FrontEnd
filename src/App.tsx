@@ -47,16 +47,20 @@ import { UserContext } from "./components/contexts/UserContext";
 import { IUser } from "./types/user.type";
 import PurchaseProcess from "./components/pages/purchase/PurchaseProcess";
 import PurchaseFinish from "./components/pages/purchase/PurchaseFinish";
+import store from "./providers/redux/store";
+import { Provider } from "react-redux";
+import { CartProvider } from "./providers/CartContext";
+
 const queryClient = new QueryClient();
 const AdminRoute: React.FC = () => {
   const [isUserValid, setUserValid] = useState(false);
   const [login, setLogin] = useState(false);
   const [checkingAuth, setCheckingAuth] = useState(true);
   const [loginStatus, setLoginStatus] = useState(false);
-  const {user, setUser} = useContext(UserContext);
+  const { user, setUser } = useContext(UserContext);
   async function checkUser() {
-      setUserValid(user && user.role[0] == "3107");
-      setCheckingAuth(false)
+    setUserValid(user && user.role[0] == "3107");
+    setCheckingAuth(false);
   }
   useEffect(() => {
     checkUser();
@@ -131,7 +135,7 @@ const UserRoute: React.FC = () => {
         <Route path="/shop" element={<Shop />} />
         <Route path="/blog" element={<Blog />} />
         <Route path="/management" element={<Management />} />
-        <Route path="/aboutUs" element={<AboutUs/>} />
+        <Route path="/aboutUs" element={<AboutUs />} />
         <Route path="/managerAccount" element={<ManagerAccount />}>
           <Route index element={<Account />} />
           <Route path="account" element={<Account />} />
@@ -170,36 +174,40 @@ const App = () => {
       setUser(user);
     } catch (e) {
       if (e instanceof AxiosError) {
-        setLoading(false)
+        setLoading(false);
         return;
       }
       if (e instanceof UnauthenticatedError) {
-        setLoading(false)
+        setLoading(false);
         return;
       }
-      setLoading(false)
+      setLoading(false);
       return;
     }
-    setLoading(false)
+    setLoading(false);
   }
   useEffect(() => {
     getUser();
-  }, [])
+  }, []);
   return (
     <QueryClientProvider client={queryClient}>
-      <UserContext.Provider value={{
-        user: user,
-        setUser: setUser,
-        isLoading: loading
-      }}>
-        <Router>
-          <div className="flex flex-col min-h-screen w-full">
-            <Routes>
-              <Route path="/*" element={<UserRoute />} />
-              <Route path="/admin/*" element={<AdminRoute />} />{" "}
-            </Routes>
-          </div>
-        </Router>
+      <UserContext.Provider
+        value={{
+          user: user,
+          setUser: setUser,
+          isLoading: loading,
+        }}
+      >
+        <CartProvider>
+          <Router>
+            <div className="flex flex-col min-h-screen w-full">
+              <Routes>
+                <Route path="/*" element={<UserRoute />} />
+                <Route path="/admin/*" element={<AdminRoute />} />{" "}
+              </Routes>
+            </div>
+          </Router>
+        </CartProvider>
       </UserContext.Provider>
     </QueryClientProvider>
   );

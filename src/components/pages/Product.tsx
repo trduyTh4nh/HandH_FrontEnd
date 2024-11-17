@@ -20,14 +20,15 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "../ui/accordion";
-import { Heart, ShoppingCart } from "lucide-react";
+import { Heart, Loader, ShoppingCart } from "lucide-react";
 import SkeletonLoadingProduct from "../widget/skeletonLoadingProduct";
 import Recommendations from "../widget/recommendations";
 import { useToast } from "@/hooks/use-toast";
 import { UserContext } from "../contexts/UserContext";
+import { useCart } from "@/providers/CartContext";
 export default function Product() {
-  const {user} = useContext(UserContext);
-  const {toast} = useToast()
+  const { user } = useContext(UserContext);
+  const { toast } = useToast();
   const { id } = useParams<{ id: string }>();
   const [error, setError] = useState<AxiosError>(null);
   const [productImages, setProductImages] = useState([]);
@@ -50,8 +51,11 @@ export default function Product() {
       console.log(res);
       return;
     }
-    toast({title: "Đã thêm sản phẩm vào mục yêu thích.", description: `Đã thêm sản phẩm ${product.product_name} vào mục yêu thích. Vui lòng truy cập 'Hồ Sơ > Mục Yêu Thích' để xem.`})
-    return res
+    toast({
+      title: "Đã thêm sản phẩm vào mục yêu thích.",
+      description: `Đã thêm sản phẩm ${product.product_name} vào mục yêu thích. Vui lòng truy cập 'Hồ Sơ > Mục Yêu Thích' để xem.`,
+    });
+    return res;
   }
   useEffect(() => {
     setProduct(null);
@@ -68,7 +72,6 @@ export default function Product() {
             tooltip: e.color_name,
             color: e.color_code,
             enabled: e.color_isPicked,
-            
           };
         })
       );
@@ -109,6 +112,31 @@ export default function Product() {
       };
     });
   }
+
+  const { cart, addProduct, getCart } = useCart();
+  const [loadingCart, setLoadingCart] = useState(false);
+
+  const addProductToCart = async (proId: string) => {
+    setLoadingCart(true);
+    try {
+      const currentUser = JSON.parse(localStorage.getItem("user"));
+      await getCart(currentUser._id);
+      await addProduct(
+        cart._id,
+        proId,
+        sizes[0].name,
+        colors[0].color,
+        currentUser._id
+      );
+      alert("Thêm vào giỏ hàng thành công!");
+    } catch (error) {
+      console.error(error);
+      alert("Thêm sản phẩm thất bại.");
+    } finally {
+      setLoadingCart(false);
+    }
+  };
+
   return error ? (
     <ErrorView
       title={`Sản phẩm không hợp lệ`}
@@ -189,10 +217,17 @@ export default function Product() {
               </div>
             </div>
             <div className="flex gap-2">
-              <Button className="flex items-center gap-4">
-                <ShoppingCart width={18} height={18} />
-                Thêm vào giỏ
-              </Button>
+              {!loadingCart ? (
+                <Button
+                  onClick={() => addProductToCart(product._id)}
+                  className="flex items-center gap-4"
+                >
+                  <ShoppingCart width={18} height={18} />
+                  Thêm vào giỏ hàng
+                </Button>
+              ) : (
+                <Loader className="animate-spin" />
+              )}
               <div className=" flex items-center gap-6 px-4 bg-gray-100 rounded-full cursor-default">
                 <div
                   onClick={() => {
@@ -215,8 +250,12 @@ export default function Product() {
                   <Add />
                 </div>
               </div>
-              <Button disabled={!user} variant="secondary" onClick={addFavorite}>
-                <Heart width={16} height={16}/>
+              <Button
+                disabled={!user}
+                variant="secondary"
+                onClick={addFavorite}
+              >
+                <Heart width={16} height={16} />
               </Button>
             </div>
           </div>
@@ -226,17 +265,15 @@ export default function Product() {
         <h2 className="font-light">Mô tả sản phẩm</h2>
         <p>{product.product_description}</p>
         <div className="grid grid-cols-2 gap-x-2">
-          {
-            productImages.map(e => {
-              return <div className="flex flex-col gap-2">
-                {
-                  e.map((img) => {
-                   return <img src={img} className="h-auto w-full"/>
-                  })
-                }
+          {productImages.map((e) => {
+            return (
+              <div className="flex flex-col gap-2">
+                {e.map((img) => {
+                  return <img src={img} className="h-auto w-full" />;
+                })}
               </div>
-            })
-          }
+            );
+          })}
         </div>
         <h2 className="font-light">Sản phẩm tương tự</h2>
         <Recommendations cate={cateId} currentId={id} />

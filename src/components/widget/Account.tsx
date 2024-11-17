@@ -66,40 +66,43 @@ export const Account: React.FC = () => {
       loading: true,
       where: "profile",
       error: null,
-    })
+    });
     const updatedUser: IUser = {
       ...data,
       _id: user._id,
-      email: user.email, 
+      email: user.email,
       userAddress: {
         street: data.street,
         city: data.ward + data.city,
         state: data.state,
         country: data.country,
         apartmentNumber: data.apartmentNumber,
-      }
-    }
+      },
+    };
     const res = await changeInformation(updatedUser);
-    if(res instanceof AxiosError) {
+    if (res instanceof AxiosError) {
       console.error(res);
       setProcess({
         loading: false,
         where: "profile",
         error: res,
-      })
+      });
       setOpenEditProfileDialog(false);
-      return
+      return;
     }
     setProcess({
       loading: false,
       where: "profile",
       error: null,
-    })
+    });
     setOpenEditProfileDialog(false);
     setUser({
       ...updatedUser,
-      avatar: updatedUser.avatar instanceof File ? URL.createObjectURL(updatedUser.avatar) : updatedUser.avatar as string,
-    })
+      avatar:
+        updatedUser.avatar instanceof File
+          ? URL.createObjectURL(updatedUser.avatar)
+          : (updatedUser.avatar as string),
+    });
   }
   const handleOpenPasswordDialog = () => {
     setOpenPasswordDialog(true);
@@ -176,7 +179,9 @@ export const Account: React.FC = () => {
         {user ? (
           <div className="flex flex-col items-center gap-4  ">
             <Avatar className="bg-primary-light w-24 h-24">
-              <AvatarImage src={user ? user.avatar as string : null}></AvatarImage>
+              <AvatarImage
+                src={user ? (user.avatar as string) : null}
+              ></AvatarImage>
               <AvatarFallback className="text-2xl font-bold">
                 {user.name
                   .split(" ")
@@ -238,8 +243,7 @@ export const Account: React.FC = () => {
                 <p className="text-gray-700 font-semibold">Ngày sinh:</p>
                 <p className="ml-auto text-gray-800 font-medium">
                   {user.birthDay
-                    ? user.birthDay.toLocaleDateString() != "" &&
-                      "Không có ngày sinh"
+                    ? user.birthDay.toString() != "" && "Không có ngày sinh"
                     : "Không có ngày sinh"}
                 </p>
               </div>
@@ -337,7 +341,14 @@ export const Account: React.FC = () => {
             <DialogHeader className="hidden">
               <DialogTitle>Chỉnh sửa người dùng</DialogTitle>
             </DialogHeader>
-            <EditProfileForm loading={process.loading && process.where == "profile"} onSubmit={onSaveProfile} defaultValues={{ user: { ...user, avatar: file }, profilePicture: user ? user.avatar as string : null }} />
+            <EditProfileForm
+              loading={process.loading && process.where == "profile"}
+              onSubmit={onSaveProfile}
+              defaultValues={{
+                user: { ...user, avatar: file },
+                profilePicture: user ? (user.avatar as string) : null,
+              }}
+            />
           </DialogContent>
         </Dialog>
         <Dialog
