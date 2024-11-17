@@ -15,8 +15,6 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-
-
 }
 a {
   font-weight: 500;
@@ -51,10 +49,10 @@ h1 {
 }
 h2 {
   font-size: 2rem;
-
 }
-button, .button {
-  transition: .2s;
+button,
+.button {
+  transition: 0.2s;
   transform: translateY(0rem);
   border-radius: 8px;
   border: 1px solid transparent;
@@ -63,7 +61,7 @@ button, .button {
   font-family: inherit;
   cursor: pointer;
 }
-button:active{
+button:active {
   box-shadow: 0px 0px 0px rgba(0, 0, 0, 0.182);
   transform: scale(0.95);
 }
@@ -90,7 +88,7 @@ button:active{
     --card-foreground: 0 0% 3.9%;
     --popover: 0 0% 100%;
     --popover-foreground: 0 0% 3.9%;
-    --primary: #FFECC4;
+    --primary: #ffecc4;
     --primary-foreground: 0 0% 98%;
     --secondary: 0 0% 96.1%;
     --secondary-foreground: 0 0% 9%;
@@ -109,8 +107,6 @@ button:active{
     --chart-4: 43 74% 66%;
     --chart-5: 27 87% 67%;
     --radius: 0.5rem;
-
-
   }
   .dark {
     --background: 0 0% 3.9%;
@@ -137,24 +133,43 @@ button:active{
     --chart-3: 30 80% 55%;
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
-
-
   }
-
-
 }
 
 @layer base {
   * {
     @apply border-border;
-
-
   }
   body {
     @apply bg-background text-foreground;
-
-
   }
+}
 
+.loading-dot {
+  display: inline-block;
+  animation: blink 1.5s infinite;
+}
 
+@keyframes blink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.badge span {
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.badge span.entering {
+  opacity: 0;
+  transform: scale(0.8);
+}
+
+.badge span.entered {
+  opacity: 1;
+  transform: scale(1);
 }
