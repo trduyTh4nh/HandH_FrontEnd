@@ -111,6 +111,8 @@ import { getPosts } from "@/apis/blog/blog-repo";
 import "slick-carousel/slick/slick.css"; 
 import "slick-carousel/slick/slick-theme.css";
 import Slider from "react-slick";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import { Button } from "../ui/button";
 
 const Blog: React.FC = () => {
   const [posts, setPosts] = useState<any[]>([]);
@@ -134,6 +136,10 @@ const Blog: React.FC = () => {
     slidesToShow: 1,
     slidesToScroll: 1,
     arrows: true,
+    nextArrow: <div>
+    </div>,
+    prevArrow: <div>
+    </div>
   };
 
   // Đóng modal
