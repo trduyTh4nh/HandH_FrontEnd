@@ -13,7 +13,7 @@ import Footer from "../widget/footer";
 import { Skeleton } from "../ui/skeleton";
 import ErrorView from "../widget/Error.widget";
 import { useUser } from "../contexts/UserContext";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 const CartPage: React.FC = () => {
   const { cart, getCart, setCart } = useCart();
   const { user, isLoading } = useUser();
@@ -22,7 +22,7 @@ const CartPage: React.FC = () => {
       getCart(user._id);
     }
   }, [user]);
-
+  const navigate = useNavigate();
   return (
     <div className="cart-page w-full py-4 flex-grow">
       <div className="cart-page_wrap flex flex-col w-full px-4 md:px-20 min-h-full">
@@ -178,18 +178,28 @@ const CartPage: React.FC = () => {
                 sản phấm
               </p>
               <div className="btn-payment w-full flex justify-center ">
-                <Link to={"/payment"} className="w-full">
-                  <Button
-                    disabled={
-                      !cart ||
-                      !cart.cart_products ||
-                      cart.cart_products.every((e) => !e.isPicked)
-                    }
-                    className="w-full"
-                  >
-                    Thanh toán
-                  </Button>
-                </Link>
+                <Button
+                  onClick={() => {
+                    navigate("/payment", {
+                      state: {
+                        products: cart.cart_products.filter((e) => e.isPicked),
+                        price: cart.cart_products.reduce(
+                          (acc, cur) =>
+                            cur.isPicked ? acc + cur.priceCartDetail : acc,
+                          0
+                        ),
+                      },
+                    });
+                  }}
+                  disabled={
+                    !cart ||
+                    !cart.cart_products ||
+                    cart.cart_products.every((e) => !e.isPicked)
+                  }
+                  className="w-full"
+                >
+                  Thanh toán
+                </Button>
               </div>
             </div>
           </div>

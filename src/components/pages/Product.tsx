@@ -269,7 +269,15 @@ export default function Product() {
             <div className="flex gap-2">
               <Button
                 disabled={loadingCart}
-                onClick={() => addProductToCart(product._id)}
+                onClick={() => {
+                  if(!user) {
+                    toast({
+                      title: "Vui lòng đăng nhập",
+                      description: "Vui lòng đăng nhập để mua sản phẩm này."})
+                    return;
+                  }
+                  addProductToCart(product._id)
+                }}
                 className="flex items-center gap-4"
               >
                 <ShoppingCart width={18} height={18} />
