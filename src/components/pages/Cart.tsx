@@ -143,12 +143,12 @@ const CartPage: React.FC = () => {
                   disabled={
                     !cart.cart_products || cart.cart_products.length == 0
                   }
-                  onClick={() => {
+                  onCheckedChange={(checked) => {
                     setCart({
                       ...cart,
                       cart_products: cart.cart_products.map((e) => ({
                         ...e,
-                        isPicked: !e.isPicked,
+                        isPicked: checked,
                       })),
                     });
                   }}
