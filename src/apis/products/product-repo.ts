@@ -231,3 +231,12 @@ export async function getAllProInWishList() {
     return error;
   }
 }
+
+export async function searchProduct(query: string) {
+  try {
+    const response = await api.get(`product/search?search=${query}`);
+    return response;
+  } catch (error) {
+    return error;
+  }
+}

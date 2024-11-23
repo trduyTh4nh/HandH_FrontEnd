@@ -126,13 +126,18 @@ export default function ProductComponentShop({
         {productDatas.length > 0 ? (
           productDatas.map((product: IProduct) => (
             <div className="wrap-product" key={product._id}>
-              <ProductItem
-                {...product}
-              />
+              <ProductItem {...product} />
             </div>
           ))
         ) : (
-          <ProductErrorView className="flex-1" mini title="Không có sản phẩm nào" count={4} message="Không có sản phẩm nào ở trang này. Vui lòng quay lại." icon="notfound"/>
+          <ProductErrorView
+            className="flex-1"
+            mini
+            title="Không có sản phẩm nào"
+            count={4}
+            message="Không có sản phẩm nào ở trang này. Vui lòng quay lại."
+            icon="notfound"
+          />
         )}
       </div>
       <div className="pagination-controls fixed  bottom-0 flex w-[70%] pb-4 justify-between">
@@ -151,7 +156,7 @@ export default function ProductComponentShop({
         ) : (
           <button
             className="bg-white hover:bg-gray-100 text-gray-800 font-semibold py-2 px-4 border border-gray-400 rounded shadow"
-            onClick={() => onPageChange(skip +  1)}
+            onClick={() => onPageChange(skip + 1)}
           >
             <div className="inner-button flex gap-2">
               {/* <span>Trang tiếp theo</span> */}
