@@ -196,3 +196,42 @@
   padding: 20px;
 
 }
+
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  overflow: hidden;
+  transition: all 0.3s ease-in-out;
+}
+
+.modal-overlay.zoom-in {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.modal-overlay.zoom-out {
+  opacity: 0;
+  transform: scale(0.8);
+}
+
+.modal-image {
+  max-width: 90%;
+  max-height: 90%;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+  transition: transform 0.3s ease-in-out;
+}
+.slick-arrow {
+}
+.slick-arrow:before {
+  color: black !important;
+}
