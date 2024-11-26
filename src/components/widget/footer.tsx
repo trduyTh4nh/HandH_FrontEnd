@@ -30,12 +30,12 @@ function Footer() {
           <b>Đơn hàng</b>
           <Link to={"/"}>Tình trạng đơn hàng</Link>
           <Link to={"/"}>Tra cứu đơn hàng</Link>
-          <Link to={"/"}>Giỏ hàng</Link>
+          <Link to={"/cart"}>Giỏ hàng</Link>
         </div>
         <div className="flex flex-col gap-2">
           <b>Giới thiệu</b>
-          <Link to={"/"}>Về Hồng Đức</Link>
-          <Link to={"/"}>Hoạt động của cửa hàng</Link>
+          <Link to={"/aboutus"}>Về Hồng Đức</Link>
+          <Link to={"/blog"}>Hoạt động của cửa hàng</Link>
         </div>
       </div>
       <hr className="border-t border-t-black" />

@@ -41,7 +41,7 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({
   const getCart = async (userId: string) => {
     try {
       const response = await getAllCartOfUser(userId);
-      setCart(response.metadata.cart || { items: [] });
+      setCart({...response.metadata.cart || { items: [] }, cart_products: response.metadata.cart.cart_products.map((e) => ({...e, isPicked: false}))});
     } catch (error) {
       console.error("Failed to fetch cart:", error);
       setCart({ items: [] });

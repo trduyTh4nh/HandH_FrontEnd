@@ -41,6 +41,7 @@ export default function   PurchaseLayout() {
       path: "/payment/status",
     },
   ]);
+  const {state} = useLocation()
   const [currentStep, setCurrentStep] = useState(0);
   return (
     <div className="w-full flex flex-col gap-4 min-h-full">
@@ -58,6 +59,7 @@ export default function   PurchaseLayout() {
       <div className="px-20 flex-1 flex flex-col">
         <p>{steps[currentStep].guide}</p>
         <p>{location.pathname}</p>
+        <p>{JSON.stringify(state)}</p>
         <Outlet />
       </div>
     </div>

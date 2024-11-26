@@ -52,7 +52,6 @@ export default function ErrorView(props: ErrorViewProps) {
         <p>{props.message}</p>
         {props.children}
       </div>
-      {!props.mini && <img src="/logo_header.svg" className="w-40" />}
     </div>
   );
 }
