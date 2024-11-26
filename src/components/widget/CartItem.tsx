@@ -1,14 +1,19 @@
 import React from "react";
 import { ICartDetail } from "../../types/cart.type";
-import { Add, Remove } from "@mui/icons-material";
 
 import { Checkbox } from "../ui/checkbox";
 import { convertHextoColorName, convertMoney } from "@/utils";
 import { useCart } from "@/providers/CartContext";
 import debounce from "lodash.debounce";
+import { Minus, Plus } from "lucide-react";
 
-const CartItem: React.FC<ICartDetail> = (props) => {
+interface ICartItemProps extends ICartDetail {
+  isChecked?: boolean;
+  onCheckChange?: (checked: boolean) => void;
+}
+const CartItem: React.FC<ICartItemProps> = (props) => {
   const {
+    isChecked,
     product,
     quantity,
     colorPicked,
@@ -16,6 +21,7 @@ const CartItem: React.FC<ICartDetail> = (props) => {
     priceCartDetail,
     idCart,
     idCartDetail,
+    onCheckChange,
   } = props;
   const {
     cart,
@@ -25,28 +31,23 @@ const CartItem: React.FC<ICartDetail> = (props) => {
     decreaseQuantity,
     increaseQuantity,
   } = useCart();
-
+  const [isDeleting, setIsDeleting] = React.useState(false);
   const deleteProductInCart = async () => {
-    setCart((prev) => ({
-      ...prev,
-      cart_products: prev.cart_products.filter(
-        (item) => item._id !== idCartDetail
-      ),
-    }));
+    setIsDeleting(true);
 
     try {
       await removeProduct(idCart, idCartDetail);
-    } catch (error) {
-      console.error("Failed to remove product:", error);
-
-      // Khôi phục lại sản phẩm nếu API gọi thất bại
+      setIsDeleting(false);
       setCart((prev) => ({
         ...prev,
-        cart_products: [
-          ...prev.cart_products,
-          cart.cart_products.find((item) => item._id === idCartDetail),
-        ],
+        cart_products: prev.cart_products.filter(
+          (item) => item._id !== idCartDetail
+        ),
       }));
+    } catch (error) {
+      console.error("Failed to remove product:", error);
+      setIsDeleting(false);
+      // Khôi phục lại sản phẩm nếu API gọi thất bại
     }
   };
 
@@ -160,11 +161,12 @@ const CartItem: React.FC<ICartDetail> = (props) => {
   }, 450);
 
   return (
-    <div className="cart-item border-b py-4 -z-10">
+    <div className={`${isDeleting ? "blur-[1px] opacity-50 scale-95" : ""} cart-item border-b py-4 -z-10 transition-all`}>
       <div className="cart-item_wrap flex flex-col md:flex-row items-center justify-between px-2 gap-4 md:gap-0 -z-10">
         <Checkbox
-          className="w-8 h-8 mr-4
-        "
+          checked={isChecked}
+          className="w-6 h-6 mr-4"
+          onCheckedChange={onCheckChange}
         ></Checkbox>
         <div className="cart-item_wrap-left flex items-center gap-4 w-full">
           <div className="cart-item_wrap-image py-4 ">
@@ -206,24 +208,34 @@ const CartItem: React.FC<ICartDetail> = (props) => {
               {convertMoney(priceCartDetail)}
             </p>
           </div>
-          <div className="cart-item_fluctuation flex gap-1 items-center rounded-full px-4 py-3 bg-[#E8E8E8] ">
+          <div className="cart-item_fluctuation flex justify-between items-center rounded-full px-4 py-2 bg-[#E8E8E8] ">
             <button
-              disabled={quantity === 1}
+              disabled={quantity === 1 || isDeleting}
               onClick={decreaseQuantityCartProduct}
               className="hover:cursor-pointer"
             >
-              <Remove className={quantity === 1 ? "text-white" : ""} />
+              <Minus
+                width={16}
+                height={16}
+                className={
+                  quantity === 1
+                    ? "text-gray-500/45 transition-all cursor-not-allowed"
+                    : "transition-all"
+                }
+              />
             </button>
             <p className="w-12 text-center">{quantity}</p>
             <button
+              disabled={isDeleting}
               onClick={increaseQuantityCartProduct}
               className="hover:cursor-pointer"
             >
-              <Add />
+              <Plus width={16} height={16} />
             </button>
           </div>
           <div className="cart-item-deletebtn">
             <button
+              disabled={isDeleting}
               onClick={deleteProductInCart}
               className="rounded-full bg-[#E8E8E8] py-2 px-8 font-bold"
             >
