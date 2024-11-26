@@ -263,18 +263,18 @@ export const Account: React.FC = () => {
               </div>
 
               <div className="flex w-full justify-between mt-6">
-                <button
+                <Button
+                  variant="secondary"
                   onClick={handleOpenEditProfileDialog}
-                  className="bg-[#FFF7E6] text-black py-2 px-6 rounded-lg hover:bg-[#ffecc4] transition-colors duration-300"
                 >
                   Chỉnh sửa hồ sơ
-                </button>
-                <button
+                </Button>
+                <Button
+                  variant="secondary"
                   onClick={handleOpenPasswordDialog}
-                  className="bg-[#FFF7E6] text-black py-2 px-6 rounded-lg hover:bg-[#ffecc4] transition-colors duration-300"
                 >
                   Đổi mật khẩu
-                </button>
+                </Button>
               </div>
             </div>
           </div>

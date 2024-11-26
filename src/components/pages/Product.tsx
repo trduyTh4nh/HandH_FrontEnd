@@ -66,7 +66,6 @@ export default function Product() {
   const [cateId, setCateId] = useState<string>(null);
   useEffect(() => {
     if (product) {
-
       if (colors.length == 0) {
         const selectedPrice = product.product_colors.find(
           (e) => e.color_isPicked
@@ -85,27 +84,31 @@ export default function Product() {
         );
       }
       if (sizes.length == 0) {
-        const selectedSize = product.product_sizes.find((e) => e.size_isPicked);
-        setPrice((prev) => prev + selectedSize.size_price);
-        setSizes(
-          product.product_sizes.map((e) => {
-            return {
-              name: e.size_name,
-              enabled: e.size_isPicked,
-              price: e.size_price,
-            };
-          })
-        );
+        if (product.product_sizes.length > 0) {
+          const selectedSize = product.product_sizes.find(
+            (e) => e.size_isPicked
+          );
+          setPrice((prev) => prev + selectedSize.size_price);
+          setSizes(
+            product.product_sizes.map((e) => {
+              return {
+                name: e.size_name,
+                enabled: e.size_isPicked,
+                price: e.size_price,
+              };
+            })
+          );
+        }
+        console.log(product.product_category);
       }
-      console.log(product.product_category);
     }
   }, [product]);
   useEffect(() => {
     if (product) {
-      setColors([])
-      setSizes([])
+      setColors([]);
+      setSizes([]);
     }
-  }, [id])
+  }, [id]);
   useEffect(() => {
     if (product) {
       const half = Math.ceil(product.product_images.length / 2);
@@ -136,7 +139,6 @@ export default function Product() {
 
   const { cart, addProduct, getCart } = useCart();
   const [loadingCart, setLoadingCart] = useState(false);
-
   const addProductToCart = async (proId: string) => {
     setLoadingCart(true);
     try {
@@ -145,11 +147,14 @@ export default function Product() {
       await addProduct(
         cart._id,
         proId,
-        sizes[0].name,
-        colors[0].color,
+        sizes.length != 0 ? sizes.find((e) => e.enabled).name : null,
+        colors.length != 0 ? colors.find((e) => e.enabled).color : null,
         currentUser._id
       );
-      alert("Thêm vào giỏ hàng thành công!");
+      toast({
+        title: "Thêm vào giỏ hàng thành công",
+        description: `Sản phẩm ${product.product_name} đã được thêm vào giỏ hàng thành công!`,
+      });
     } catch (error) {
       console.error(error);
       alert("Thêm sản phẩm thất bại.");
@@ -208,27 +213,31 @@ export default function Product() {
             </h2>
           </div>
           <div className="flex flex-col gap-4">
-            <h3 className="text-2xl font-light">Kích cỡ</h3>
-            <div className="flex gap-4 w-full">
-              {sizes.map((e) => (
-                <Chip
-                  enabled={e.enabled}
-                  onClick={(enabled) => {
-                    setSizes(() => changeSelected(e, sizes, enabled));
-                    const selectedPrice = colors.find((e) => e.enabled);
-                    setPrice(
-                      (prev) =>
-                        (product.product_price +
-                          selectedPrice.price +
-                          e.price) *
-                        quantity
-                    );
-                  }}
-                >
-                  {e.name}
-                </Chip>
-              ))}
-            </div>
+            {sizes.length > 0 && (
+              <>
+                <h3 className="text-2xl font-light">Kích cỡ</h3>
+                <div className="flex gap-4 w-full">
+                  {sizes.map((e) => (
+                    <Chip
+                      enabled={e.enabled}
+                      onClick={(enabled) => {
+                        setSizes(() => changeSelected(e, sizes, enabled));
+                        const selectedPrice = colors.find((e) => e.enabled);
+                        setPrice(
+                          (prev) =>
+                            (product.product_price +
+                              selectedPrice.price +
+                              e.price) *
+                            quantity
+                        );
+                      }}
+                    >
+                      {e.name}
+                    </Chip>
+                  ))}
+                </div>
+              </>
+            )}
             <div className="flex flex-col gap-2">
               <h2 className="text-2xl font-light">Màu sắc</h2>
               <div className="flex gap-4 w-full">
@@ -258,17 +267,22 @@ export default function Product() {
               </div>
             </div>
             <div className="flex gap-2">
-              {!loadingCart ? (
-                <Button
-                  onClick={() => addProductToCart(product._id)}
-                  className="flex items-center gap-4"
-                >
-                  <ShoppingCart width={18} height={18} />
-                  Thêm vào giỏ hàng
-                </Button>
-              ) : (
-                <Loader className="animate-spin" />
-              )}
+              <Button
+                disabled={loadingCart}
+                onClick={() => {
+                  if(!user) {
+                    toast({
+                      title: "Vui lòng đăng nhập",
+                      description: "Vui lòng đăng nhập để mua sản phẩm này."})
+                    return;
+                  }
+                  addProductToCart(product._id)
+                }}
+                className="flex items-center gap-4"
+              >
+                <ShoppingCart width={18} height={18} />
+                Thêm vào giỏ hàng
+              </Button>
               <Button
                 disabled={!user}
                 variant="secondary"
