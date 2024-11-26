@@ -56,6 +56,7 @@ import BlogPage from "./AdminPage/BlogPage";
 import { useTransition, animated } from "react-spring";
 import SelectionButton from "./components/widget/selectionButton.widget";
 import { AccountBalanceOutlined } from "@mui/icons-material";
+import LogoutPage from "./AdminPage/LogoutPage";
 const queryClient = new QueryClient();
 const AdminRoute: React.FC = () => {
   const [isUserValid, setUserValid] = useState(false);
@@ -88,6 +89,7 @@ const AdminRoute: React.FC = () => {
             <Route path="/financeManage" element={<FinancePage />} />
             <Route path="/bannerManage" element={<BannerPage />} />
             <Route path="/categoryManage" element={<CategoryPage />} />
+            <Route path="/logout" element={<LogoutPage />} />
           </Routes>
         ) : (
           <ErrorView

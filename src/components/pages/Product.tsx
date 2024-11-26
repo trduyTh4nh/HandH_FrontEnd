@@ -256,10 +256,12 @@ export default function Product() {
                             selectedSize.price) *
                           quantity
                       );
-                      setProduct({
-                        ...product,
-                        product_thumb: e.image,
-                      });
+                      if (e.image) {
+                        setProduct({
+                          ...product,
+                          product_thumb: e.image,
+                        });
+                      }
                     }}
                     tooltip={e.tooltip}
                   />
@@ -270,13 +272,14 @@ export default function Product() {
               <Button
                 disabled={loadingCart}
                 onClick={() => {
-                  if(!user) {
+                  if (!user) {
                     toast({
                       title: "Vui lòng đăng nhập",
-                      description: "Vui lòng đăng nhập để mua sản phẩm này."})
+                      description: "Vui lòng đăng nhập để mua sản phẩm này.",
+                    });
                     return;
                   }
-                  addProductToCart(product._id)
+                  addProductToCart(product._id);
                 }}
                 className="flex items-center gap-4"
               >

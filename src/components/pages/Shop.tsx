@@ -446,7 +446,6 @@ const Shop: React.FC = () => {
             ></ProductComponentShop>
           </div>
         </div>
-      <Footer/>
       </div>
     </>
   );

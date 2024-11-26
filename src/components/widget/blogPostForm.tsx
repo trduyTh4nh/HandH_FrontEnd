@@ -19,27 +19,33 @@ import { createPost } from "@/apis/blog/blog-repo";
 import { UserContext } from "../contexts/UserContext";
 import { AxiosError } from "axios";
 import { useToast } from "@/hooks/use-toast";
+import { IBlogPost } from "@/types/blog.type";
 
 const blogFormSchema = z.object({
-  content: z.string().max(25000).optional(),
+  content: z.string({required_error: "Vui lòng nhập nội dung bài viết"}).max(25000),
 });
 export type BlogPostSchema = z.infer<typeof blogFormSchema>;
 type BlogPostFormProps = {
-  defaultValues?: BlogPostSchema;
+  defaultValues?: IBlogPost;
   images?: string[] | File[] | null;
-  onSubmit?: (post: BlogPostSchema) => void;
+  onSubmit?: (post: IBlogPost) => void;
+  onUpdate?: (post: IBlogPost) => void;
 };
 export default function BlogPostForm(props: BlogPostFormProps) {
   const form = useForm({
     resolver: zodResolver(blogFormSchema),
-    defaultValues: props.defaultValues,
+    defaultValues: {
+      content: props.defaultValues?.content || "",
+    },
   });
   const { user } = useContext(UserContext);
   const [loading, setLoading] = useState(false);
-  const [images, setImages] = useState<File[] | null>([]);
+  const [images, setImages] = useState<(File | string)[] | null>(props.defaultValues ? props.defaultValues.images as string[] : []);
+  const [arrPositionImage, setArrPositionImage] = useState<number[]>([]);
   function removeImage(index: number) {
     if (!images) return;
     const newImages = images.filter((_, i) => i !== index);
+    setArrPositionImage([...arrPositionImage, index]);
     setImages(newImages);
   }
   const {toast} = useToast()
@@ -60,14 +66,20 @@ export default function BlogPostForm(props: BlogPostFormProps) {
   }
   async function uploadBlogPost(data: BlogPostSchema) {
     setLoading(true);
-    const res = await createPost(data.content, images, user._id);
+    const res = await createPost(data.content, images as File[], user._id);
     console.log(res)
     if (res instanceof AxiosError) {
       setLoading(false);
       return;
     }
     setLoading(false);
-    props.onSubmit(data);
+    props.onSubmit({
+      _id: "createdPost",
+      content: data.content,
+      author: user._id,
+      images: images ? images.map((e) => (e instanceof File) ? URL.createObjectURL(e) : e as string) : [],
+      createdAt: new Date().toISOString(),
+    });
   }
   return (
     <Form {...form}>
@@ -99,7 +111,7 @@ export default function BlogPostForm(props: BlogPostFormProps) {
         >
           {images && images.length > 0 ? (
             images.map((e, index) => (
-              <div key={e.name} className="flex justify-center items-center px-4 py-8 border-gray-200 border rounded-xl relative">
+              <div key={index} className="flex justify-center items-center px-4 py-8 border-gray-200 border rounded-xl relative">
                 <Button
                   type="button"
                   onClick={() => {
@@ -111,7 +123,7 @@ export default function BlogPostForm(props: BlogPostFormProps) {
                   <Trash2 width={16} height={16} className="text-red-400" />
                 </Button>
                 <img
-                  src={URL.createObjectURL(e)}
+                  src={(e instanceof File) ? URL.createObjectURL(e) : e as string}
                   key={index}
                   className="h-24 object-contain rounded-lg"
                 />
@@ -156,7 +168,7 @@ export default function BlogPostForm(props: BlogPostFormProps) {
                 <Loader className="animate-spin" />
                 Đang đăng bài
               </div>
-            ) : (
+            ) : ( props.defaultValues ? "Cập nhật" :
               "Đăng bài"
             )}
           </Button>

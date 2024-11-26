@@ -34,3 +34,34 @@ export async function createPost(content: string, images: File[], idUser: string
         console.error(e)
     }
 }
+export async function deletePost(id: string) {
+    try {
+        const res = await api.delete(`blog/deleteBlogPost/${id}`);
+        return res["metadata"];
+    } catch (e) {
+        if(e instanceof AxiosError){
+            console.warn(e)
+            return e;
+        }
+        console.error(e)
+    }
+}
+export async function updatePost(id: string, content: string, images: File[], arrImageIndex: number[]) {
+    try {
+        const formData = new FormData();
+        formData.append("content", content);
+        formData.append("idBlog", id);
+        formData.append("arrPositionImage", JSON.stringify(arrImageIndex));
+        images.forEach((image) => {
+            formData.append("images", image);
+        });
+        const res = await formApi.put(`blog/updateBlogPost/`, formData);
+        return res["metadata"];
+    } catch (e) {
+        if(e instanceof AxiosError){
+            console.warn(e)
+            return e;
+        }
+        console.error(e)
+    }
+}
