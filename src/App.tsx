@@ -134,7 +134,7 @@ const AdminRoute: React.FC = () => {
 
 const UserRoute: React.FC = () => {
   return (
-    <div className="flex-grow flex mt-[5rem] md:mt-[10.2rem]">
+    <div className="flex-grow flex mt-[4.625rem] md:mt-[10.2rem]">
       <Navbar />
       <Toaster />
       <Routes>
@@ -234,7 +234,7 @@ const App = () => {
               </Routes>
             </div>
             <div className="fixed h-24 w-24 bottom-4 left-4 z-50 p-4 cursor-pointer group"
-             onClick={() =>window.location.href = "https://zalo.me/0856478995"}
+             onClick={() =>window.location.href = "https://zalo.me/0909893395"}
           >
             <img 
               src="/src/assets/image/icon_zalo.png" 

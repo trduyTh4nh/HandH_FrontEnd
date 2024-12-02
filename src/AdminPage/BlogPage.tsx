@@ -98,6 +98,10 @@ export default function BlogPage() {
                 setOpenUploadDialog(false);
                 setPosts([...posts, e]);
               }}
+              onUpdate={(e) => {
+                setPosts(posts.map((p) => (p._id === e._id ? e : p)));
+                setOpenUploadDialog(false);
+              }}
             />
           </DialogContent>
         </Dialog>
@@ -134,7 +138,7 @@ export default function BlogPage() {
                 <TableRow className={`${task.atIndex == index && task.isRunning ? "grayscale blur-[2px]" : ""} transition-all`}>
                   <TableCell>{index + 1}</TableCell>
                   <TableCell
-                    className="flex gap-1 cursor-pointer"
+                    className="flex gap-1 cursor-pointer overflow-auto"
                     onClick={() => {
                       setSelectedPost(post);
                       setIsImagesDialogOpen(true);

@@ -25,6 +25,23 @@ export async function getProductById(id: string) {
     return e;
   }
 }
+export async function changeVisibility(action: "draftProduct" | "unDaftProduct" | "publicProduct" | "unPublicProduct", idProduct: string) {
+  try {
+    let res
+    if(action == "publicProduct"){
+      res = await api.patch(`product/${action}/${idProduct}`);
+    } else {
+      res = await api.put(`product/${action}/${idProduct}`);
+    }
+    console.log(res)
+  } catch (e) {
+    if(e instanceof AxiosError) {
+      console.warn(e);
+      return e;
+    }
+    console.error(e);
+  }
+}
 export async function getNewestProduct(n: number) {
   try {
     const response = await api.get<any>(`product/getLastestProduct/${n}`);

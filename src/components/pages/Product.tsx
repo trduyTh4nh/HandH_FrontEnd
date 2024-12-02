@@ -195,8 +195,8 @@ export default function Product() {
     <SkeletonLoadingProduct />
   ) : (
     <div className={`pt-4 transition-all w-full`}>
-      <div className="product_main flex flex-1 gap-8 px-48 pb-10 justify-stretch relative box-border">
-        <div className="w-1/2">
+      <div className="product_main flex flex-col md:flex-row flex-1 gap-8 px-10 md:px-48 pb-10 justify-stretch relative box-border">
+        <div className="w-full md:w-1/2">
           <ImagesProduct
             imgList={[
               {
@@ -205,7 +205,7 @@ export default function Product() {
             ]}
           />
         </div>
-        <div className="flex flex-col gap-4 sticky top-[11.5rem] self-start w-1/2">
+        <div className="flex flex-col gap-4 sticky top-[11.5rem] self-start w-full md:w-1/2">
           <div>
             <h1>{product.product_name}</h1>
             <h2 className="text-3xl font-light">
@@ -216,7 +216,7 @@ export default function Product() {
             {sizes.length > 0 && (
               <>
                 <h3 className="text-2xl font-light">Kích cỡ</h3>
-                <div className="flex gap-4 w-full">
+                <div className="flex gap-4 w-full flex-wrap">
                   {sizes.map((e) => (
                     <Chip
                       enabled={e.enabled}
@@ -297,7 +297,7 @@ export default function Product() {
           </div>
         </div>
       </div>
-      <div className="px-48 flex flex-col gap-2 pb-4">
+      <div className=" flex flex-col gap-2 pb-4 px-10 md:px-48">
         <h2 className="font-light">Mô tả sản phẩm</h2>
         <p>{product.product_description}</p>
         <div className="grid grid-cols-2 gap-x-2">

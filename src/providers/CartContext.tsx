@@ -14,6 +14,9 @@ import {
   createCartUser,
   increaseQuantityCartDetail,
 } from "@/apis/cart/cart-repo";
+import { IUserAddress } from "@/types/user.type";
+import { createOrderFromCart } from "@/apis/order/order-repo";
+import { AxiosError } from "axios";
 
 interface CartContextType {
   cart: any;
@@ -29,6 +32,7 @@ interface CartContextType {
   removeProduct: (idCart: string, idCartDetail: string) => Promise<void>;
   decreaseQuantity: (idCart: string, idCartDetail: string) => Promise<void>;
   increaseQuantity: (idCart: string, idCartDetail: string) => Promise<void>;
+  createPendingOrder: (idUser: string, address: IUserAddress) => Promise<any>;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -37,11 +41,16 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
   const [cart, setCart] = useState<any>({});
-
   const getCart = async (userId: string) => {
     try {
       const response = await getAllCartOfUser(userId);
-      setCart({...response.metadata.cart || { items: [] }, cart_products: response.metadata.cart.cart_products.map((e) => ({...e, isPicked: false}))});
+      setCart({
+        ...(response.metadata.cart || { items: [] }),
+        cart_products: response.metadata.cart.cart_products.map((e) => ({
+          ...e,
+          isPicked: false,
+        })),
+      });
     } catch (error) {
       console.error("Failed to fetch cart:", error);
       setCart({ items: [] });
@@ -92,7 +101,16 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({
       console.error("Failed to increase quantity:", error);
     }
   };
-
+  const createPendingOrder = async (idUser: string, address: IUserAddress) => {
+    const products = cart.cart_products.filter((e) => e.isPicked).map(e => e._id);
+    console.log(products)
+    const res = await createOrderFromCart(products, cart._id, idUser, address);
+    if(res instanceof AxiosError) {
+      console.log("Failed to create order:", res);
+      return;
+    }
+    return res;
+  }
   return (
     <CartContext.Provider
       value={{
@@ -103,6 +121,7 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({
         decreaseQuantity,
         setCart,
         increaseQuantity,
+        createPendingOrder
       }}
     >
       {children}

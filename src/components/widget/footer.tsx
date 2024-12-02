@@ -5,11 +5,11 @@ import { UserContext } from "../contexts/UserContext";
 function Footer() {
   const { user, setUser } = useContext(UserContext);
   return (
-    <div className="relative z-30 px-20 py-4 bg-primary-light flex flex-col gap-4">
+    <div className="relative z-30 px-10 md:px-20 py-4 bg-primary-light flex flex-col gap-4">
       <div className="w-full flex justify-between">
         <img src="/logo_header.svg" className="h-12" />
       </div>
-      <div className="flex gap-32">
+      <div className="flex flex-col md:flex-row gap-8 md:gap-32">
         <div className="flex flex-col gap-2">
           <b>Tài khoản</b>
           {user ? (
@@ -54,11 +54,9 @@ function Footer() {
         </span>
       </b>
 
-      <div className="flex justify-between">
+      <div className="flex justify-between flex-col md:flex-row">
         <div className="flex gap-4">
-          <Link className="text-black" to="/privacy">
-            CHÍNH SÁCH BẢO MẬT
-          </Link>
+          
           <Link className="text-black" to="/policy">
             ĐIỀU KHOẢN & ĐIỀU KIỆN
           </Link>

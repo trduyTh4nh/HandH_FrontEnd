@@ -111,7 +111,7 @@ import { getPosts } from "@/apis/blog/blog-repo";
 import "slick-carousel/slick/slick.css"; 
 import "slick-carousel/slick/slick-theme.css";
 import Slider from "react-slick";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, User2, UserCircle } from "lucide-react";
 import { Button } from "../ui/button";
 
 const Blog: React.FC = () => {
@@ -164,11 +164,7 @@ const Blog: React.FC = () => {
               <div key={post._id} className="post-container">
                 <div className="post-header">
                   <div className="post-header-right">
-                    <img
-                      src="https://lumiere-a.akamaihd.net/v1/images/sea-avatar-wayofwater-gallery06_a360a29e.jpeg?region=1%2C0%2C1298%2C730"
-                      alt="author"
-                      className="circle-image"
-                    />
+                    <UserCircle size={48}/>
                     <div className="post-header-title">
                       <p style={{ fontSize: 20, fontWeight: "bold" }}>Tác giả</p>
                       <div className="post-header-title-daypost">
