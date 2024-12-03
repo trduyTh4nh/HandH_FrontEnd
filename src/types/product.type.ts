@@ -30,7 +30,7 @@ export interface IProduct {
     product_category?: string;
     product_colors?: IColorProductVariation[],
     product_sizes?: ISizeProductVarication[]
-    product_images?: string[] | File[]
+    product_images?: (string | File)[]
 }
 
 export enum CateFilter {

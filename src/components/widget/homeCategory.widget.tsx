@@ -9,7 +9,7 @@ type HomeCategoryWidgetProps = {
 };
 export default function HomeCategory(props: HomeCategoryWidgetProps) {
   return (
-    <Link to={`/shop?cate=${props.id}`} className={`flex group flex-col gap-2 overflow-hidden cursor-pointer no-underline ${props.className}`}>
+    <Link to={`/shop?cate=${props.id}`} className={`flex group w-full flex-col gap-2 overflow-hidden cursor-pointer no-underline ${props.className}`}>
       <AspectRatio ratio={2 / 3} className="w-full">
         <div className="w-full h-full overflow-hidden">
           <img src={props.image} alt={props.name} className="h-full w-full object-cover group-hover:scale-105 transition-all" />

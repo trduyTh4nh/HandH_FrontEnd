@@ -31,6 +31,7 @@ const ProductItem: React.FC<IProduct> = (props) => {
       <div className="product_item-image w-full">
         <AspectRatio ratio={2/3}>
           <img
+            loading="lazy"
             src={product_thumb as string}
             className="w-full h-full scale-90 object-cover rounded-sm"
             alt=""

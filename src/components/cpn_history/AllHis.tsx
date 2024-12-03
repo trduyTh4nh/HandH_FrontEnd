@@ -6,6 +6,8 @@ import {
 import React, { useEffect, useState } from "react";
 import ErrorView from "../widget/Error.widget";
 import { Input } from "../ui/input";
+import { getProduct } from "@/apis/products/product-repo";
+import { AxiosError } from "axios";
 
 interface Product {
   name: string;
@@ -31,23 +33,33 @@ const AllHis = () => {
   ); // Track which order is expanded
   const [startDate, setStartDate] = useState<string>("");
   const [endDate, setEndDate] = useState<string>("");
+  const [products, setProducts] = useState<Product[]>([]);
   const user = localStorage.getItem("user");
   const parsedUser = JSON.parse(user || "{}");
   const userId = parsedUser._id;
   console.log(userId);
-
+  async function getProducts() {
+    const res = await getProduct();
+    if (res instanceof AxiosError) {
+      console.warn(res);
+      return;
+    }
+    console.log(res.metadata)
+    setProducts(res.metadata);
+  }
   const [orders, setOrders] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const fetchOrders = async () => {
     try {
       setLoading(true);
       const response = await GetAllOrderOfUser(userId);
+      await getProducts();
+      console.log(response);
       const updatedOrders = response.metadata.map((order) => ({
         ...order,
         itemsCount: calculateItemsCount(order.products),
       }));
       setOrders(updatedOrders);
-      console.log(updatedOrders);
     } catch (error) {
       setLoading(false);
       console.error("Error fetching orders:", error);
@@ -56,7 +68,11 @@ const AllHis = () => {
   };
 
   const calculateItemsCount = (products: Product[]) => {
-    return products.reduce((total, product) => total + product.quantity, 0);
+    console.log(products)
+    return products.reduce((total, product) =>  {
+      if(product)
+        return total + product.quantity
+    }, 0);
   };
 
   useEffect(() => {
@@ -144,7 +160,7 @@ const AllHis = () => {
 
           {expandedOrderIndex === index && (
             <div className="mt-4">
-              {order.products.map((product, index) => (
+              {order.products.map((product, index) => product && (
                 <div key={index} className="flex items-center border-t py-2">
                   <img
                     className="w-16 h-28 bg-gray-300 rounded-lg object-cover"
@@ -180,7 +196,7 @@ const AllHis = () => {
                   </div>
                   <div className="ml-auto">x{product.quantity}</div>
                   <div className="ml-auto font-bold text-xl">
-                    {product.product_price} đồng
+                    {product.priceAtPurchase} đồng
                   </div>
                 </div>
               ))}
