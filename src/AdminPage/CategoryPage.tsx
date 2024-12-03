@@ -1,6 +1,6 @@
 
 import { Button } from "@/components/ui/button";
-import {getCate,addCate} from "@/apis/cate/cate-repo"
+import { getCate, addCate, deleteCate } from "@/apis/cate/cate-repo"
 import {
   Dialog,
   DialogContent,
@@ -33,6 +33,7 @@ import { convertMoney } from "@/utils";
 import React, { useEffect, useState } from "react";
 import { ICategory } from "@/types/category";
 import { AxiosError } from "axios";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 
 
 
@@ -42,17 +43,16 @@ const CategoryPage: React.FC = () => {
   const [editingCate, setEditingCate] = React.useState<ICategory | null>(
     null
   );
-  const[cates,setCate]=React.useState<ICategory[]>([])
 
-  
+
   const [newCate, setNewcate] = React.useState<ICategory>({
     category_name: "",
     category_description: "",
     category_image: "",
     category_total: 0,
-    createdAt:"",
-    updatedAt:""
-    
+    createdAt: "",
+    updatedAt: ""
+
   });
 
   const handleEdit = (cate: ICategory) => {
@@ -67,7 +67,7 @@ const CategoryPage: React.FC = () => {
       setNewcate((prev) => ({
         ...prev,
         [name]:
-          name === "category_total" 
+          name === "category_total"
             ? parseFloat(value)
             : value,
       }));
@@ -96,30 +96,35 @@ const CategoryPage: React.FC = () => {
   };
 
 
-  async function  fetchCate() {
-    const data=await getCate();
-    if(data instanceof AxiosError){
+  async function fetchCate() {
+    const data = await getCate();
+    if (data instanceof AxiosError) {
       console.log(data.message);
-        
-    }else{
+    } else {
       console.log(data);
       setCate(data.metadata);
     }
-    
   }
-  useEffect(()=>{
+  useEffect(() => {
     fetchCate();
-  },[])
-  
-  const handleRemove = (cateName: string) => {
-    setCate(cates.filter((p) => p.category_name !== cateName));
+  }, [])
+
+  const [cates, setCate] = React.useState<ICategory[]>([])
+  const handleDeleteCate = async (id: string) => {
+    const result = await deleteCate(id);
+    if (result instanceof AxiosError) {
+      console.log("Xóa thất bại:", result.message);
+    } else {
+      console.log("Xóa thành công");
+      setCate((prev) => prev.filter((cate) => cate._id !== id));
+    }
   };
-  const handleSave=()=>{
-    if(editingCate){
+  const handleSave = () => {
+    if (editingCate) {
       setCate(
-        cates.map((c)=>c.category_name===editingCate.category_name?editingCate:c)
+        cates.map((c) => c.category_name === editingCate.category_name ? editingCate : c)
       ),
-      setEditingCate(null)
+        setEditingCate(null)
     }
   }
 
@@ -136,18 +141,18 @@ const CategoryPage: React.FC = () => {
       reader.readAsDataURL(file);
     }
   };
-  const handleAddcate = async() => {
+  const handleAddcate = async () => {
     const productSlug =
       newCate.category_name?.toLowerCase().replace(/ /g, "-") || "";
     const CateToAdd = {
       ...newCate,
       product_slug: productSlug,
     };
-    const result=await addCate(CateToAdd);
-    if(result instanceof AxiosError){
+    const result = await addCate(CateToAdd);
+    if (result instanceof AxiosError) {
       console.log(result.message)
     }
-    else{
+    else {
       setCate((prev) => [...prev, CateToAdd]);
       setNewcate({
         category_name: "",
@@ -156,7 +161,7 @@ const CategoryPage: React.FC = () => {
         category_total: 0,
         createdAt: "",
         updatedAt: "",
-        
+
       });
       setIsAddCateOpen(false);
     }
@@ -168,7 +173,7 @@ const CategoryPage: React.FC = () => {
   //     ...newCate,
   //     product_slug: productSlug,
   //   };
-  
+
   //     setCate((prev) => [...prev, CateToAdd]);
   //     setNewcate({
   //       category_name: "",
@@ -177,7 +182,7 @@ const CategoryPage: React.FC = () => {
   //       category_total: 0,
   //       createdAt: "",
   //       updatedAt: "",
-        
+
   //     });
   //     setIsAddCateOpen(false);
   // };
@@ -189,14 +194,14 @@ const CategoryPage: React.FC = () => {
           Danh sách loại sản phẩm
         </h2>
         <Dialog open={isAddCateOpen} onOpenChange={setIsAddCateOpen}>
-            <DialogTrigger asChild>
+          <DialogTrigger asChild>
             <Button>
               <Plus className="mr-2 h-4 w-4" /> Thêm loại sản phẩm
             </Button>
-           </DialogTrigger>
+          </DialogTrigger>
           <DialogContent className="sm:max-w-[1000px]">
 
-          <DialogHeader>
+            <DialogHeader>
               <DialogTitle>Thêm loại sản phẩm mới</DialogTitle>
             </DialogHeader>
             <div className="flex gap-8 px-4">
@@ -239,12 +244,12 @@ const CategoryPage: React.FC = () => {
                     onChange={(e) => handleInputChange(e, true)}
                   />
                 </div>
-                
+
               </div>
               {/*  */}
               <div className="grid gap-4 py-4 max-h-[70vh]  flex-initial w-80 overflow-y-auto">
                 {" "}
-                
+
                 <div className="grid grid-cols-1 items-center gap-4">
                   <Label htmlFor="new-cate-image" className="text-left">
                     Hình ảnh
@@ -275,16 +280,13 @@ const CategoryPage: React.FC = () => {
                     )}
                   </div>
                 </div>
-                
-                
-                
               </div>
             </div>
             <div className="flex justify-end">
               <Button onClick={handleAddcate}>Thêm sản phẩm</Button>
             </div>
           </DialogContent>
-          
+
         </Dialog>
       </div>
       <Card>
@@ -292,19 +294,19 @@ const CategoryPage: React.FC = () => {
 
           <Table>
             <TableHeader>
-               <TableRow>
-            <TableHead>Hình ảnh</TableHead>
+              <TableRow>
+                <TableHead>Hình ảnh</TableHead>
 
-               <TableHead>Tên</TableHead>
-                <TableHead>Gía</TableHead>
+                <TableHead>Tên</TableHead>
+                <TableHead>Giá</TableHead>
                 <TableHead>Hành động</TableHead>
-               </TableRow>
+              </TableRow>
             </TableHeader>
             <TableBody>
               {
-                cates.map((category)=>(<TableRow key={category.category_name}>
+                cates.map((category) => (<TableRow key={category.category_name}>
                   <TableCell>
-                  <img
+                    <img
                       className="w-20 h-20 rounded-md object-contain"
                       src={category.category_image}
                       alt=""
@@ -313,33 +315,48 @@ const CategoryPage: React.FC = () => {
                   <TableCell>{category.category_name}</TableCell>
                   <TableCell>{category.category_total}</TableCell>
                   <TableCell>  <div className="flex space-x-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handleEdit(category)}
-                      >
-                        <Pencil className="h-4 w-4 mr-1" />
-                        Chỉnh sửa
-                      </Button>
-                      {/* New button  */}
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handleEdit(category)}
-                      >
-                        <MoreHorizontalIcon className="h-4 w-4 mr-1" />
-                        Chi tiết
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handleRemove(category.category_name!)}
-                      >
-                        <Trash2 className="h-4 w-4 mr-1" />
-                        Xóa
-                      </Button>
-                     
-                    </div></TableCell>
+                    {/* <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleEdit(category)}
+                    >
+                      <Pencil className="h-4 w-4 mr-1" />
+                      Chỉnh sửa
+                    </Button> */}
+                    {/* New button  */}
+                    {/* <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleEdit(category)}
+                    >
+                      <MoreHorizontalIcon className="h-4 w-4 mr-1" />
+                      Chi tiết
+                    </Button> */}
+                    <AlertDialog>
+                      <AlertDialogTrigger className="bg-transparent">
+                        <Button className="shadow-none" variant="outline">Xoá</Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>Bạn có muốn xoá loại sản phẩm "{category.category_name}" không?</AlertDialogTitle>
+                          <AlertDialogDescription>Hành động này không thể được hoàn tác.</AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Huỷ</AlertDialogCancel>
+                          <AlertDialogAction onClick={() => { handleDeleteCate(category._id) }}>Đồng ý</AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                    {/* <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleDeleteCate(category._id!)}
+                    >
+                      <Trash2 className="h-4 w-4 mr-1" />
+                      Xóa
+                    </Button> */}
+
+                  </div></TableCell>
 
                 </TableRow>))
               }
@@ -347,70 +364,73 @@ const CategoryPage: React.FC = () => {
           </Table>
         </CardContent>
       </Card>
-      {editingCate&&(
+      {/* {editingCate && (
         <Card>
-            <CardHeader>
-              <CardTitle>Chỉnh sửa</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <form className="space-y-4">
-                <div>
-                  <Label htmlFor="">Tên loại</Label>
-                  <Input
+          <CardHeader>
+            <CardTitle>Chỉnh sửa</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <form className="space-y-4">
+              <div>
+                <Label htmlFor="">Tên loại</Label>
+                <Input
                   id="cate_name"
                   name="cate_name"
                   value={editingCate.category_name}
                   onChange={handleInputChange}
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="">Mô tả</Label>
-                  <Input
+                />
+              </div>
+              <div>
+                <Label htmlFor="">Mô tả</Label>
+                <Input
                   id="cate_description"
                   name="cate_description"
                   value={editingCate.category_description}
                   onChange={handleInputChange}
-                  />
-                </div><div>
-                  <Label htmlFor="">Giá</Label>
-                  <Input
+                />
+              </div><div>
+                <Label htmlFor="">Giá</Label>
+                <Input
                   id="cate_price"
                   name="cate_price"
                   value={editingCate.category_total}
                   onChange={handleInputChange}
-                  />
-                </div>
-                <div className="grid grid-cols-1 items-center gap-4">
-                  <Label htmlFor="new-cate-image" className="text-left">
-                    Hình ảnh
-                  </Label>
-                  <div  className="flex items-center gap-2">
+                />
+              </div>
+              <div className="grid grid-cols-1 items-center gap-4">
+                <Label htmlFor="new-cate-image" className="text-left">
+                  Hình ảnh
+                </Label>
+                <div className="flex items-center gap-2">
 
-                    <Input  id="new-cate-image"
+                  <Input id="new-cate-image"
                     type="file"
                     accept="image/*"
                     onChange={handleImageUploadEdit}
-                    className="hidden"/>
-                    <Label  htmlFor="new-cate-image" className="cursor-pointer">
+                    className="hidden" />
+                  <Label htmlFor="new-cate-image" className="cursor-pointer">
                     <div className="flex items-center gap-2 px-4 py-2 bg-secondary text-secondary-foreground hover:bg-secondary/80 rounded-md">
                       <Upload className="h-4 w-4" />
                       Đăng tải hình ảnh
                     </div>
-                    </Label>
-                    {editingCate.category_image&&(
-                      <img src={editingCate.category_image}
-                       alt="Product"
+                  </Label>
+                  {editingCate.category_image && (
+                    <img src={editingCate.category_image}
+                      alt="Product"
                       className="w-16 h-16 object-cover rounded"
-                      />
-                    )}
-                  </div>
+                    />
+                  )}
                 </div>
-                <Button onClick={handleSave}>Lưu sản phẩm</Button>
-              </form>
-            </CardContent>
+              </div>
+              <Button onClick={handleSave}>Lưu sản phẩm</Button>
+            </form>
+          </CardContent>
         </Card>
-      )}
+
+      )} */}
+
     </div>
+
   );
 };
 
