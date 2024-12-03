@@ -63,7 +63,7 @@ const AdminRoute: React.FC = () => {
   const [login, setLogin] = useState(false);
   const [checkingAuth, setCheckingAuth] = useState(true);
   const [loginStatus, setLoginStatus] = useState(false);
-  const {user, setUser, isLoading} = useContext(UserContext);
+  const { user, setUser, isLoading } = useContext(UserContext);
   async function checkUser() {
     setUserValid(user && user.role[0] == "3107");
     setCheckingAuth(false);
@@ -135,6 +135,19 @@ const AdminRoute: React.FC = () => {
 const UserRoute: React.FC = () => {
   return (
     <div className="flex-grow flex mt-[4.625rem] md:mt-[10.2rem]">
+      <div
+        className="fixed h-24 w-24 bottom-4 right-4 z-50 p-4 cursor-pointer group"
+        onClick={() => (window.location.href = "https://zalo.me/0909893395")}
+      >
+        <img
+          src="/src/assets/image/icon_zalo.png"
+          className="w-full h-full object-cover transition-transform duration-200 transform group-hover:scale-110"
+          alt="Zalo Icon"
+        />
+        <div className="absolute  text-black bg-white rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+          Tư vấn
+        </div>
+      </div>
       <Navbar />
       <Toaster />
       <Routes>
@@ -143,7 +156,7 @@ const UserRoute: React.FC = () => {
         <Route path="/shop" element={<Shop />} />
         <Route path="/blog" element={<Blog />} />
         <Route path="/management" element={<Management />} />
-        <Route path="/aboutUs" element={<AboutUs/>} />
+        <Route path="/aboutUs" element={<AboutUs />} />
         <Route path="/user" element={<ManagerAccount />}>
           <Route index element={<Account />} />
           <Route path="account" element={<Account />} />
@@ -159,7 +172,7 @@ const UserRoute: React.FC = () => {
           </Route>
           <Route path="favoriteProduct" element={<FavoriteProduct />} />
         </Route>
-        <Route path="/termAndConditions" element={<TermsAndConditions/>}/>
+        <Route path="/termAndConditions" element={<TermsAndConditions />} />
 
         <Route path="/product/:id" element={<Product />} />
         <Route path="/cart" element={<CartPage />} />
@@ -217,7 +230,6 @@ const App = () => {
   }, []);
   return (
     <QueryClientProvider client={queryClient}>
-
       <UserContext.Provider
         value={{
           user: user,
@@ -233,47 +245,6 @@ const App = () => {
                 <Route path="/admin/*" element={<AdminRoute />} />{" "}
               </Routes>
             </div>
-            <div className="fixed h-24 w-24 bottom-4 right-4 z-50 p-4 cursor-pointer group"
-             onClick={() =>window.location.href = "https://zalo.me/0909893395"}
-          >
-            <img 
-              src="/src/assets/image/icon_zalo.png" 
-              className="w-full h-full object-cover transition-transform duration-200 transform group-hover:scale-110" 
-              alt="Zalo Icon" 
-            />
-            <div className="absolute  text-black bg-white rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-500">
-              Tư vấn
-            </div>
-             {/* Component màu xám hiển thị khi click */}
-              {/* {grayComponentTransitions(
-                (style, item) =>
-                  item && (
-                    <animated.div
-                      style={style}
-                      className="absolute bottom-32 right-4 bg-white shadow-lg opacity-75  w-80 h-auto rounded-xl z-40"
-                    >
-                      <div className="bg-[#ffecc4] rounded-t-xl p-4">
-                        <img src="src/assets/image/logo_header.svg"/>
-                        <h2>Xin chào</h2>
-                        <p>Rất vui khi được tư vấn quý khách</p>
-                      </div>
-                      <div className="p-4  w-full">
-                           <div className="pt-20 pb-20">
-                              <SelectionButton onClick={() => window.location.href = "https://zalo.me/0856478995"}>
-                                <>
-                                  <b>Chat bằng Zalo</b>
-                                </>
-                              </SelectionButton>
-                           </div>
-                           <div className="divider"></div>
-                           <div className="pt-5">
-                            <p className="text-xs">Đ/C: K20 Cư Xá Vĩnh Hội, Phường 6, Quận 4, TP. Hồ Chí Minh</p>
-                           </div>
-                      </div>
-                    </animated.div>
-                  )
-              )} */}
-          </div>
           </Router>
         </CartProvider>
       </UserContext.Provider>
