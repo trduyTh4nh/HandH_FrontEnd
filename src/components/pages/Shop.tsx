@@ -19,6 +19,7 @@ import PaginationControls from "../widget/PaginationsControl";
 import Footer from "../widget/footer";
 import { useMediaQuery } from "react-responsive";
 import { Filter } from "lucide-react";
+import {Helmet} from "react-helmet";
 type PriceFilter = {
   id: number;
   price: number;
@@ -223,6 +224,9 @@ const Shop: React.FC = () => {
 
   return (
     <>
+      <Helmet>
+        <title>Cửa hàng - Áo Dài Hồng Đức</title>
+      </Helmet>
       <div
         className={`shop pb-20 ${
           showNav && !isMobile ? "pl-10 md:pl-20" : "pl-10 md:pl-4"

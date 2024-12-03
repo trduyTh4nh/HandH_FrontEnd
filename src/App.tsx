@@ -233,7 +233,7 @@ const App = () => {
                 <Route path="/admin/*" element={<AdminRoute />} />{" "}
               </Routes>
             </div>
-            <div className="fixed h-24 w-24 bottom-4 left-4 z-50 p-4 cursor-pointer group"
+            <div className="fixed h-24 w-24 bottom-4 right-4 z-50 p-4 cursor-pointer group"
              onClick={() =>window.location.href = "https://zalo.me/0909893395"}
           >
             <img 

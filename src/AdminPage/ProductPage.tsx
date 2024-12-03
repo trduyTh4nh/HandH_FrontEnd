@@ -35,6 +35,7 @@ import {
   MoreHorizontalIcon,
   Pencil,
   Plus,
+  RefreshCcw,
   Search,
   TextSearch,
   Trash2,
@@ -139,7 +140,7 @@ const ProductPage: React.FC = () => {
     }
   };
 
-  const handleRemove = async (productSlug: string) => {
+  const handleRemove = async (productSlug: string, index: number) => {
     setProcess({
       message: "Đang xoá sản phẩm",
       isRunning: true,
@@ -403,7 +404,7 @@ const ProductPage: React.FC = () => {
                   : "text-primary"
               }}`}
             >
-              {error &&
+              {error && error.response &&
               error.response.data &&
               //@ts-ignore
               errorIndexes[error.response.data.message] == null ? (
@@ -439,19 +440,27 @@ const ProductPage: React.FC = () => {
             </DialogFooter>
           </DialogContent>
         </Dialog>
-        <Dialog open={isAddProductOpen} onOpenChange={setIsAddProductOpen}>
-          <DialogTrigger asChild>
-            <Button>
-              <Plus className="mr-2 h-4 w-4" /> Thêm sản phẩm
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="sm:max-w-[85%] max-h-full overflow-auto">
-            <DialogHeader>
-              <DialogTitle>Thêm sản phẩm mới</DialogTitle>
-            </DialogHeader>
-            <ProductUploadForm onSubmit={uploadProduct} />
-          </DialogContent>
-        </Dialog>
+        <div className="flex gap-2">
+          <Button variant="secondary" onClick={() => {
+            setProduct(null)
+            fetch()
+          }}>
+            <RefreshCcw className="h-4 w-4" />
+          </Button>
+          <Dialog open={isAddProductOpen} onOpenChange={setIsAddProductOpen}>
+            <DialogTrigger asChild>
+              <Button>
+                <Plus className="mr-2 h-4 w-4" /> Thêm sản phẩm
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[85%] max-h-full overflow-auto">
+              <DialogHeader>
+                <DialogTitle>Thêm sản phẩm mới</DialogTitle>
+              </DialogHeader>
+              <ProductUploadForm onSubmit={uploadProduct} />
+            </DialogContent>
+          </Dialog>
+        </div>
       </div>
 
       <Card>
@@ -474,7 +483,7 @@ const ProductPage: React.FC = () => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {products.map((product) => (
+                {products.map((product, index) => (
                   <TableRow key={product.product_slug}>
                     <TableCell>
                       {!product.product_thumb || product.product_thumb == "" ? (
@@ -555,7 +564,7 @@ const ProductPage: React.FC = () => {
                               </DialogClose>
                               <DialogClose>
                                 <Button
-                                  onClick={() => handleRemove(product._id!)}
+                                  onClick={() => handleRemove(product._id!, index)}
                                 >
                                   Xóa
                                 </Button>
@@ -609,11 +618,14 @@ const ProductPage: React.FC = () => {
                                   : "Chuyển thành nháp"}
                               </p>
                             </DropdownMenuItem>
-                            <DropdownMenuItem className="flex gap-2" onClick={() => {
-                              setEditing(true)
-                              setEditingProduct(product)
-                              setProductReadOnly(true)
-                            }}>
+                            <DropdownMenuItem
+                              className="flex gap-2"
+                              onClick={() => {
+                                setEditing(true);
+                                setEditingProduct(product);
+                                setProductReadOnly(true);
+                              }}
+                            >
                               <TextSearch width={16} height={16}></TextSearch>
                               <p>Xem chi tiết</p>
                             </DropdownMenuItem>
@@ -633,8 +645,8 @@ const ProductPage: React.FC = () => {
           open={isEditing}
           onOpenChange={(o) => {
             setEditing(o);
-            if(productReadOnly && !o) {
-              setProductReadOnly(false)
+            if (productReadOnly && !o) {
+              setProductReadOnly(false);
             }
           }}
         >
@@ -642,7 +654,15 @@ const ProductPage: React.FC = () => {
             <DialogTitle>Chỉnh sửa</DialogTitle>
           </DialogHeader>
           <DialogContent className="min-w-[75%] max-h-full overflow-auto">
-            {isEditing && editingProduct ? <ProductUploadForm onSubmit={(e) => {}} defaultValue={editingProduct} readOnly={productReadOnly} /> : <h1>tại thằng quang</h1>}
+            {isEditing && editingProduct ? (
+              <ProductUploadForm
+                onSubmit={(e) => {}}
+                defaultValue={editingProduct}
+                readOnly={productReadOnly}
+              />
+            ) : (
+              <h1>tại thằng quang</h1>
+            )}
           </DialogContent>
         </Dialog>
       )}

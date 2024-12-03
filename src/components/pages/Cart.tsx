@@ -37,17 +37,13 @@ import {
 } from "../ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
 const CartPage: React.FC = () => {
-  const { cart, getCart, setCart, createPendingOrder } = useCart();
+  const { cart, getCart, setCart, proceedToPayment } = useCart();
   const { user, isLoading } = useUser();
   const {toast} = useToast()
   const [isLoadingOrder, setIsLoadingOrder] = React.useState(false);
   const createPurchaseOrder = async () => {
     setIsLoadingOrder(true);
-    const res = await createPendingOrder(user._id, user.userAddress)
-    if(!res){
-      setIsLoadingOrder(false);
-      return
-    }
+    const res = proceedToPayment()
     setIsLoadingOrder(false);
     navigate(`/payment`)
   };
@@ -216,7 +212,7 @@ const CartPage: React.FC = () => {
                   {cart.cart_products
                     ? cart.cart_products.filter((e) => e.isPicked).length
                     : 0}{" "}
-                  sản phấm
+                  sản phẩm
                 </p>
                 <div className="btn-payment w-full flex justify-center ">
                   <Button

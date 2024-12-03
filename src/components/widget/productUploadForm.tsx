@@ -107,6 +107,7 @@ const schema = z
   });
 export type ProductUploadFormProps = {
   onSubmit: (data: IProduct) => void;
+  onUpdate?: (data: IProduct) => void;
   defaultValue?: IProduct;
   readOnly?: boolean;
 };
@@ -246,6 +247,8 @@ export default function ProductUploadForm(props: ProductUploadFormProps) {
           },
         ]
   );
+  const [deletedColorList, setDeletedColorList] = useState<string[]>([]);
+  const [deletedSizeList, setDeletedSizeList] = useState<string[]>([]);
   const [imageList, setImageList] = useState<(File | string)[]>(
     props.defaultValue ? props.defaultValue.product_images : []
   );
@@ -282,11 +285,11 @@ export default function ProductUploadForm(props: ProductUploadFormProps) {
   function validateColor(): boolean {
     const requiredFieldsFilled =
       colorList.filter(
-        (e) => e.color_code == "" || e.color_name == "" || e.color_price < 0
+        (e) => e.color_code == "" || !e.color_image
       ).length == 0;
     console.error(
       colorList.filter(
-        (e) => e.color_code == "" || e.color_name == "" || e.color_price < 0
+        (e) => e.color_code == ""
       )
     );
     return requiredFieldsFilled;
@@ -312,7 +315,11 @@ export default function ProductUploadForm(props: ProductUploadFormProps) {
     console.log(tmpData);
     setColorvalidationMessage(null);
     setSizeValidationMessage(null);
-    props.onSubmit(tmpData);
+    if (props.defaultValue) {
+      props.onUpdate(tmpData);
+    } else {
+      props.onSubmit(tmpData);
+    }
   }
   function addImages(file: FileList) {
     const files = Array.from(file);
@@ -462,8 +469,8 @@ export default function ProductUploadForm(props: ProductUploadFormProps) {
                       field.value ? "border-solid shadow-sm" : "border-dashed"
                     } border-gray-200 rounded-2xl justify-center items-center py-4 hover:border-solid hover:shadow-sm transition-all active:scale-95`}
                   >
-                    {!field.value ||
-                      (!field.value && productThumbUrl && (
+                    {
+                      (!field.value || !productThumbUrl && (
                         <>
                           <Image className="text-gray-200" />
                           <p>Đăng tải hình ảnh</p>
@@ -667,7 +674,8 @@ export default function ProductUploadForm(props: ProductUploadFormProps) {
               </>
             )}
             <Input
-              disabled={props.readOnly}
+              
+              disabled={(props.readOnly || props.defaultValue) as boolean}
               type="file"
               multiple
               accept="image/*"
@@ -695,11 +703,11 @@ export default function ProductUploadForm(props: ProductUploadFormProps) {
                       Hình ảnh <span className="text-red-400">*</span>
                     </TableHead>
                     <TableHead>
-                      Tên màu <span className="text-red-400">*</span>
+                      Mã màu
                     </TableHead>
                     <TableHead>Giá màu</TableHead>
                     <TableHead>Mặc định</TableHead>
-                    {!props.readOnly && <TableHead>H. Động</TableHead>}
+                    {!props.readOnly && !props.defaultValue && <TableHead>H. Động</TableHead>}
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -729,7 +737,7 @@ export default function ProductUploadForm(props: ProductUploadFormProps) {
                           )}
                         </Label>
                         <Input
-                          disabled={props.readOnly}
+                          disabled={(props.readOnly || props.defaultValue) as boolean}
                           accept="image/*"
                           onChange={(el) => {
                             if (el.target.files[0]) {
@@ -774,7 +782,7 @@ export default function ProductUploadForm(props: ProductUploadFormProps) {
                       </TableCell>
                       <TableCell>
                         <Input
-                          disabled={props.readOnly}
+                          disabled={(props.readOnly || props.defaultValue) as boolean}
                           placeholder="0"
                           value={e.color_price == 0 ? "" : e.color_price}
                           type="number"
@@ -791,7 +799,7 @@ export default function ProductUploadForm(props: ProductUploadFormProps) {
                       </TableCell>
                       <TableCell>
                         <Switch
-                          disabled={props.readOnly}
+                          disabled={(props.readOnly || props.defaultValue) as boolean}
                           onCheckedChange={(el) => {
                             setColorProperty(
                               {
@@ -804,7 +812,7 @@ export default function ProductUploadForm(props: ProductUploadFormProps) {
                           checked={e.color_isPicked}
                         ></Switch>
                       </TableCell>
-                      {!props.readOnly && (
+                      {!props.readOnly && !props.defaultValue && (
                         <TableCell>
                           <Button
                             type="button"
@@ -822,7 +830,7 @@ export default function ProductUploadForm(props: ProductUploadFormProps) {
                 </TableBody>
               </Table>
             ) : null}
-            {!props.readOnly && (
+            {!props.readOnly || props.defaultValue && (
               <Button
                 type="button"
                 variant="outline"
@@ -849,7 +857,7 @@ export default function ProductUploadForm(props: ProductUploadFormProps) {
                     </TableHead>
                     <TableHead>Giá kích cỡ</TableHead>
                     <TableHead>Mặc định</TableHead>
-                    {!props.readOnly && <TableHead>H. Động</TableHead>}
+                    {!props.readOnly && !props.defaultValue && <TableHead>H. Động</TableHead>}
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -857,7 +865,7 @@ export default function ProductUploadForm(props: ProductUploadFormProps) {
                     <TableRow>
                       <TableCell>
                         <Input
-                          disabled={props.readOnly}
+                          disabled={(props.readOnly || props.defaultValue) as boolean}
                           onChange={(el) => {
                             setSizeProperty(
                               {
@@ -872,7 +880,7 @@ export default function ProductUploadForm(props: ProductUploadFormProps) {
                       </TableCell>
                       <TableCell>
                         <Input
-                          disabled={props.readOnly}
+                          disabled={(props.readOnly || props.defaultValue) as boolean}
                           placeholder="0"
                           onChange={(el) => {
                             setSizeProperty(
@@ -893,7 +901,7 @@ export default function ProductUploadForm(props: ProductUploadFormProps) {
                       </TableCell>
                       <TableCell>
                         <Switch
-                          disabled={props.readOnly}
+                          disabled={(props.readOnly || props.defaultValue) as boolean}
                           onCheckedChange={(el) => {
                             setSizeProperty(
                               {
@@ -907,7 +915,7 @@ export default function ProductUploadForm(props: ProductUploadFormProps) {
                         />
                       </TableCell>
                       <TableCell>
-                        {!props.readOnly && (
+                        {!props.readOnly && !props.defaultValue && (
                           <Button
                             onClick={() => {
                               deleteSize(e);
@@ -924,7 +932,7 @@ export default function ProductUploadForm(props: ProductUploadFormProps) {
                 </TableBody>
               </Table>
             ) : null}
-            {!props.readOnly && (
+            {!props.readOnly || props.defaultValue && (
               <Button
                 type="button"
                 variant="outline"
@@ -943,7 +951,8 @@ export default function ProductUploadForm(props: ProductUploadFormProps) {
               </Button>
             </DialogClose>
             <Button className="flex-1">
-              Thêm sản phẩm {form.getValues("isDraft") ? "(nháp)" : ""}
+              {props.defaultValue ? "Cập nhật sản phẩm" : "Thêm sản phẩm"}{" "}
+              {form.getValues("isDraft") ? " (nháp)" : ""}
             </Button>
           </div>
         </div>

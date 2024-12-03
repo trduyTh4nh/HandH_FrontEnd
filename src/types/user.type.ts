@@ -18,4 +18,5 @@ export interface IUser {
   userAddress?: IUserAddress;
   role?: string;
   avatar?: string | File;
+  createdAt?: string
 }
