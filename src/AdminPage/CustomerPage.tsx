@@ -137,7 +137,7 @@ const CustomerPage: React.FC = () => {
                   <TableHead>Tên</TableHead>
                   <TableHead>Email</TableHead>
                   <TableHead>Điện thoại</TableHead>
-                  <TableHead>Quyền</TableHead>
+                  <TableHead>Ngày tạo</TableHead>
                   <TableHead>Hành động</TableHead>
                 </TableRow>
               </TableHeader>
@@ -151,14 +151,20 @@ const CustomerPage: React.FC = () => {
                           {user.name
                             .split(" ")
                             .map((n) => n[0])
-                            .join("").toUpperCase()}
+                            .join("")
+                            .toUpperCase()}
                         </AvatarFallback>
                       </Avatar>
                     </TableCell>
                     <TableCell className="font-medium">{user.name}</TableCell>
                     <TableCell>{user.email}</TableCell>
                     <TableCell>{user.phone}</TableCell>
-                    <TableCell>{user.role}</TableCell>
+                    <TableCell>
+                      {new Date(user.createdAt).toLocaleDateString("VI-vn", {
+                        hour: "numeric",
+                        minute: "numeric",
+                      })}
+                    </TableCell>
                     <TableCell>
                       <div className="flex space-x-2">
                         <Dialog>
@@ -188,6 +194,18 @@ const CustomerPage: React.FC = () => {
                                 <TabsContent value="details">
                                   <div className="grid grid-cols-2 gap-4">
                                     <div className="space-y-2">
+                                      <Avatar className="w-16 h-16">
+                                        <AvatarImage
+                                          src={selectedUser.avatar as string}
+                                        />
+                                        <AvatarFallback>
+                                          {selectedUser.name
+                                            .split(" ")
+                                            .map((n) => n[0])
+                                            .join("")
+                                            .toUpperCase()}
+                                        </AvatarFallback>
+                                      </Avatar>
                                       <Label>Tên</Label>
                                       <Input
                                         value={selectedUser.name}

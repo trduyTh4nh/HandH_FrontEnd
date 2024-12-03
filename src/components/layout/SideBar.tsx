@@ -87,7 +87,7 @@ const SideBar = (props: SideBarProps) => {
                   icon: NotebookPen,
                 },
                 {
-                  name: "Quay về trang chính",
+                  name: "Quay về trang chủ",
                   path: "/",
                   icon: Store,
                 },

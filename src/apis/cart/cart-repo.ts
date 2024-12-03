@@ -1,4 +1,4 @@
-import { AxiosError, isAxiosError } from "axios";
+import { Axios, AxiosError, isAxiosError } from "axios";
 import API from "../api";
 
 const api = new API({ headerType: "json" });
@@ -106,7 +106,21 @@ export async function createCartUser(idUser: string) {
     return error;
   }
 }
-
+export async function createCart(idUser: string) {
+  try {
+    const res = await api.post("cart/createCart", {
+      cart: {
+        cart_user: idUser
+      }
+    })
+  } catch (e) {
+    if(e instanceof AxiosError) {
+      console.warn(e);
+      return e;
+    }
+    console.error(e);
+  }
+}
 export async function GetAllOrderOfUser(idUser: string) {
   try {
     const response = await api.get(`order/getAllOrderOfUser/${idUser}`);

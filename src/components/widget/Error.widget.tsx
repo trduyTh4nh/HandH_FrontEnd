@@ -1,6 +1,7 @@
 import {
   Ban,
   Loader,
+  LogOut,
   LucideIcon,
   OctagonMinus,
   SearchX,
@@ -19,7 +20,8 @@ export type ErrorViewProps = {
     | "unauthorized"
     | "notfound"
     | "notallowed"
-    | "loading";
+    | "loading"
+    | "logout";
   children?: React.ReactNode;
   className?: string;
   mini?: boolean;
@@ -32,6 +34,7 @@ export default function ErrorView(props: ErrorViewProps) {
     unauthorized: <OctagonMinus width={iconSize} height={iconSize} />,
     notfound: <SearchX width={iconSize} height={iconSize} />,
     notallowed: <ShieldBan width={iconSize} height={iconSize} />,
+    logout: <LogOut width={iconSize} height={iconSize} />,
     loading: (
       <Loader width={iconSize} height={iconSize} className="animate-spin" />
     ),

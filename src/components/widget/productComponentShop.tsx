@@ -38,7 +38,7 @@ export default function ProductComponentShop({
 }) {
   const [productData, setProductData] = React.useState<IProduct[]>([]);
   const [loading, setLoading] = React.useState(true);
-
+  
   const fetchProFilter = async ({ pageParam = 0 }) => {
     // Tạo object filter với điều kiện kiểm tra từng trường
     const filter: any = {};
@@ -125,8 +125,10 @@ export default function ProductComponentShop({
       <div className="home-new-list-product py-4 flex flex-wrap">
         {productDatas.length > 0 ? (
           productDatas.map((product: IProduct) => (
-            <div className="wrap-product" key={product._id}>
-              <ProductItem {...product} />
+            <div className="wrap-product w-full" key={product._id}>
+              <ProductItem
+                {...product}
+              />
             </div>
           ))
         ) : (
@@ -140,7 +142,7 @@ export default function ProductComponentShop({
           />
         )}
       </div>
-      <div className="pagination-controls fixed  bottom-0 flex w-[70%] pb-4 justify-between">
+      <div className="pagination-controls max-sm:pl-20 fixed  bottom-24 flex w-[70%] pb-4 justify-between">
         <button
           className="bg-white hover:bg-gray-100 text-gray-800 font-semibold py-2 px-4 border border-gray-400 rounded shadow"
           onClick={() => onPageChange(skip - 1)}

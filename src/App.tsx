@@ -56,6 +56,7 @@ import BlogPage from "./AdminPage/BlogPage";
 import { useTransition, animated } from "react-spring";
 import SelectionButton from "./components/widget/selectionButton.widget";
 import { AccountBalanceOutlined } from "@mui/icons-material";
+import LogoutPage from "./AdminPage/LogoutPage";
 const queryClient = new QueryClient();
 const AdminRoute: React.FC = () => {
   const [isUserValid, setUserValid] = useState(false);
@@ -88,6 +89,7 @@ const AdminRoute: React.FC = () => {
             <Route path="/financeManage" element={<FinancePage />} />
             <Route path="/bannerManage" element={<BannerPage />} />
             <Route path="/categoryManage" element={<CategoryPage />} />
+            <Route path="/logout" element={<LogoutPage />} />
           </Routes>
         ) : (
           <ErrorView
@@ -132,7 +134,7 @@ const AdminRoute: React.FC = () => {
 
 const UserRoute: React.FC = () => {
   return (
-    <div className="flex-grow flex mt-[5rem] md:mt-[10.2rem]">
+    <div className="flex-grow flex mt-[4.625rem] md:mt-[10.2rem]">
       <Navbar />
       <Toaster />
       <Routes>
@@ -231,8 +233,8 @@ const App = () => {
                 <Route path="/admin/*" element={<AdminRoute />} />{" "}
               </Routes>
             </div>
-            <div className="fixed h-24 w-24 bottom-4 left-4 z-50 p-4 cursor-pointer group"
-             onClick={() =>window.location.href = "https://zalo.me/0856478995"}
+            <div className="fixed h-24 w-24 bottom-4 right-4 z-50 p-4 cursor-pointer group"
+             onClick={() =>window.location.href = "https://zalo.me/0909893395"}
           >
             <img 
               src="/src/assets/image/icon_zalo.png" 
