@@ -31,7 +31,7 @@ import { Calendar } from "../ui/calendar";
 
 const editProfileSchema = z
   .object({
-    name: z.string({ required_error: "Tên không được để trống" }),
+    name: z.string({ required_error: "Tên không được để trống" }).max(128, {message: "Tên không được dài quá 128 ký tự"}),
     email: z.string({ required_error: "Email không được để trống" }).email(),
     phone: z
       .string({ required_error: "Số điện thoại không được để trống" })

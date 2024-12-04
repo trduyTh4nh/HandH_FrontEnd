@@ -50,7 +50,7 @@ export const ManagerAccount: React.FC = () => {
         <>
           <div className="fixed h-full top-0 pt-[11.2rem] pb-8 pl-20 pr-8 box-border">
             <div className="bg-primary-light h-full w-96 rounded-2xl border border-gray-100 p-4 heght-div1 box-border">
-              <div className="flex items-center p-2 gap-4 mb-2">
+              <div className="flex items-center p-2 gap-4 mb-2 w-full">
                 {isLoading || !user ? (
                   <>
                     <Skeleton className="w-12 h-12 rounded-full" />
@@ -66,8 +66,8 @@ export const ManagerAccount: React.FC = () => {
                       alt="Profile"
                       className="w-12 h-12 rounded-full"
                     />
-                    <div>
-                      <h3 className="text-lg font-bold">{user.name}</h3>
+                    <div className="w-full">
+                      <h3 className="text-lg font-bold text-ellipsis w-full break-all line-clamp-2 hover:line-clamp-none">{user.name}</h3>
                       <p className="text-sm text-gray-500">
                         {user.role == "3107" ? "Quản trị viên" : "Khách hàng"}
                       </p>

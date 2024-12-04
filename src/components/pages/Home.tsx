@@ -233,7 +233,7 @@ const Home: React.FC = () => {
             <Contacts
               title="Địa chỉ"
               subtitle="K20, Cư Xã Vĩnh Hội, Phường 6, Quận 4, TP. Hồ Chí Minh, Việt Nam"
-              url="https://maps.app.goo.gl/s3e5Dzzh8ziZwAAaA"
+              url="https://maps.app.goo.gl/EN3oGMgFuMvfyJX78"
               icon={<StoreOutlined fontSize="large" />}
             />
           </div>

@@ -70,7 +70,10 @@ export default function Product() {
         const selectedPrice = product.product_colors.find(
           (e) => e.color_isPicked
         );
-        setPrice(product.product_price + selectedPrice.color_price);
+        setPrice(
+          product.product_price +
+            (selectedPrice ? selectedPrice.color_price : 0)
+        );
         setColors(
           product.product_colors.map((e) => {
             return {
@@ -226,7 +229,7 @@ export default function Product() {
                         setPrice(
                           (prev) =>
                             (product.product_price +
-                              selectedPrice.price +
+                            (selectedPrice ? selectedPrice.price : 0) +
                               e.price) *
                             quantity
                         );
@@ -239,34 +242,38 @@ export default function Product() {
               </>
             )}
             <div className="flex flex-col gap-2">
-              <h2 className="text-2xl font-light">Màu sắc</h2>
-              <div className="flex gap-4 w-full">
-                {colors.map((e) => (
-                  <ColorChip
-                    image={e.image}
-                    active={e.enabled}
-                    color={e.color}
-                    onClick={(selected) => {
-                      const selectedSize = sizes.find((e) => e.enabled);
-                      setColors(() => changeSelected(e, colors, selected));
-                      setPrice(
-                        (prev) =>
-                          (product.product_price +
-                            e.price +
-                            selectedSize.price) *
-                          quantity
-                      );
-                      if (e.image) {
-                        setProduct({
-                          ...product,
-                          product_thumb: e.image,
-                        });
-                      }
-                    }}
-                    tooltip={e.tooltip}
-                  />
-                ))}
-              </div>
+              {colors.length > 0 && (
+                <>
+                  <h2 className="text-2xl font-light">Màu sắc</h2>
+                  <div className="flex gap-4 w-full">
+                    {colors.map((e) => (
+                      <ColorChip
+                        image={e.image}
+                        active={e.enabled}
+                        color={e.color}
+                        onClick={(selected) => {
+                          const selectedSize = sizes.find((e) => e.enabled);
+                          setColors(() => changeSelected(e, colors, selected));
+                          setPrice(
+                            (prev) =>
+                              (product.product_price +
+                                e.price +
+                               selectedSize ? selectedSize.price : 0) *
+                              quantity
+                          );
+                          if (e.image) {
+                            setProduct({
+                              ...product,
+                              product_thumb: e.image,
+                            });
+                          }
+                        }}
+                        tooltip={e.tooltip}
+                      />
+                    ))}
+                  </div>
+                </>
+              )}
             </div>
             <div className="flex gap-2">
               <Button
