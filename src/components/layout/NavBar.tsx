@@ -252,6 +252,12 @@ const Navbar: React.FC = () => {
               >
                 Cửa Hàng
               </NavLink>
+              {/* <NavLink
+                to="/shopcate"
+                className="text-title-nav hover:underline hover:text-black hover:bg-gray-100 transition-all duration-800 px-3 py-2 rounded-md font-medium"
+              >
+                Cửa Hàng Loại
+              </NavLink> */}
               <NavLink
                 to="/blog"
                 className="text-title-nav hover:underline hover:text-black hover:bg-gray-100 transition-all duration-800 px-3 py-2 rounded-md font-medium"
