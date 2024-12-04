@@ -63,6 +63,7 @@ export const Account: React.FC = () => {
     isOpen: false,
   });
   async function onSaveProfile(data: UserSchema) {
+    const oldUser = user;
     setProcess({
       loading: true,
       where: "profile",
@@ -101,6 +102,7 @@ export const Account: React.FC = () => {
     setOpenEditProfileDialog(false);
     setUser({
       ...updatedUser,
+      role: oldUser.role,
       avatar:
         updatedUser.avatar instanceof File
           ? URL.createObjectURL(updatedUser.avatar)
@@ -222,7 +224,7 @@ export const Account: React.FC = () => {
               <div className="flex items-center gap-2 mb-4">
                 <CircleUser className="text-black" />
                 <p className="text-gray-700 font-semibold">Họ tên:</p>
-                <p className="ml-auto text-gray-800 font-medium">{user.name}</p>
+                <p className="ml-auto text-gray-800 font-medium line-clamp-1 text-right">{user.name}</p>
               </div>
               <div className="flex items-center gap-2 mb-4">
                 <Phone className="text-black" />
