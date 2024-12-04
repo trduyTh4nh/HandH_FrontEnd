@@ -25,17 +25,24 @@ export async function getProductById(id: string) {
     return e;
   }
 }
-export async function changeVisibility(action: "draftProduct" | "unDaftProduct" | "publicProduct" | "unPublicProduct", idProduct: string) {
+export async function changeVisibility(
+  action:
+    | "draftProduct"
+    | "unDaftProduct"
+    | "publicProduct"
+    | "unPublicProduct",
+  idProduct: string
+) {
   try {
-    let res
-    if(action == "publicProduct"){
+    let res;
+    if (action == "publicProduct") {
       res = await api.patch(`product/${action}/${idProduct}`);
     } else {
       res = await api.put(`product/${action}/${idProduct}`);
     }
-    console.log(res)
+    console.log(res);
   } catch (e) {
-    if(e instanceof AxiosError) {
+    if (e instanceof AxiosError) {
       console.warn(e);
       return e;
     }
@@ -252,6 +259,15 @@ export async function getAllProInWishList() {
 export async function searchProduct(query: string) {
   try {
     const response = await api.get(`product/search?search=${query}`);
+    return response;
+  } catch (error) {
+    return error;
+  }
+}
+
+export async function getProductByCategory(query: string) {
+  try {
+    const response = await api.get(`product/getProductCate/${query}`);
     return response;
   } catch (error) {
     return error;
