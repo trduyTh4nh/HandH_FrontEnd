@@ -1,8 +1,9 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
+import { string, z } from "zod";
 import Dropzone from "react-dropzone";
+import { prominent } from "color.js";
 import {
   Form,
   FormControl,
@@ -106,10 +107,14 @@ const schema = z
   });
 export type ProductUploadFormProps = {
   onSubmit: (data: IProduct) => void;
+  onUpdate?: (data: IProduct) => void;
   defaultValue?: IProduct;
   readOnly?: boolean;
 };
 export default function ProductUploadForm(props: ProductUploadFormProps) {
+  const productThumbUrl = props.defaultValue
+    ? props.defaultValue.product_thumb
+    : null;
   function addProductColor() {
     setColorList([
       ...colorList,
@@ -144,7 +149,6 @@ export default function ProductUploadForm(props: ProductUploadFormProps) {
       if (i == index) {
         return {
           ...value,
-          size_isPicked: true,
         };
       }
       return e;
@@ -170,7 +174,6 @@ export default function ProductUploadForm(props: ProductUploadFormProps) {
       if (i == index) {
         return {
           ...value,
-          color_isPicked: true,
         };
       }
       return e;
@@ -183,6 +186,13 @@ export default function ProductUploadForm(props: ProductUploadFormProps) {
       const cate: ICategory[] = cateResult.metadata;
       console.log(cate);
       setCateList(cate);
+      const index = cate.findIndex(
+        (e) => e._id === props.defaultValue.product_category
+      );
+      console.log(props.defaultValue.product_category);
+      if (props.defaultValue) {
+        form.setValue("product_category", cate[index]._id);
+      }
     } catch (e) {
       if (e instanceof AxiosError) {
         console.log(e);
@@ -194,55 +204,73 @@ export default function ProductUploadForm(props: ProductUploadFormProps) {
     getAllCate();
   }, []);
   const [cateList, setCateList] = useState<ICategory[]>([]);
-  const [colorList, setColorList] = useState<IColorProductVariation[]>([
-    {
-      color_code: "#000",
-      color_price: 0,
-      color_name: "",
-      color_isPicked: true,
-    },
-  ]);
-  const [sizeList, setSizeList] = useState<ISizeProductVarication[]>([
-    {
-      size_name: "S",
-      size_price: 0,
-      size_isPicked: true,
-    },
-    {
-      size_name: "M",
-      size_price: 0,
-      size_isPicked: false,
-    },
-    {
-      size_name: "L",
-      size_price: 0,
-      size_isPicked: false,
-    },
-    {
-      size_name: "XL",
-      size_price: 0,
-      size_isPicked: false,
-    },
-  ]);
-  const [imageList, setImageList] = useState<File[]>([]);
+  const [colorList, setColorList] = useState<IColorProductVariation[]>(
+    props.defaultValue
+      ? props.defaultValue.product_colors.map((e) => {
+          return {
+            ...e,
+            color_image: e.image_product_col,
+          };
+        })
+      : [
+          {
+            color_code: "#000",
+            color_price: 0,
+            color_name: "",
+            color_isPicked: true,
+          },
+        ]
+  );
+  const [sizeList, setSizeList] = useState<ISizeProductVarication[]>(
+    props.defaultValue
+      ? props.defaultValue.product_sizes
+      : [
+          {
+            size_name: "S",
+            size_price: 0,
+            size_isPicked: true,
+          },
+          {
+            size_name: "M",
+            size_price: 0,
+            size_isPicked: false,
+          },
+          {
+            size_name: "L",
+            size_price: 0,
+            size_isPicked: false,
+          },
+          {
+            size_name: "XL",
+            size_price: 0,
+            size_isPicked: false,
+          },
+        ]
+  );
+  const [deletedColorList, setDeletedColorList] = useState<string[]>([]);
+  const [deletedSizeList, setDeletedSizeList] = useState<string[]>([]);
+  const [imageList, setImageList] = useState<(File | string)[]>(
+    props.defaultValue ? props.defaultValue.product_images : []
+  );
   const [sizeValidationMessage, setSizeValidationMessage] =
     useState<string>(null);
   const [colorValidationMessage, setColorvalidationMessage] =
     useState<string>(null);
   const form = useForm<z.infer<typeof schema>>({
     resolver: zodResolver(schema),
-    defaultValues: props.defaultValue ? {
-      product_name: props.defaultValue.product_name,
-      product_description: props.defaultValue.product_description,
-      product_price: props.defaultValue.product_price,
-      product_thumb: null,
-      product_category: props.defaultValue.product_category,
-      isPublished: props.defaultValue.isPublished,
-      isDraft: props.defaultValue.isDraft,
-    } : {
-      product_price: 0,
-      isDraft: true,
-    },
+    defaultValues: props.defaultValue
+      ? {
+          product_name: props.defaultValue.product_name,
+          product_description: props.defaultValue.product_description,
+          product_price: props.defaultValue.product_price,
+          product_thumb: null,
+          isPublished: props.defaultValue.isPublished,
+          isDraft: props.defaultValue.isDraft,
+        }
+      : {
+          product_price: 0,
+          isDraft: true,
+        },
   });
   //TODO: return kiểu IProduct.
   function parseToIProduct(data: z.infer<typeof schema>): IProduct {
@@ -257,11 +285,11 @@ export default function ProductUploadForm(props: ProductUploadFormProps) {
   function validateColor(): boolean {
     const requiredFieldsFilled =
       colorList.filter(
-        (e) => e.color_code == "" || e.color_name == "" || e.color_price < 0
+        (e) => e.color_code == "" || !e.color_image
       ).length == 0;
     console.error(
       colorList.filter(
-        (e) => e.color_code == "" || e.color_name == "" || e.color_price < 0
+        (e) => e.color_code == ""
       )
     );
     return requiredFieldsFilled;
@@ -287,7 +315,11 @@ export default function ProductUploadForm(props: ProductUploadFormProps) {
     console.log(tmpData);
     setColorvalidationMessage(null);
     setSizeValidationMessage(null);
-    props.onSubmit(tmpData);
+    if (props.defaultValue) {
+      props.onUpdate(tmpData);
+    } else {
+      props.onSubmit(tmpData);
+    }
   }
   function addImages(file: FileList) {
     const files = Array.from(file);
@@ -323,7 +355,11 @@ export default function ProductUploadForm(props: ProductUploadFormProps) {
                   Tên sản phẩm <span className="text-red-400">*</span>
                 </Label>
                 <FormControl>
-                  <Input {...field} placeholder="Bắt buộc" />
+                  <Input
+                    disabled={props.readOnly}
+                    {...field}
+                    placeholder="Bắt buộc"
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -337,6 +373,7 @@ export default function ProductUploadForm(props: ProductUploadFormProps) {
                 <Label>Mô tả sản phẩm</Label>
                 <FormControl>
                   <Textarea
+                    disabled={props.readOnly}
                     {...field}
                     placeholder="Bắt buộc, dưới 1024 ký tự"
                   />
@@ -366,12 +403,16 @@ export default function ProductUploadForm(props: ProductUploadFormProps) {
                   Giá này sẽ thay đổi theo màu sắc và kích cỡ tương ứng.
                 </p>
                 <FormControl>
-                  <Input {...field} placeholder="Bắt buộc" />
+                  <Input
+                    disabled={props.readOnly}
+                    {...field}
+                    placeholder="Bắt buộc"
+                  />
                 </FormControl>
                 <p className="text-sm">
-                  {
-                    Number(form.getValues("product_price")).toLocaleString() + " "
-                  } đồng
+                  {Number(form.getValues("product_price")).toLocaleString() +
+                    " "}{" "}
+                  đồng
                 </p>
                 <FormMessage />
               </FormItem>
@@ -388,11 +429,19 @@ export default function ProductUploadForm(props: ProductUploadFormProps) {
                 <FormControl>
                   <Select
                     {...field}
+                    value={cateList.length == 0 ? null : field.value}
+                    defaultValue={
+                      cateList.length > 0 && props.defaultValue
+                        ? props.defaultValue.product_category
+                        : ""
+                    }
                     onValueChange={(e) => field.onChange(e)}
-                    disabled={cateList.length == 0}
+                    disabled={cateList.length == 0 || props.readOnly}
                   >
                     <SelectTrigger>
-                      <SelectValue placeholder="Chọn danh mục của sản phẩm..."></SelectValue>
+                      <SelectValue
+                        placeholder={`Chọn danh mục của sản phẩm...`}
+                      ></SelectValue>
                       <SelectContent>
                         {cateList.map((e) => (
                           <SelectItem value={e._id} key={e._id}>
@@ -420,33 +469,43 @@ export default function ProductUploadForm(props: ProductUploadFormProps) {
                       field.value ? "border-solid shadow-sm" : "border-dashed"
                     } border-gray-200 rounded-2xl justify-center items-center py-4 hover:border-solid hover:shadow-sm transition-all active:scale-95`}
                   >
-                    {!field.value && (
-                      <>
-                        <Image className="text-gray-200" />
-                        <p>Đăng tải hình ảnh</p>
-                      </>
-                    )}
-                    {field.value && (
+                    {
+                      (!field.value || !productThumbUrl && (
+                        <>
+                          <Image className="text-gray-200" />
+                          <p>Đăng tải hình ảnh</p>
+                        </>
+                      ))}
+                    {field.value || productThumbUrl ? (
                       <>
                         <img
                           src={
-                            field.value ? URL.createObjectURL(field.value) : ""
+                            field.value
+                              ? URL.createObjectURL(field.value)
+                              : productThumbUrl
+                              ? (productThumbUrl as string)
+                              : ""
                           }
                           className="h-24"
                         />
-                        <p>{field.value.name}</p>
-                        <p
-                          className={`${
-                            field.value.size >= 104857600
-                              ? "text-red-400 font-bold"
-                              : ""
-                          }`}
-                        >
-                          {formatBytes(field.value.size)}
+                        <p>
+                          {field.value ? field.value.name : "Hình ảnh sản phẩm"}
                         </p>
+                        {field.value && (
+                          <p
+                            className={`${
+                              field.value.size >= 104857600
+                                ? "text-red-400 font-bold"
+                                : ""
+                            }`}
+                          >
+                            {formatBytes(field.value.size)}
+                          </p>
+                        )}
                       </>
-                    )}
+                    ) : null}
                     <Input
+                      disabled={props.readOnly}
                       className="hidden"
                       id="image_picker"
                       accept="image/*"
@@ -539,28 +598,32 @@ export default function ProductUploadForm(props: ProductUploadFormProps) {
                 <div className="w-full grid grid-cols-3 gap-2">
                   {imageList.map((e, index) => (
                     <div className="flex justify-center items-center px-4 py-8 border-gray-200 border rounded-xl relative">
-                      <Button
-                        type="button"
-                        onClick={() => {
-                          removeImage(index);
-                        }}
-                        variant="secondary"
-                        className="absolute right-2 top-2 bg-secondary/80 backdrop-blur-lg"
-                      >
-                        <Trash2
-                          width={16}
-                          height={16}
-                          className="text-red-400"
-                        />
-                      </Button>
+                      {!props.readOnly && (
+                        <Button
+                          type="button"
+                          onClick={() => {
+                            removeImage(index);
+                          }}
+                          variant="secondary"
+                          className="absolute right-2 top-2 bg-secondary/80 backdrop-blur-lg"
+                        >
+                          <Trash2
+                            width={16}
+                            height={16}
+                            className="text-red-400"
+                          />
+                        </Button>
+                      )}
                       <img
-                        src={URL.createObjectURL(e)}
+                        src={
+                          e instanceof File ? URL.createObjectURL(e as File) : e
+                        }
                         key={index}
                         className="h-24 object-contain rounded-lg"
                       />
                     </div>
                   ))}
-                  {imageList.length != 6 && (
+                  {imageList.length != 6 && !props.readOnly && (
                     <label
                       htmlFor="images-input"
                       className="flex justify-center flex-col gap-2 border-gray-200 border items-center px-4 py-8 rounded-2xl relative"
@@ -572,9 +635,15 @@ export default function ProductUploadForm(props: ProductUploadFormProps) {
                 </div>
                 <Dialog>
                   <DialogTrigger className="w-full">
-                    <Button variant="outline" type="button" className="w-full">
-                      Xoá tất cả
-                    </Button>
+                    {!props.readOnly && (
+                      <Button
+                        variant="outline"
+                        type="button"
+                        className="w-full"
+                      >
+                        Xoá tất cả
+                      </Button>
+                    )}
                   </DialogTrigger>
                   <DialogContent>
                     <DialogHeader>
@@ -605,6 +674,8 @@ export default function ProductUploadForm(props: ProductUploadFormProps) {
               </>
             )}
             <Input
+              
+              disabled={(props.readOnly || props.defaultValue) as boolean}
               type="file"
               multiple
               accept="image/*"
@@ -632,11 +703,11 @@ export default function ProductUploadForm(props: ProductUploadFormProps) {
                       Hình ảnh <span className="text-red-400">*</span>
                     </TableHead>
                     <TableHead>
-                      Tên màu <span className="text-red-400">*</span>
+                      Mã màu
                     </TableHead>
                     <TableHead>Giá màu</TableHead>
                     <TableHead>Mặc định</TableHead>
-                    <TableHead>H. Động</TableHead>
+                    {!props.readOnly && !props.defaultValue && <TableHead>H. Động</TableHead>}
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -645,12 +716,18 @@ export default function ProductUploadForm(props: ProductUploadFormProps) {
                       <TableCell>
                         <Label
                           htmlFor={`color-input-${index}`}
-                          className={cn(buttonVariants({ variant: "outline" }))}
+                          className={cn(
+                            buttonVariants({
+                              variant: "outline",
+                              className: "py-0",
+                            })
+                          )}
                         >
                           {!e.color_image ? (
                             <ImagePlus width={16} height={16} />
                           ) : (
                             <img
+                              className="h-full"
                               src={
                                 e.color_image instanceof File
                                   ? URL.createObjectURL(e.color_image)
@@ -660,20 +737,27 @@ export default function ProductUploadForm(props: ProductUploadFormProps) {
                           )}
                         </Label>
                         <Input
+                          disabled={(props.readOnly || props.defaultValue) as boolean}
                           accept="image/*"
                           onChange={(el) => {
                             if (el.target.files[0]) {
-                              setColorList(
-                                colorList.map((e, i) => {
-                                  if (i == index) {
-                                    return {
-                                      ...e,
-                                      color_image: el.target.files[0],
-                                    };
-                                  }
-                                  return e;
-                                })
-                              );
+                              prominent(
+                                URL.createObjectURL(el.target.files[0]),
+                                { amount: 1, format: "hex" }
+                              ).then((color) => {
+                                setColorList(
+                                  colorList.map((e, i) => {
+                                    if (i == index) {
+                                      return {
+                                        ...e,
+                                        color_image: el.target.files[0],
+                                        color_code: color as string,
+                                      };
+                                    }
+                                    return e;
+                                  })
+                                );
+                              });
                             }
                           }}
                           id={`color-input-${index}`}
@@ -683,12 +767,13 @@ export default function ProductUploadForm(props: ProductUploadFormProps) {
                       </TableCell>
                       <TableCell>
                         <Input
-                          value={e.color_name}
+                          disabled
+                          value={e.color_code}
                           onChange={(el) => {
                             setColorProperty(
                               {
                                 ...e,
-                                color_name: el.target.value,
+                                color_code: el.target.value,
                               },
                               index
                             );
@@ -697,6 +782,7 @@ export default function ProductUploadForm(props: ProductUploadFormProps) {
                       </TableCell>
                       <TableCell>
                         <Input
+                          disabled={(props.readOnly || props.defaultValue) as boolean}
                           placeholder="0"
                           value={e.color_price == 0 ? "" : e.color_price}
                           type="number"
@@ -713,6 +799,7 @@ export default function ProductUploadForm(props: ProductUploadFormProps) {
                       </TableCell>
                       <TableCell>
                         <Switch
+                          disabled={(props.readOnly || props.defaultValue) as boolean}
                           onCheckedChange={(el) => {
                             setColorProperty(
                               {
@@ -725,30 +812,34 @@ export default function ProductUploadForm(props: ProductUploadFormProps) {
                           checked={e.color_isPicked}
                         ></Switch>
                       </TableCell>
-                      <TableCell>
-                        <Button
-                          type="button"
-                          variant="outline"
-                          onClick={() => {
-                            deleteColor(e);
-                          }}
-                        >
-                          <Trash2 width={16} height={16} />
-                        </Button>
-                      </TableCell>
+                      {!props.readOnly && !props.defaultValue && (
+                        <TableCell>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            onClick={() => {
+                              deleteColor(e);
+                            }}
+                          >
+                            <Trash2 width={16} height={16} />
+                          </Button>
+                        </TableCell>
+                      )}
                     </TableRow>
                   ))}
                 </TableBody>
               </Table>
             ) : null}
-            <Button
-              type="button"
-              variant="outline"
-              className="text-sm"
-              onClick={addProductColor}
-            >
-              Thêm màu
-            </Button>
+            {!props.readOnly || props.defaultValue && (
+              <Button
+                type="button"
+                variant="outline"
+                className="text-sm"
+                onClick={addProductColor}
+              >
+                Thêm màu
+              </Button>
+            )}
           </div>
           <p className="text-sm text-red-400">{colorValidationMessage}</p>
           <p className="text-sm">Kích cỡ sản phẩm</p>
@@ -766,7 +857,7 @@ export default function ProductUploadForm(props: ProductUploadFormProps) {
                     </TableHead>
                     <TableHead>Giá kích cỡ</TableHead>
                     <TableHead>Mặc định</TableHead>
-                    <TableHead>H. Động</TableHead>
+                    {!props.readOnly && !props.defaultValue && <TableHead>H. Động</TableHead>}
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -774,6 +865,7 @@ export default function ProductUploadForm(props: ProductUploadFormProps) {
                     <TableRow>
                       <TableCell>
                         <Input
+                          disabled={(props.readOnly || props.defaultValue) as boolean}
                           onChange={(el) => {
                             setSizeProperty(
                               {
@@ -788,6 +880,7 @@ export default function ProductUploadForm(props: ProductUploadFormProps) {
                       </TableCell>
                       <TableCell>
                         <Input
+                          disabled={(props.readOnly || props.defaultValue) as boolean}
                           placeholder="0"
                           onChange={(el) => {
                             setSizeProperty(
@@ -808,6 +901,7 @@ export default function ProductUploadForm(props: ProductUploadFormProps) {
                       </TableCell>
                       <TableCell>
                         <Switch
+                          disabled={(props.readOnly || props.defaultValue) as boolean}
                           onCheckedChange={(el) => {
                             setSizeProperty(
                               {
@@ -821,29 +915,33 @@ export default function ProductUploadForm(props: ProductUploadFormProps) {
                         />
                       </TableCell>
                       <TableCell>
-                        <Button
-                          onClick={() => {
-                            deleteSize(e);
-                          }}
-                          variant="outline"
-                          type="button"
-                        >
-                          <Trash2 width={16} height={16} />
-                        </Button>
+                        {!props.readOnly && !props.defaultValue && (
+                          <Button
+                            onClick={() => {
+                              deleteSize(e);
+                            }}
+                            variant="outline"
+                            type="button"
+                          >
+                            <Trash2 width={16} height={16} />
+                          </Button>
+                        )}
                       </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
               </Table>
             ) : null}
-            <Button
-              type="button"
-              variant="outline"
-              className="text-sm"
-              onClick={addProductSize}
-            >
-              Thêm kích cỡ
-            </Button>
+            {!props.readOnly || props.defaultValue && (
+              <Button
+                type="button"
+                variant="outline"
+                className="text-sm"
+                onClick={addProductSize}
+              >
+                Thêm kích cỡ
+              </Button>
+            )}
           </div>
           <p className="text-sm text-red-400">{sizeValidationMessage}</p>
           <div className="flex gap-2">
@@ -852,7 +950,10 @@ export default function ProductUploadForm(props: ProductUploadFormProps) {
                 Huỷ
               </Button>
             </DialogClose>
-            <Button className="flex-1">Thêm sản phẩm {form.getValues("isDraft") ? "(nháp)" : ""}</Button>
+            <Button className="flex-1">
+              {props.defaultValue ? "Cập nhật sản phẩm" : "Thêm sản phẩm"}{" "}
+              {form.getValues("isDraft") ? " (nháp)" : ""}
+            </Button>
           </div>
         </div>
       </form>

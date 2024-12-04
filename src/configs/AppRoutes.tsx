@@ -27,6 +27,7 @@ import CartPage from "../components/pages/Cart";
 import PurchaseLayout from "../components/pages/purchase/PurchaseLayout";
 import PurchaseReview from "../components/pages/purchase/PurchaseReview";
 import PurchaseChoose from "../components/pages/purchase/PurchaseChoose";
+import PurchaseFailed from "../components/pages/purchase/PurchaseFailed";
 import BannerPage from "@/AdminPage/BannerPage";
 import CategoryPage from "@/AdminPage/CategoryPage";
 import Blog from "../components/pages/Blog";
@@ -84,6 +85,7 @@ const UserRoute: React.FC = () => {
           <Route path="/payment/choose" element={<PurchaseChoose />} />
           <Route path="/payment/process" element={<PurchaseChoose />} />
           <Route path="/payment/status" element={<PurchaseChoose />} />
+          <Route path="/payment/failed" element={<PurchaseFailed />} />
         </Route>
       </main>
     </Routes>

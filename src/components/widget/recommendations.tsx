@@ -22,7 +22,7 @@ export default function Recommendations(props: {cate: string, currentId: string}
     useEffect(() => {
         getProducts();
     }, [])
-    return !products ? <SkeletonLoadingProductGrid/> : products.length != 0 ? <div className="grid grid-cols-4">
+    return !products ? <SkeletonLoadingProductGrid/> : products.length != 0 ? <div className="grid grid-cols-2 md:grid-cols-4">
         {
             products.map((e) => {
                 return <ProductItem {...e} />

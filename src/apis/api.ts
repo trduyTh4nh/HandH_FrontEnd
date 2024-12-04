@@ -10,8 +10,6 @@ class API {
 
   constructor({ headerType = "json" }: { headerType?: "json" | "formdata" }) {
     const url = import.meta.env.VITE_API_URL;
-    console.log(url);
-
     let headers = {
       "Content-Type": "application/json",
     };
@@ -57,7 +55,6 @@ class API {
     );
   }
   public async get<T>(url: string, params?: object): Promise<T> {
-    console.log(params);
     const response = await this.axiosInstance.get<T>(url, { params });
     return response.data;
   }

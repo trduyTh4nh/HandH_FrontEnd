@@ -9,6 +9,7 @@ import {
   LogOutIcon,
   Megaphone,
   MegaphoneIcon,
+  NotebookPen,
   ShirtIcon,
   ShoppingBagIcon,
   Store,
@@ -69,11 +70,7 @@ const SideBar = (props: SideBarProps) => {
                   path: "/admin/customersManage",
                   icon: UsersIcon,
                 },
-                {
-                  name: "Tài chính",
-                  path: "/admin/financeManage",
-                  icon: DollarSignIcon,
-                },
+                
                 {
                   name: "Biển quảng cáo",
                   path: "/admin/bannerManage",
@@ -85,7 +82,12 @@ const SideBar = (props: SideBarProps) => {
                   icon: CopyIcon,
                 },
                 {
-                  name: "Quay về trang chính",
+                  name: "Bài đăng",
+                  path: "/admin/blog",
+                  icon: NotebookPen,
+                },
+                {
+                  name: "Quay về trang chủ",
                   path: "/",
                   icon: Store,
                 },

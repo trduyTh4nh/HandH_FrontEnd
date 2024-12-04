@@ -13,9 +13,10 @@ export interface IUser {
   email?: string;
   password?: string;
   name?: string;
-  birthDay?: Date;
+  birthDay?: Date | string;
   phone?: string;
   userAddress?: IUserAddress;
   role?: string;
-  avatar?: string;
+  avatar?: string | File;
+  createdAt?: string
 }

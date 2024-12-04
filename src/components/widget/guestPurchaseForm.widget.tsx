@@ -88,7 +88,7 @@ export default function GuestPurchaseForm(props: GuestPurchaseFormProps) {
   }, []);
   return (
     <>
-      <b>Thông tin khách hàng</b>
+      <b>Thông tin cá nhân</b>
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
@@ -156,6 +156,9 @@ export default function GuestPurchaseForm(props: GuestPurchaseFormProps) {
               </FormItem>
             )}
           ></FormField>
+      <b>Thông tin giao hàng</b>
+      <p>Cửa hàng chỉ giao hàng trong khu vực trung tâm thành phố. Không tính phí giao hàng</p>
+
           <div className="flex gap-2">
             <FormField
               control={form.control}
@@ -224,7 +227,7 @@ export default function GuestPurchaseForm(props: GuestPurchaseFormProps) {
                 </FormItem>
               )}
             ></FormField>
-          <Button type="submit">Tiếp theo</Button>
+          <Button className="font-bold" type="submit">Tiếp theo</Button>
         </form>
       </Form>
       {/* <div className="flex gap-2">

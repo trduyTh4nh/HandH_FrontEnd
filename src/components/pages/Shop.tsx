@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "../../styles/shop.css";
 
 import ZoomInMapIcon from "@mui/icons-material/ZoomInMap";
@@ -16,6 +16,10 @@ import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 import { getProduct } from "@/apis/products/product-repo";
 import PaginationControls from "../widget/PaginationsControl";
+import Footer from "../widget/footer";
+import { useMediaQuery } from "react-responsive";
+import { Filter } from "lucide-react";
+import {Helmet} from "react-helmet";
 type PriceFilter = {
   id: number;
   price: number;
@@ -32,6 +36,9 @@ export type Size = {
 };
 
 const Shop: React.FC = () => {
+  const isMobile = useMediaQuery({
+    query: "(max-width: 768px)",
+  })
   async function getProducts() {
     const products = await getProduct();
     setMaximumPageCount(products.metadata.length);
@@ -141,11 +148,13 @@ const Shop: React.FC = () => {
     });
   };
 
-  const [showNav, setShowNav] = React.useState(true);
+  const [showNav, setShowNav] = React.useState(!isMobile);
   const handleShow = () => {
     setShowNav(!showNav);
   };
-
+  useEffect(() => {
+    setShowNav(!isMobile);
+  }, [isMobile])
   function changeSelected(element: any, array: Array<any>, value: boolean) {
     return array.map((e) => {
       if (e == element) {
@@ -215,23 +224,26 @@ const Shop: React.FC = () => {
 
   return (
     <>
+      <Helmet>
+        <title>Cửa hàng - Áo Dài Hồng Đức</title>
+      </Helmet>
       <div
         className={`shop pb-20 ${
-          showNav ? "pl-20" : "pl-4"
-        } transition-all pr-20 w-screen`}
+          showNav && !isMobile ? "pl-10 md:pl-20" : "pl-10 md:pl-4"
+        } transition-all pr-10 md:pr-10 w-screen`}
       >
         <div className="wrap-shop justify-between flex">
           <div
             className={`shop-filter mt-2 mb-2 ${
-              showNav ? "" : "flex-none w-16"
-            } transition-all duration-300 top-16 h-screen relative`}
+              showNav && !isMobile ? "" : "flex-none w-16"
+            } transition-all duration-300 top-16 h-screen relative max-md:w-0`}
             // style={{
             //     flex: showNav ? 1 : 0
             // }}
           >
-            <div className="shop-filter_wrap box-border fixed z-10 flex top-0 flex-col w-[15%] gap-2  overflow-auto pt-[11.2rem] pb-4">
+            <div className="shop-filter_wrap box-border fixed z-10 flex top-0 flex-col w-[50%] md:w-[15%] gap-2 overflow-auto pt-[4.675rem] md:pt-[11.2rem] pb-4">
               <div
-                className={`filer-hide-btn ${
+                className={`filer-hide-btn bg-background ${
                   showNav ? "w-full" : "w-fit"
                 }
                             gap-4 items-center 
@@ -249,21 +261,22 @@ const Shop: React.FC = () => {
                   {showNav ? (
                     <ZoomInMapIcon className=""></ZoomInMapIcon>
                   ) : (
-                    <ZoomOutMapIcon></ZoomOutMapIcon>
+                    <Filter></Filter>
                   )}
                 </div>
-                {showNav ? <p>Ẩn</p> : null}
+                {showNav ? <p>Ẩn</p> : <p>Lọc sản phẩm</p>}
               </div>
 
               {transition(
                 (styles, showNav) =>
                   showNav && (
                     <animated.div style={styles} className="Sidebar">
-                      <div className="fliter-body bg-white flex flex-col gap-4 pr-4 border-r border-r-gray-300">
+                      <div className="fliter-body bg-background/85 backdrop-blur-xl flex flex-col gap-4 pr-4 border-r rounded-r-2xl border-r-gray-300">
                         <div className="child-title text-[1.2rem] font-bold">
                           <p>Giá</p>
                         </div>
                         <Select
+                          
                           onValueChange={(val) =>
                             handlePickPrice(parseInt(val))
                           }
@@ -432,7 +445,7 @@ const Shop: React.FC = () => {
             </div>
           </div>
 
-          <div className="shop-product h- screen">
+          <div className="shop-product screen">
             <ProductComponentShop
               take={take}
               skip={page}

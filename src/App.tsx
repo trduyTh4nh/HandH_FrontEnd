@@ -23,6 +23,7 @@ import Delivering from "./components/cpn_history/Delivering";
 import Delivered from "./components/cpn_history/Delivered";
 import Received from "./components/cpn_history/Received";
 import Canceled from "./components/cpn_history/Canceled";
+import PurchaseFailed from "./components/pages/purchase/PurchaseFailed";
 import Product from "./components/pages/Product";
 import CartPage from "./components/pages/Cart";
 import PurchaseLayout from "./components/pages/purchase/PurchaseLayout";
@@ -41,20 +42,31 @@ import { Dialog, DialogContent, DialogTrigger } from "./components/ui/dialog";
 import PopupComponent from "./components/widget/popUpComponent";
 import { getLoggedInUser, UnauthenticatedError } from "./apis/user/user-repo";
 import { AxiosError } from "axios";
-
+import AboutUs from "./components/pages/AboutUs";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { UserContext } from "./components/contexts/UserContext";
 import { IUser } from "./types/user.type";
+import PurchaseProcess from "./components/pages/purchase/PurchaseProcess";
+import PurchaseFinish from "./components/pages/purchase/PurchaseFinish";
+import { Provider } from "react-redux";
+import { CartProvider } from "./providers/CartContext";
+
+import TermsAndConditions from "@/components/pages/TermsAndConditions";
+import BlogPage from "./AdminPage/BlogPage";
+import { useTransition, animated } from "react-spring";
+import SelectionButton from "./components/widget/selectionButton.widget";
+import { AccountBalanceOutlined } from "@mui/icons-material";
+import LogoutPage from "./AdminPage/LogoutPage";
 const queryClient = new QueryClient();
 const AdminRoute: React.FC = () => {
   const [isUserValid, setUserValid] = useState(false);
   const [login, setLogin] = useState(false);
   const [checkingAuth, setCheckingAuth] = useState(true);
   const [loginStatus, setLoginStatus] = useState(false);
-  const {user, setUser} = useContext(UserContext);
+  const { user, setUser, isLoading } = useContext(UserContext);
   async function checkUser() {
-      setUserValid(user && user.role[0] == "3107");
-      setCheckingAuth(false)
+    setUserValid(user && user.role[0] == "3107");
+    setCheckingAuth(false);
   }
   useEffect(() => {
     checkUser();
@@ -71,28 +83,30 @@ const AdminRoute: React.FC = () => {
           <Routes>
             <Route path="/" element={<Dashboard />} />
             <Route path="/productsManage" element={<ProductPage />} />
+            <Route path="/blog" element={<BlogPage />} />
             <Route path="/ordersManage" element={<OrderPage />} />
             <Route path="/customersManage" element={<CustomerPage />} />
             <Route path="/financeManage" element={<FinancePage />} />
             <Route path="/bannerManage" element={<BannerPage />} />
             <Route path="/categoryManage" element={<CategoryPage />} />
+            <Route path="/logout" element={<LogoutPage />} />
           </Routes>
         ) : (
           <ErrorView
             className="h-screen"
             title={
-              !checkingAuth
+              !isLoading
                 ? "Bạn không có quyền truy cập vào trang này"
                 : "Đang kiểm tra quyền của bạn..."
             }
             message={
-              !checkingAuth
+              !isLoading
                 ? "Vui lòng đăng nhập với tư cách là quản trị viên để có thể truy cập."
                 : "Đợi chút nhé, chúng tôi đang kiểm tra quyền hạn của bạn..."
             }
-            icon={!checkingAuth ? "notallowed" : "loading"}
+            icon={!isLoading ? "notallowed" : "loading"}
           >
-            {!checkingAuth ? (
+            {!isLoading ? (
               <div className="flex gap-2">
                 <Link to={"/"}>
                   <Button>Quay lại</Button>
@@ -120,7 +134,20 @@ const AdminRoute: React.FC = () => {
 
 const UserRoute: React.FC = () => {
   return (
-    <div className="flex-grow flex mt-[5rem] md:mt-[10.2rem]">
+    <div className="flex-grow flex mt-[4.625rem] md:mt-[10.2rem]">
+      <div
+        className="fixed h-24 w-24 bottom-4 right-4 z-50 p-4 cursor-pointer group"
+        onClick={() => (window.location.href = "https://zalo.me/0909893395")}
+      >
+        <img
+          src="/src/assets/image/icon_zalo.png"
+          className="w-full h-full object-cover transition-transform duration-200 transform group-hover:scale-110"
+          alt="Zalo Icon"
+        />
+        <div className="absolute  text-black bg-white rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+          Tư vấn
+        </div>
+      </div>
       <Navbar />
       <Toaster />
       <Routes>
@@ -129,7 +156,8 @@ const UserRoute: React.FC = () => {
         <Route path="/shop" element={<Shop />} />
         <Route path="/blog" element={<Blog />} />
         <Route path="/management" element={<Management />} />
-        <Route path="/managerAccount" element={<ManagerAccount />}>
+        <Route path="/aboutUs" element={<AboutUs />} />
+        <Route path="/user" element={<ManagerAccount />}>
           <Route index element={<Account />} />
           <Route path="account" element={<Account />} />
           <Route path="paymentHistory" element={<PaymentHistory />}>
@@ -144,13 +172,16 @@ const UserRoute: React.FC = () => {
           </Route>
           <Route path="favoriteProduct" element={<FavoriteProduct />} />
         </Route>
+        <Route path="/termAndConditions" element={<TermsAndConditions />} />
+
         <Route path="/product/:id" element={<Product />} />
         <Route path="/cart" element={<CartPage />} />
         <Route path="/payment" element={<PurchaseLayout />}>
           <Route path="/payment/" element={<PurchaseReview />} />
           <Route path="/payment/choose" element={<PurchaseChoose />} />
-          <Route path="/payment/process" element={<PurchaseChoose />} />
-          <Route path="/payment/status" element={<PurchaseChoose />} />
+          <Route path="/payment/process" element={<PurchaseProcess />} />
+          <Route path="/payment/status" element={<PurchaseFinish />} />
+          <Route path="/payment/failed" element={<PurchaseFailed />} />
         </Route>
         <Route path="/test" element={<Test />} />
       </Routes>
@@ -160,6 +191,21 @@ const UserRoute: React.FC = () => {
 const App = () => {
   const [user, setUser] = useState<IUser>(null);
   const [loading, setLoading] = useState<boolean>(false);
+  const [showTooltip, setShowTooltip] = useState(false);
+  const [showGrayComponent, setShowGrayComponent] = useState(false);
+  const transitions = useTransition(showTooltip, {
+    from: { opacity: 0, transform: "translateY(10px)" },
+    enter: { opacity: 1, transform: "translateY(0px)" },
+    leave: { opacity: 0, transform: "translateY(10px)" },
+    config: { tension: 170, friction: 20 },
+  });
+  // Transition cho Component màu xám khi click
+  // const grayComponentTransitions = useTransition(showGrayComponent, {
+  //   from: { opacity: 0 },
+  //   enter: { opacity: 1 },
+  //   leave: { opacity: 0 },
+  //   config: { tension: 170, friction: 20 },
+  // });
   async function getUser() {
     try {
       setLoading(true);
@@ -167,36 +213,40 @@ const App = () => {
       setUser(user);
     } catch (e) {
       if (e instanceof AxiosError) {
-        setLoading(false)
+        setLoading(false);
         return;
       }
       if (e instanceof UnauthenticatedError) {
-        setLoading(false)
+        setLoading(false);
         return;
       }
-      setLoading(false)
+      setLoading(false);
       return;
     }
-    setLoading(false)
+    setLoading(false);
   }
   useEffect(() => {
     getUser();
-  }, [])
+  }, []);
   return (
     <QueryClientProvider client={queryClient}>
-      <UserContext.Provider value={{
-        user: user,
-        setUser: setUser,
-        isLoading: loading
-      }}>
-        <Router>
-          <div className="flex flex-col min-h-screen w-full">
-            <Routes>
-              <Route path="/*" element={<UserRoute />} />
-              <Route path="/admin/*" element={<AdminRoute />} />{" "}
-            </Routes>
-          </div>
-        </Router>
+      <UserContext.Provider
+        value={{
+          user: user,
+          setUser: setUser,
+          isLoading: loading,
+        }}
+      >
+        <CartProvider>
+          <Router>
+            <div className="flex flex-col min-h-screen w-full">
+              <Routes>
+                <Route path="/*" element={<UserRoute />} />
+                <Route path="/admin/*" element={<AdminRoute />} />{" "}
+              </Routes>
+            </div>
+          </Router>
+        </CartProvider>
       </UserContext.Provider>
     </QueryClientProvider>
   );

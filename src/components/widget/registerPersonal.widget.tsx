@@ -22,7 +22,7 @@ const registerSchema = z
   .object({
     fullName: z
       .string({ required_error: "Họ tên không được bỏ trống" })
-      .min(2, { message: "Họ tên phải có ít nhất 2 ký tự" }),
+      .min(2, { message: "Họ tên phải có ít nhất 2 ký tự" }).max(128, {message: "Họ tên không được quá 128 ký tự"}),
     email: z
       .string({ required_error: "Email không được bỏ trống" })
       .email({ message: "Email không hợp lệ" }),
