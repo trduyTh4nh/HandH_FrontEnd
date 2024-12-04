@@ -16,9 +16,7 @@ const boxCategory: React.FC<ICategory> = (props) => {
                     <div className="name-cate">
                         <p className="text-black font-bold">{category_name}</p>
                     </div>
-                    <div className="total-cate">
-                        <p className="text-gray-400 text-sm">{category_total} sản phẩm liên quan</p>
-                    </div>
+                    
                 </div>
             </div>
             

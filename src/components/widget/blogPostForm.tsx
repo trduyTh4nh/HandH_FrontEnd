@@ -19,30 +19,61 @@ import { createPost } from "@/apis/blog/blog-repo";
 import { UserContext } from "../contexts/UserContext";
 import { AxiosError } from "axios";
 import { useToast } from "@/hooks/use-toast";
-
+import { IBlogPost } from "@/types/blog.type";
+import * as blogRepo from "@/apis/blog/blog-repo";
 const blogFormSchema = z.object({
-  content: z.string().max(25000).optional(),
+  content: z
+    .string({ required_error: "Vui lòng nhập nội dung bài viết" })
+    .max(25000),
 });
 export type BlogPostSchema = z.infer<typeof blogFormSchema>;
 type BlogPostFormProps = {
-  defaultValues?: BlogPostSchema;
+  defaultValues?: IBlogPost;
   images?: string[] | File[] | null;
-  onSubmit?: (post: BlogPostSchema) => void;
+  onSubmit?: (post: IBlogPost) => void;
+  onUpdate?: (post: IBlogPost) => void;
 };
 export default function BlogPostForm(props: BlogPostFormProps) {
+  const oldBlogPost = props.defaultValues;
   const form = useForm({
     resolver: zodResolver(blogFormSchema),
-    defaultValues: props.defaultValues,
+    defaultValues: {
+      content: props.defaultValues?.content || "",
+    },
   });
   const { user } = useContext(UserContext);
   const [loading, setLoading] = useState(false);
-  const [images, setImages] = useState<File[] | null>([]);
+  const [images, setImages] = useState<(File | string)[] | null>(
+    props.defaultValues ? (props.defaultValues.images as string[]) : []
+  );
+  const [arrPositionImage, setArrPositionImage] = useState<number[]>([]);
+  async function updatePost(data: BlogPostSchema) {
+    if(!props.defaultValues || oldBlogPost.content == form.getValues("content") && oldBlogPost.images == images)
+      return;
+    setLoading(true);
+    const updatedImages = arrPositionImage.map((i) => images[i]);
+    const res = await blogRepo.updatePost(props.defaultValues._id, data.content, updatedImages as File[], arrPositionImage)
+    if(res instanceof AxiosError){
+      setLoading(false);
+      return;
+    }
+    props.onUpdate({
+      _id: props.defaultValues._id,
+      author: user._id,
+      createdAt: props.defaultValues.createdAt,
+      updatedAt: new Date().toISOString(),
+      content: data.content,
+      images: images.map((e) => e instanceof File ? URL.createObjectURL(e) : e),
+    })
+    setLoading(false);
+  }
   function removeImage(index: number) {
     if (!images) return;
     const newImages = images.filter((_, i) => i !== index);
+    setArrPositionImage([...arrPositionImage, index]);
     setImages(newImages);
   }
-  const {toast} = useToast()
+  const { toast } = useToast();
   function addImages(file: FileList) {
     const files = Array.from(file);
     if (images.length + files.length > 20) {
@@ -58,20 +89,37 @@ export default function BlogPostForm(props: BlogPostFormProps) {
       ...files.filter((e, index) => index + images.length + 1 <= 20),
     ]);
   }
+  function editImagePost(index: number, newImage: File) {
+    const newImages = images.map((e, i) => (i === index ? newImage : e));
+    setImages(newImages);
+    if (!arrPositionImage.includes(index)) {
+      setArrPositionImage([...arrPositionImage, index]);
+    }
+  }
   async function uploadBlogPost(data: BlogPostSchema) {
     setLoading(true);
-    const res = await createPost(data.content, images, user._id);
-    console.log(res)
+    const res = await createPost(data.content, images as File[], user._id);
+    console.log(res);
     if (res instanceof AxiosError) {
       setLoading(false);
       return;
     }
     setLoading(false);
-    props.onSubmit(data);
+    props.onSubmit({
+      _id: "createdPost",
+      content: data.content,
+      author: user._id,
+      images: images
+        ? images.map((e) =>
+            e instanceof File ? URL.createObjectURL(e) : (e as string)
+          )
+        : [],
+      createdAt: new Date().toISOString(),
+    });
   }
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(uploadBlogPost)}>
+      <form onSubmit={form.handleSubmit(props.defaultValues ? updatePost : uploadBlogPost)}>
         <FormField
           control={form.control}
           name="content"
@@ -99,21 +147,39 @@ export default function BlogPostForm(props: BlogPostFormProps) {
         >
           {images && images.length > 0 ? (
             images.map((e, index) => (
-              <div key={e.name} className="flex justify-center items-center px-4 py-8 border-gray-200 border rounded-xl relative">
-                <Button
-                  type="button"
-                  onClick={() => {
-                    removeImage(index);
+              <div
+                key={index}
+                className="flex justify-center items-center px-4 py-8 border-gray-200 border rounded-xl relative"
+              >
+                {!props.defaultValues && (
+                  <Button
+                    type="button"
+                    onClick={() => {
+                      removeImage(index);
+                    }}
+                    variant="secondary"
+                    className="absolute right-2 top-2 bg-secondary/80 backdrop-blur-lg"
+                  >
+                    <Trash2 width={16} height={16} className="text-red-400" />
+                  </Button>
+                )}
+                <label htmlFor={`imginput-${index}`} className="cursor-pointer">
+                  <img
+                    src={
+                      e instanceof File ? URL.createObjectURL(e) : (e as string)
+                    }
+                    key={index}
+                    className="h-24 object-contain rounded-lg"
+                  />
+                </label>
+                <input
+                  type="file"
+                  className="hidden"
+                  id={`imginput-${index}`}
+                  accept="image/*"
+                  onChange={(e) => {
+                    editImagePost(index, e.target.files![0]);
                   }}
-                  variant="secondary"
-                  className="absolute right-2 top-2 bg-secondary/80 backdrop-blur-lg"
-                >
-                  <Trash2 width={16} height={16} className="text-red-400" />
-                </Button>
-                <img
-                  src={URL.createObjectURL(e)}
-                  key={index}
-                  className="h-24 object-contain rounded-lg"
                 />
               </div>
             ))
@@ -123,15 +189,18 @@ export default function BlogPostForm(props: BlogPostFormProps) {
               <p>Ấn vào để đăng tải 1 hoặc nhiều hình ảnh.</p>
             </>
           )}
-          {images && images.length != 0 && images.length != 20 && (
-            <label
-              htmlFor="images"
-              className="flex justify-center flex-col gap-2 border-gray-200 border items-center px-4 py-8 rounded-2xl relative h-full"
-            >
-              <Plus />
-              <p>Thêm hình</p>
-            </label>
-          )}
+          {images &&
+            images.length != 0 &&
+            images.length != 20 &&
+            !props.defaultValues && (
+              <label
+                htmlFor="images"
+                className="flex justify-center flex-col gap-2 border-gray-200 border items-center px-4 py-8 rounded-2xl relative h-full"
+              >
+                <Plus />
+                <p>Thêm hình</p>
+              </label>
+            )}
         </label>
         <Label>{images ? images.length : 0} / 20 hình ảnh</Label>
         <input
@@ -156,6 +225,8 @@ export default function BlogPostForm(props: BlogPostFormProps) {
                 <Loader className="animate-spin" />
                 Đang đăng bài
               </div>
+            ) : props.defaultValues ? (
+              "Cập nhật"
             ) : (
               "Đăng bài"
             )}

@@ -1,4 +1,4 @@
-import { NavLink, useNavigate } from "react-router-dom";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import "../../styles/styles.css";
 
 import React, { useEffect } from "react";
@@ -35,10 +35,13 @@ import {
 import {
   ChevronRight,
   Heart,
+  Home,
   Loader,
   LogOut,
+  Newspaper,
   ReceiptText,
   Shield,
+  Store,
   User,
   UserCircle,
 } from "lucide-react";
@@ -49,10 +52,36 @@ import { useToast } from "@/hooks/use-toast";
 import { UserContext } from "../contexts/UserContext";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { getCate } from "@/apis/cate/cate-repo";
+import {
+  Sheet,
+  SheetClose,
+  SheetContent,
+  SheetHeader,
+  SheetTrigger,
+} from "../ui/sheet";
+import { Link } from "react-router-dom";
+import { Separator } from "../ui/separator";
 // import { duration } from "@mui/material";
-
+const navLinks = [
+  {
+    path: "/",
+    title: "Trang chủ",
+    icon: <Home />,
+  },
+  {
+    path: "/shop",
+    title: "Cửa hàng",
+    icon: <Store />,
+  },
+  {
+    path: "/blog",
+    title: "Hoạt động",
+    icon: <Newspaper />,
+  },
+];
 const Navbar: React.FC = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [showCate, setShowCate] = React.useState(false);
   const [showLogoutConfirm, setShowLogoutConfirm] = React.useState(false);
   const transitions = useTransition(showCate, {
@@ -64,6 +93,7 @@ const Navbar: React.FC = () => {
       friction: 14,
     },
   });
+  const [showSheet, setShowSheet] = React.useState(false);
   const [cates, setCates] = React.useState<ICategory[]>(null);
   const [login, setLogin] = React.useState(false);
   const [register, setRegister] = React.useState(false);
@@ -76,8 +106,8 @@ const Navbar: React.FC = () => {
   });
   const { toast } = useToast();
   async function getCategories() {
-    const res = await getCate()
-    setCates(res.metadata)
+    const res = await getCate();
+    setCates(res.metadata);
   }
   useEffect(() => {
     if (isLoading) {
@@ -165,12 +195,44 @@ const Navbar: React.FC = () => {
       <div className="flex mx-auto px-10 md:px-20 py-4 justify-between items-center">
         <div className="flex justify-start gap-4 items-center">
           <div className="flex-shrink-0 flex items-center gap-2">
-            <Button variant="ghost" className="block md:hidden bg-transparent">
-              <Menu></Menu>
-            </Button>
+            <Sheet open={showSheet} onOpenChange={setShowSheet}>
+              <SheetTrigger>
+                <Button
+                  variant="ghost"
+                  className="px-2 md:hidden bg-transparent"
+                >
+                  <Menu></Menu>
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="left" className="space-y-4">
+                <div className="flex flex-col gap-2">
+                  {navLinks.map((e, index) => (
+                    <SheetClose>
+                      <Link
+                        onClick={() => setShowSheet(false)}
+                        to={e.path}
+                        className={`flex gap-4 items-center p-2 no-underline rounded-full hover:bg-gray-100 ${
+                          location.pathname == e.path ? "bg-primary-light" : ""
+                        }`}
+                      >
+                        {e.icon}
+                        <p>{e.title}</p>
+                      </Link>
+                    </SheetClose>
+                  ))}
+                </div>
+                <Separator className="w-full" />
+                <div>
+                  {cates &&
+                    cates.map((category: ICategory, index) => (
+                      <div key={index}>{boxCategory(category)}</div>
+                    ))}
+                </div>
+              </SheetContent>
+            </Sheet>
             <NavLink to="/">
               <img
-                className="w-auto h-12"
+                className="w-auto h-10 md:h-12"
                 src="/src/assets/image/logo_header.svg"
                 alt="Logo"
               />
@@ -257,7 +319,9 @@ const Navbar: React.FC = () => {
                     Xin chào, {user.name}!
                     <Avatar className="w-8 h-8">
                       <AvatarImage src={user.avatar as string}></AvatarImage>
-                      <AvatarFallback><UserCircle width={16} height={16}/></AvatarFallback>
+                      <AvatarFallback>
+                        <UserCircle width={16} height={16} />
+                      </AvatarFallback>
                     </Avatar>
                   </div>
                 </DropdownMenuTrigger>
@@ -292,7 +356,7 @@ const Navbar: React.FC = () => {
                       <ReceiptText className="w-4 h-4" />
                       <p className="flex-1">Lịch sử mua hàng</p>
                     </DropdownMenuItem>
-                    {user.role == '3107' ? (
+                    {user.role == "3107" ? (
                       <DropdownMenuItem
                         className="flex gap-2"
                         onClick={() => {

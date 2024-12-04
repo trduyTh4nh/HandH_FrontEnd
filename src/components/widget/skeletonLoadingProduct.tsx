@@ -2,11 +2,11 @@ import { Skeleton } from "../ui/skeleton";
 
 export default function SkeletonLoadingProduct() {
   return (
-    <div className="pt-4 product_main flex flex-1 gap-8 px-48 pb-10 justify-stretch relative box-border">
-      <div className="w-1/2 flex">
-        <Skeleton className="flex-1 w-full rounded-lg h-[670px]" />
+    <div className="product_main flex flex-col md:flex-row flex-1 gap-8 px-10 md:px-48 pb-10 w-full relative box-border">
+      <div className="w-full md:w-1/2 flex">
+        <Skeleton className="flex-1 w-full rounded-lg h-[550px] md:h-[670px]" />
       </div>
-      <div className="flex flex-col gap-4 sticky top-[11.5rem] self-start w-1/2">
+      <div className="flex flex-col gap-4 sticky top-[11.5rem] self-start w-full md:w-1/2">
         <div className="flex flex-col gap-1">
           <Skeleton className="h-[3.2rem] w-full" />
           <Skeleton className="h-[1.875rem] w-44" />

@@ -36,11 +36,29 @@ export async function addCate(newCategory:ICategory) {
     const response = await api.post('category', {
       category: newCategory,
     });
+    console.log(response);
     return response;
   } catch (error) {
     const e = error as AxiosError;
     console.log(e)
     return error;
+  } 
+}
+export async function deleteCate(id: string) {
+  try {
+    const response = await api.delete(`category/${id}`);
+    return response;
+  } catch (error) {
+    console.log(error);
+    return error;
   }
-  
+}
+export async function updateCate(id: string, updatedCategory: ICategory) {
+  try {
+    const response = await api.put(`category/${id}`, updatedCategory);
+    return response;
+  } catch (error) {
+    console.error(error);
+    return error;
+  }
 }

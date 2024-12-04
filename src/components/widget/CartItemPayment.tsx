@@ -1,9 +1,10 @@
 import React from "react";
 import { ICartDetail } from "../../types/cart.type";
 import { Add, Remove } from "@mui/icons-material";
+import { convertHextoColorName, convertMoneyP2 } from "@/utils";
 
 const CartItemPayMent: React.FC<ICartDetail> = (props) => {
-    const { product, quantity, colorPicked, sizePicked }: any = props;
+    const { product, quantity, colorPicked, sizePicked, priceCartDetail }: any = props;
     
     return (
         <div className="cart-item border-b py-4 -z-10">
@@ -11,22 +12,22 @@ const CartItemPayMent: React.FC<ICartDetail> = (props) => {
                 <div className="cart-item_wrap-left flex items-center gap-4 w-full">
                     <div className="cart-item_wrap-image py-4 ">
                         {/* <img src={product.product_thumb as string} className=" md:w-40 " alt="" /> */}
-                        <img src={"https://lamia.com.vn/storage/dam/dam-co-yem-tre-vai-phoi-hoa-ld251-8-1.jpg"} className=" md:w-40 rounded-xl" alt="" />
+                        <img src={product.thumb_product} className=" md:w-40 rounded-xl" alt="" />
                     </div>
                     <div className="wrap-mid-cart-info flex w-full flex-col">
                         <div className="cart-item_wrap-infomation">
                             <div className="info-name">
-                                <h3 className="text-lg font-bold">{product.product_name}</h3>
+                                <h3 className="text-lg font-bold">{product.name_product}</h3>
                             </div>
                             <div className="info-cate py-2  ">
                                 <p>{product.product_category}</p>
                             </div>
                         </div>
                         <div className="cart-item_wrap_variant flex items-center gap-4">
-                            <div className="variant-size bg-black text-white w-[70px] px-4 py-1 rounded-full text-center">{sizePicked}</div>
+                            <div className="variant-size bg-black text-white w-[70px] px-4 py-1 rounded-full text-center">{sizePicked.size}</div>
                                 <div className="bg-[#E8E8E8] flex flex-row items-center py-2 px-5 rounded-3xl ">
-                                    <div className="variant-color w-4 h-4  rounded-full" style={{ backgroundColor: colorPicked }}></div>
-                                    <p className="font-bold ml-2">Xanh dương</p>
+                                    <div className="variant-color w-4 h-4  rounded-full" style={{ backgroundColor: colorPicked.color }}></div>
+                                    <p className="font-bold ml-2">{convertHextoColorName(colorPicked.color)}</p>
                                 </div>
                         </div>
                     </div>
@@ -38,8 +39,7 @@ const CartItemPayMent: React.FC<ICartDetail> = (props) => {
                         <p className="w-12 text-center">x{quantity}</p>
                     </div>
                     <div className="cart-item_price flex gap-1 items-center px-4 py-3">
-                        <p className="text-xl md:text-[24px] font-bold">{(product.product_price * quantity)}</p>
-                        <span className="text-xl md:text-[24px] font-bold">đồng</span>
+                        <p className="text-xl md:text-[24px] font-bold">{(convertMoneyP2(priceCartDetail * quantity))}</p>
                     </div>
                    
                     
