@@ -37,15 +37,14 @@ export const ManagerAccount: React.FC = () => {
   return (
     <>
       {!isLoading && !user ? (
-        
-          <ErrorView
-            title="Bạn chưa đăng nhập"
-            message="Vui lòng đăng nhập để quản lý tài khoản cá nhân và đơn hàng."
-            icon="notallowed">
-              <b>Bạn muốn kiểm tra tình trạng đơn hàng?</b>
-              <Button>Kiểm tra tình trạng đơn hàng</Button>
-            </ErrorView>
-        
+        <ErrorView
+          title="Bạn chưa đăng nhập"
+          message="Vui lòng đăng nhập để quản lý tài khoản cá nhân và đơn hàng."
+          icon="notallowed"
+        >
+          <b>Bạn muốn kiểm tra tình trạng đơn hàng?</b>
+          <Button>Kiểm tra tình trạng đơn hàng</Button>
+        </ErrorView>
       ) : (
         <>
           <div className="fixed h-full top-0 pt-[11.2rem] pb-8 pl-20 pr-8 box-border">
@@ -64,10 +63,12 @@ export const ManagerAccount: React.FC = () => {
                     <img
                       src={user.avatar as string}
                       alt="Profile"
-                      className="w-12 h-12 rounded-full"
+                      className="w-12 h-12 rounded-full object-cover"
                     />
                     <div className="w-full">
-                      <h3 className="text-lg font-bold text-ellipsis w-full break-all line-clamp-2 hover:line-clamp-none">{user.name}</h3>
+                      <h3 className="text-lg font-bold text-ellipsis w-full break-all line-clamp-2 hover:line-clamp-none">
+                        {user.name}
+                      </h3>
                       <p className="text-sm text-gray-500">
                         {user.role == "3107" ? "Quản trị viên" : "Khách hàng"}
                       </p>
