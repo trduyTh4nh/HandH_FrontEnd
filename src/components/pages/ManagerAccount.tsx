@@ -26,11 +26,6 @@ const navLinks = [
     icon: <History />,
     display: "Lịch sử mua hàng",
   },
-  {
-    path: "pendingOrder",
-    icon: <ReceiptText />,
-    display: "Đơn hàng đang chờ",
-  },
 ];
 export const ManagerAccount: React.FC = () => {
   const { user, setUser, isLoading } = useContext(UserContext);
@@ -48,8 +43,8 @@ export const ManagerAccount: React.FC = () => {
         
       ) : (
         <>
-          <div className="fixed h-full top-0 pt-[11.2rem] pb-8 pl-20 pr-8 box-border">
-            <div className="bg-primary-light h-full w-96 rounded-2xl border border-gray-100 p-4 heght-div1 box-border">
+          <div className="fixed h-full top-0 pt-[11.2rem] pb-8 pl-20 pr-8 max-sm:p-0 box-border">
+            <div className="hidden md:block bg-primary-light h-full w-0 md:w-96 rounded-2xl border border-gray-100 p-4 heght-div1 box-border">
               <div className="flex items-center p-2 gap-4 mb-2 w-full">
                 {isLoading || !user ? (
                   <>
@@ -94,14 +89,10 @@ export const ManagerAccount: React.FC = () => {
                   </li>
                 ))}
               </ul>
-              <button className="flex items-center gap-4 border border-transparent w-full box-border no-underline transition-all rounded-full p-3">
-                <LogOut />
-                <p>Đăng xuất</p>
-              </button>
             </div>
           </div>
-          <div className="flex flex-grow flex-1 mx-20">
-            <div className="w-96 p-48"></div>
+          <div className="flex flex-grow flex-1 md:mx-20">
+            <div className="md:block hidden w-96 p-48"></div>
             <div className="w-full">
               <Outlet />
             </div>
