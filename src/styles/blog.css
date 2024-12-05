@@ -234,15 +234,15 @@
 
 @media (max-width: 768px) {
   .containe-center {
-    width: 100vh;
+    width: 100%;
     padding: 0;
   }
   .header {
-    padding: 0 1rem !important;
+    padding: 0 2.5rem !important;
     margin-bottom: 1rem;
   }
   .entire-page {
-    padding: 1rem;
+    padding: 1rem 2.5rem;
   }
   .header-blog {
     display: flex;
@@ -255,25 +255,25 @@
     margin-top: 1rem;
   }
   .post-title p {
-    font-size: 2rem;
+    font-size: 1rem;
   }
   .post-header-title p {
-    font-size: 2rem;
+    font-size: 1rem;
   }
   .post-header-right svg {
     transform: scale(1.6);
   }
   .post-header-title {
-    margin-left: 2rem;
+    margin-left: 1rem;
   }
   .post-header-title p {
-    font-size: 2rem !important;
+    font-size: 1rem !important;
   }
   .post-header-right {
     align-items: center;
   }
   .quanity-name {
-    font-size: 2rem;
+    font-size: 1rem;
   }
   .entire-page {
     display: flex;

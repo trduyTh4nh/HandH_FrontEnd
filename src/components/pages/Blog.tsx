@@ -150,9 +150,9 @@ const Blog: React.FC = () => {
   return (
     <div className="entire-page">
       <div className="header px-[210px] header-blog-parent">
-        <div className="flex gap-2 items-center header-blog">
+        <div className="flex flex-col md:flex-row gap-2 md:items-center header-blog">
           <h2 className="text-3xl font-bold">Hoạt động cửa hàng</h2>
-          <p>•</p>
+          <p className="hidden md:block">•</p>
           <p className="quanity-name">{posts.length} bài đăng</p>
         </div>
         <div className="divider"></div>
@@ -164,7 +164,7 @@ const Blog: React.FC = () => {
               <div key={post._id} className="post-container">
                 <div className="post-header">
                   <div className="post-header-right">
-                    <UserCircle size={48} />
+                    <UserCircle className="md:w-12 md:h-12" />
                     <div className="post-header-title">
                       <p style={{ fontSize: 20, fontWeight: "bold" }}>
                         Tác giả

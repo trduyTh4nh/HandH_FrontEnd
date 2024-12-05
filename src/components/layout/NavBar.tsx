@@ -56,6 +56,7 @@ import {
   Sheet,
   SheetClose,
   SheetContent,
+  SheetFooter,
   SheetHeader,
   SheetTrigger,
 } from "../ui/sheet";
@@ -205,7 +206,7 @@ const Navbar: React.FC = () => {
                   <Menu></Menu>
                 </Button>
               </SheetTrigger>
-              <SheetContent side="left" className="space-y-4">
+              <SheetContent side="left" className="space-y-4 flex flex-col h-screen box-border">
                 <div className="flex flex-col gap-2">
                   {navLinks.map((e, index) => (
                     <SheetClose>
@@ -223,11 +224,19 @@ const Navbar: React.FC = () => {
                   ))}
                 </div>
                 <Separator className="w-full" />
-                <div>
-                  {cates &&
-                    cates.map((category: ICategory, index) => (
-                      <div key={index}>{boxCategory(category)}</div>
-                    ))}
+                <div className="flex flex-col justify-between flex-1">
+                  <div>
+                    {cates &&
+                      cates.map((category: ICategory, index) => (
+                        <div key={index}>{boxCategory(category)}</div>
+                      ))}
+                  </div>
+                  <div className="flex gap-2">
+                    <Avatar>
+                      <AvatarImage src={user.avatar as string}></AvatarImage>
+                      <AvatarFallback>U</AvatarFallback>
+                    </Avatar>
+                  </div>
                 </div>
               </SheetContent>
             </Sheet>
@@ -490,7 +499,6 @@ const Navbar: React.FC = () => {
             </animated.div>
           )
       )}
-      
     </nav>
   );
 };
