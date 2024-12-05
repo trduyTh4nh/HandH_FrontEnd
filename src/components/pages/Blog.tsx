@@ -1,11 +1,10 @@
 // import React, { useState, useEffect } from "react";
 // import '../../styles/blog.css';
 // import { getPosts } from "@/apis/blog/blog-repo";
-// import "slick-carousel/slick/slick.css"; 
+// import "slick-carousel/slick/slick.css";
 // import "slick-carousel/slick/slick-theme.css";
 // import Slider from "react-slick";
 // import 'bootstrap/dist/css/boostrap.min.css'
-
 
 // const Blog: React.FC = () => {
 //     const [posts, setPosts] = useState<any[]>([]);
@@ -108,7 +107,7 @@
 import React, { useState, useEffect } from "react";
 import "../../styles/blog.css";
 import { getPosts } from "@/apis/blog/blog-repo";
-import "slick-carousel/slick/slick.css"; 
+import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import Slider from "react-slick";
 import { ChevronLeft, ChevronRight, User2, UserCircle } from "lucide-react";
@@ -136,10 +135,8 @@ const Blog: React.FC = () => {
     slidesToShow: 1,
     slidesToScroll: 1,
     arrows: true,
-    nextArrow: <div>
-    </div>,
-    prevArrow: <div>
-    </div>
+    nextArrow: <div></div>,
+    prevArrow: <div></div>,
   };
 
   // Đóng modal
@@ -152,9 +149,12 @@ const Blog: React.FC = () => {
 
   return (
     <div className="entire-page">
-      <div className="header">
-        <h2 style={{ fontWeight: "bold", fontSize: 36 }}>Hoạt động cửa hàng</h2>
-        <p>{posts.length} bài đăng</p>
+      <div className="header px-[210px]">
+        <div className="flex gap-2 items-center">
+          <h2 className="text-3xl font-bold">Hoạt động cửa hàng</h2>
+          <p>•</p>
+          <p>{posts.length} bài đăng</p>
+        </div>
         <div className="divider"></div>
       </div>
       <div className="body">
@@ -164,11 +164,15 @@ const Blog: React.FC = () => {
               <div key={post._id} className="post-container">
                 <div className="post-header">
                   <div className="post-header-right">
-                    <UserCircle size={48}/>
+                    <UserCircle size={48} />
                     <div className="post-header-title">
-                      <p style={{ fontSize: 20, fontWeight: "bold" }}>Tác giả</p>
+                      <p style={{ fontSize: 20, fontWeight: "bold" }}>
+                        Tác giả
+                      </p>
                       <div className="post-header-title-daypost">
-                        <p style={{ fontSize: 16 }}>{new Date(post.createdAt).toLocaleDateString()}</p>
+                        <p style={{ fontSize: 16 }}>
+                          {new Date(post.createdAt).toLocaleDateString()}
+                        </p>
                       </div>
                     </div>
                   </div>

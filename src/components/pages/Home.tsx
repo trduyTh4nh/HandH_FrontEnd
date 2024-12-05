@@ -89,10 +89,10 @@ const Home: React.FC = () => {
       <div id="" className="home-page flex flex-col gap-8 w-full">
         {bannerList ? (
           <HomeBanner
-            title={bannerList[0].title}
-            description={bannerList[0].content}
-            image={bannerList[0].url}
-            link=""
+            title={bannerList.find(e => e.isMain).title}
+            description={bannerList.find(e => e.isMain).content}
+            image={bannerList.find(e => e.isMain).url}
+            link={`/shop/event/${bannerList.find(e => e.isMain)._id}`}
             button=""
           />
         ) : (
