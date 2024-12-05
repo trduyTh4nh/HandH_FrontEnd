@@ -1,12 +1,12 @@
-export interface ICategory {
-    _id?: string,
-    category_name: string,
-    category_description: string,
-    category_image: string,
-    category_total: number,
-    createdAt:string,
-    updatedAt:string,
-}
+    export interface ICategory {
+        _id?: string,
+        category_name: string,
+        category_description: string,
+        category_image: string,
+        category_total: number,
+        createdAt:string,
+        updatedAt:string,
+    }
 
 
 const sampleCategories: ICategory[] = [

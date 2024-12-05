@@ -219,7 +219,7 @@ const Navbar: React.FC = () => {
                       </AvatarFallback>
                     </Avatar>
                     <div className="flex flex-col items-start">
-                      <b>{user.name}</b>
+                      <b>{user ? user.name : ""}</b>
                       <a className="text-sm">Ấn để xem hồ sơ cá nhân</a>
                     </div>
                   </div>
