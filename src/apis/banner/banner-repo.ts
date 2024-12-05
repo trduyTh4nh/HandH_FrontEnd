@@ -17,15 +17,25 @@ export async function getAllBanner() {
   }
 }
 
-export async function createBanner(banner: IBanner, file: File) {
+export async function createBanner(
+  banner: IBanner,
+  file: File,
+  products: string[]
+) {
   try {
     const formData = new FormData();
     formData.append("title", banner.title);
     formData.append("content", banner.title);
     formData.append("file", file);
-
     const response = await specialApi.post("upload/uploadBanner", formData);
-
+    if (products && products.length > 0) {
+      const response2 = await api.put("upload/addProductToBanner", {
+        //@ts-ignore
+        idBanner: response.metadata._id,
+        products: products,
+      });
+      return response2;
+    }
     return response;
   } catch (error) {
     console.log(error);

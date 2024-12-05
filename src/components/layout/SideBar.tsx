@@ -54,7 +54,6 @@ const SideBar = (props: SideBarProps) => {
             </div>
             <nav>
               {[
-                { name: "Tổng quan", path: "/admin", icon: BarChart3Icon },
                 {
                   name: "Sản phẩm",
                   path: "/admin/productsManage",

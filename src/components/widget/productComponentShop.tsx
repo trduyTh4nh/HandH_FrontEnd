@@ -38,7 +38,7 @@ export default function ProductComponentShop({
 }) {
   const [productData, setProductData] = React.useState<IProduct[]>([]);
   const [loading, setLoading] = React.useState(true);
-  
+
   const fetchProFilter = async ({ pageParam = 0 }) => {
     // Tạo object filter với điều kiện kiểm tra từng trường
     const filter: any = {};
@@ -126,9 +126,7 @@ export default function ProductComponentShop({
         {productDatas.length > 0 ? (
           productDatas.map((product: IProduct) => (
             <div className="wrap-product w-full" key={product._id}>
-              <ProductItem
-                {...product}
-              />
+              <ProductItem {...product} />
             </div>
           ))
         ) : (
@@ -150,7 +148,6 @@ export default function ProductComponentShop({
         >
           <div className="inner-button flex gap-2">
             <ArrowLeft></ArrowLeft>
-            {/* <span>Trang trước</span> */}
           </div>
         </button>
         {productDatas.length === 0 ? (
@@ -161,7 +158,6 @@ export default function ProductComponentShop({
             onClick={() => onPageChange(skip + 1)}
           >
             <div className="inner-button flex gap-2">
-              {/* <span>Trang tiếp theo</span> */}
               <ArrowRight></ArrowRight>
             </div>
           </button>

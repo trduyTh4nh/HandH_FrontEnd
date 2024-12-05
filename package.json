@@ -42,6 +42,7 @@
     "axios": "^1.7.7",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
+    "cmdk": "^1.0.0",
     "color-namer": "^1.4.0",
     "color.js": "^1.2.0",
     "date-fns": "^3.6.0",

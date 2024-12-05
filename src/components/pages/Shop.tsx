@@ -19,7 +19,8 @@ import PaginationControls from "../widget/PaginationsControl";
 import Footer from "../widget/footer";
 import { useMediaQuery } from "react-responsive";
 import { Filter } from "lucide-react";
-import {Helmet} from "react-helmet";
+import { Helmet } from "react-helmet";
+import { useSearchParams } from "react-router-dom";
 type PriceFilter = {
   id: number;
   price: number;
@@ -36,9 +37,16 @@ export type Size = {
 };
 
 const Shop: React.FC = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  useEffect(() => {
+    const category = searchParams.get("cate");
+    console.log("cate: ", category);
+  }, [searchParams]);
+
   const isMobile = useMediaQuery({
     query: "(max-width: 768px)",
-  })
+  });
   async function getProducts() {
     const products = await getProduct();
     setMaximumPageCount(products.metadata.length);
@@ -154,7 +162,7 @@ const Shop: React.FC = () => {
   };
   useEffect(() => {
     setShowNav(!isMobile);
-  }, [isMobile])
+  }, [isMobile]);
   function changeSelected(element: any, array: Array<any>, value: boolean) {
     return array.map((e) => {
       if (e == element) {
@@ -237,9 +245,6 @@ const Shop: React.FC = () => {
             className={`shop-filter mt-2 mb-2 ${
               showNav && !isMobile ? "" : "flex-none w-16"
             } transition-all duration-300 top-16 h-screen relative max-md:w-0`}
-            // style={{
-            //     flex: showNav ? 1 : 0
-            // }}
           >
             <div className="shop-filter_wrap box-border fixed z-10 flex top-0 flex-col w-[50%] md:w-[15%] gap-2 overflow-auto pt-[4.675rem] md:pt-[11.2rem] pb-4">
               <div
@@ -276,7 +281,6 @@ const Shop: React.FC = () => {
                           <p>Giá</p>
                         </div>
                         <Select
-                          
                           onValueChange={(val) =>
                             handlePickPrice(parseInt(val))
                           }
@@ -401,11 +405,6 @@ const Shop: React.FC = () => {
                             ></SizeWidget>
                           ))}
                         </div>
-
-                        <div className="child-title text-[1.2rem] font-bold">
-                          <p>Màu sắc</p>
-                        </div>
-
                         {/* <div className="pick-color flex gap-4 flex-wrap">
                           {colors.map((e: any) => (
                             <ColorChip

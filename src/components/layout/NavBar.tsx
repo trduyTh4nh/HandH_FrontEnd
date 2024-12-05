@@ -56,11 +56,13 @@ import {
   Sheet,
   SheetClose,
   SheetContent,
+  SheetFooter,
   SheetHeader,
   SheetTrigger,
 } from "../ui/sheet";
 import { Link } from "react-router-dom";
 import { Separator } from "../ui/separator";
+import { CommandDialog, CommandInput } from "../ui/command";
 // import { duration } from "@mui/material";
 const navLinks = [
   {
@@ -204,7 +206,7 @@ const Navbar: React.FC = () => {
                   <Menu></Menu>
                 </Button>
               </SheetTrigger>
-              <SheetContent side="left" className="space-y-4">
+              <SheetContent side="left" className="space-y-4 flex flex-col h-screen box-border">
                 <div className="flex flex-col gap-2">
                   {navLinks.map((e, index) => (
                     <SheetClose>
@@ -222,11 +224,19 @@ const Navbar: React.FC = () => {
                   ))}
                 </div>
                 <Separator className="w-full" />
-                <div>
-                  {cates &&
-                    cates.map((category: ICategory, index) => (
-                      <div key={index}>{boxCategory(category)}</div>
-                    ))}
+                <div className="flex flex-col justify-between flex-1">
+                  <div>
+                    {cates &&
+                      cates.map((category: ICategory, index) => (
+                        <div key={index}>{boxCategory(category)}</div>
+                      ))}
+                  </div>
+                  <div className="flex gap-2">
+                    <Avatar>
+                      <AvatarImage src={user.avatar as string}></AvatarImage>
+                      <AvatarFallback>U</AvatarFallback>
+                    </Avatar>
+                  </div>
                 </div>
               </SheetContent>
             </Sheet>
@@ -252,6 +262,12 @@ const Navbar: React.FC = () => {
               >
                 Cửa Hàng
               </NavLink>
+              {/* <NavLink
+                to="/shopcate"
+                className="text-title-nav hover:underline hover:text-black hover:bg-gray-100 transition-all duration-800 px-3 py-2 rounded-md font-medium"
+              >
+                Cửa Hàng Loại
+              </NavLink> */}
               <NavLink
                 to="/blog"
                 className="text-title-nav hover:underline hover:text-black hover:bg-gray-100 transition-all duration-800 px-3 py-2 rounded-md font-medium"
