@@ -16,7 +16,7 @@ const HeaderComponentSearch = () => {
   const navigate = useNavigate();
   const [searchResults, setSearchResults] = useState([]);
   const [showResults, setShowResults] = useState(false);
-  const { cart, getCart } = useCart();
+  const { cart, getCart, getFavoriteProducts } = useCart();
   const [loading, setLoading] = useState(true);
   const [dataLoaded, setDataLoaded] = useState(false);
   const [searchValue, setSearchValue] = useState("");
@@ -63,6 +63,7 @@ const HeaderComponentSearch = () => {
       const currentUser = JSON.parse(localStorage.getItem("user"));
       if (currentUser) {
         await getCart(currentUser._id);
+        await getFavoriteProducts();
       }
       setLoading(false);
       setTimeout(() => setDataLoaded(true), 200);

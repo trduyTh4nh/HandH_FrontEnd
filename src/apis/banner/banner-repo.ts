@@ -16,7 +16,16 @@ export async function getAllBanner() {
     return error;
   }
 }
-
+export async function getABanner(id: string) {
+  try {
+    const response = await api.get(`upload/getABanner/${id}`);
+    return response;
+  } catch (error) {
+    console.log(error);
+    const e = error as AxiosError;
+    return error;
+  }
+}
 export async function createBanner(
   banner: IBanner,
   file: File,

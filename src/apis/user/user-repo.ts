@@ -21,6 +21,15 @@ export async function register(data) {
       ...rest,
       name: fullName,
     });
+    //@ts-ignore
+    const customApi = new API({authorization: res.metadata.metadata.tokens.accessToken, idUser: res.metadata.metadata.user.id});
+    console.log(res);
+    const res2 = await customApi.post("cart/createCart", {
+      "cart": {
+          //@ts-ignore
+          "cart_user": res.metadata.metadata.user.id
+      }
+  })
     return res;
   } catch (error) {
     const e = error as AxiosError;

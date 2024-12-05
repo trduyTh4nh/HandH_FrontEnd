@@ -135,6 +135,16 @@ export async function GetAllOrderOfUser(idUser: string) {
     return null;
   }
 }
+export async function bulkRemoveProductIncart(idCart: string, products: string[]) {
+  try {
+    const payload = {
+      cart: idCart,
+      cartDetails: products
+    }
+  } catch {
+
+  }
+}
 // const user = localStorage.getItem('user');
 //   const parsedUser = JSON.parse(user);
 //   const userId = parsedUser._id;

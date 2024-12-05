@@ -8,7 +8,7 @@ import axios, {
 class API {
   private axiosInstance: AxiosInstance;
 
-  constructor({ headerType = "json" }: { headerType?: "json" | "formdata" }) {
+  constructor({ headerType = "json", authorization, idUser }: { headerType?: "json" | "formdata", authorization?: string, idUser?: string }) {
     const url = import.meta.env.VITE_API_URL;
     let headers = {
       "Content-Type": "application/json",
@@ -27,16 +27,16 @@ class API {
       (config: InternalAxiosRequestConfig) => {
         const token = localStorage.getItem("token");
         const rToken = localStorage.getItem("refreshToken");
-        if (token) {
-          config.headers.authorization = `${token}`;
+        if (token || authorization) {
+          config.headers.authorization = `${authorization ? authorization : token}`;
         }
         if (rToken) {
           config.headers["x-rtoken-id"] = rToken;
         }
         const user = localStorage.getItem("user");
-        if (user) {
+        if (user || idUser) {
           const userObj = JSON.parse(user);
-          config.headers["x-client-id"] = userObj._id;
+          config.headers["x-client-id"] = idUser ? idUser : userObj._id;
         }
         return config;
       },

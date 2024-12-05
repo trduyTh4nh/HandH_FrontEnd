@@ -48,12 +48,21 @@ export default function BlogPostForm(props: BlogPostFormProps) {
   );
   const [arrPositionImage, setArrPositionImage] = useState<number[]>([]);
   async function updatePost(data: BlogPostSchema) {
-    if(!props.defaultValues || oldBlogPost.content == form.getValues("content") && oldBlogPost.images == images)
+    if (
+      !props.defaultValues ||
+      (oldBlogPost.content == form.getValues("content") &&
+        oldBlogPost.images == images)
+    )
       return;
     setLoading(true);
     const updatedImages = arrPositionImage.map((i) => images[i]);
-    const res = await blogRepo.updatePost(props.defaultValues._id, data.content, updatedImages as File[], arrPositionImage)
-    if(res instanceof AxiosError){
+    const res = await blogRepo.updatePost(
+      props.defaultValues._id,
+      data.content,
+      updatedImages as File[],
+      arrPositionImage
+    );
+    if (res instanceof AxiosError) {
       setLoading(false);
       return;
     }
@@ -63,15 +72,15 @@ export default function BlogPostForm(props: BlogPostFormProps) {
       createdAt: props.defaultValues.createdAt,
       updatedAt: new Date().toISOString(),
       content: data.content,
-      images: images.map((e) => e instanceof File ? URL.createObjectURL(e) : e),
-    })
+      images: images.map((e) =>
+        e instanceof File ? URL.createObjectURL(e) : e
+      ),
+    });
     setLoading(false);
   }
   function removeImage(index: number) {
-    if (!images) return;
-    const newImages = images.filter((_, i) => i !== index);
-    setArrPositionImage([...arrPositionImage, index]);
-    setImages(newImages);
+    console.log(index);
+    setImages(images.filter((img, i) => i !== index));
   }
   const { toast } = useToast();
   function addImages(file: FileList) {
@@ -119,7 +128,11 @@ export default function BlogPostForm(props: BlogPostFormProps) {
   }
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(props.defaultValues ? updatePost : uploadBlogPost)}>
+      <form
+        onSubmit={form.handleSubmit(
+          props.defaultValues ? updatePost : uploadBlogPost
+        )}
+      >
         <FormField
           control={form.control}
           name="content"
@@ -147,15 +160,14 @@ export default function BlogPostForm(props: BlogPostFormProps) {
         >
           {images && images.length > 0 ? (
             images.map((e, index) => (
-              <div
-                key={index}
-                className="flex justify-center items-center px-4 py-8 border-gray-200 border rounded-xl relative"
-              >
+              <div className="flex justify-center items-center px-4 py-8 border-gray-200 border rounded-xl relative">
                 {!props.defaultValues && (
                   <Button
                     type="button"
                     onClick={() => {
-                      removeImage(index);
+                      // console.log(e)
+                      // removeImage(index);
+                      setImages(images.filter((img, i) => i !== index));
                     }}
                     variant="secondary"
                     className="absolute right-2 top-2 bg-secondary/80 backdrop-blur-lg"
@@ -190,8 +202,8 @@ export default function BlogPostForm(props: BlogPostFormProps) {
             </>
           )}
           {images &&
-            images.length != 0 &&
-            images.length != 20 &&
+            images.length > 0 &&
+            images.length <= 20 &&
             !props.defaultValues && (
               <label
                 htmlFor="images"

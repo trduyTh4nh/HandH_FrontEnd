@@ -31,7 +31,7 @@ const registerSchema = z
         required_error: "Số điện thoại không được bỏ trống",
         invalid_type_error: "Số điện thoại không hợp lệ",
       })
-      .min(10, { message: "Số điện thoại phải có ít nhất 10 số" }),
+      .min(10, { message: "Số điện thoại phải 10 số" }).max(10, { message: "Số điện thoại phải 10 số" }),
     password: z
       .string({ required_error: "Mật khẩu không được bỏ trống" })
       .min(8, { message: "Mật khẩu phải có ít nhất 6 ký tự" })

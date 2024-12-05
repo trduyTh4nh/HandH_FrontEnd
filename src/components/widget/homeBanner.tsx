@@ -22,11 +22,11 @@ export default function HomeBanner(props: HomeBannerProps) {
             {props.title}
           </h1>
           <p>{props.description}</p>
-          {/* <Link to={props.link}>
+          <Link to={props.link}>
             <Button variant="ghost" className="w-fit px-12">
               Mua ngay
             </Button>
-          </Link> */}
+          </Link>
         </div>
         <div className="w-full h-full absolute bg-white-transparent z-10"></div>
         <img

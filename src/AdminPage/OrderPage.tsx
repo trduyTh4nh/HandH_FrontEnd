@@ -176,7 +176,7 @@ const OrderPage: React.FC = () => {
                             {convertMoney(
                               order.products.reduce(
                                 (acc, product) =>
-                                  product ? acc + product.priceAtPurchase : 0,
+                                  product ? acc + product.priceAtPurchase : acc,
                                 0
                               )
                             )}
@@ -453,7 +453,7 @@ const OrderPage: React.FC = () => {
                   )}
               </TableBody>
             </Table>
-          ) : !filteredOrders ? (
+          ) : !filteredOrders && !loading ? (
             <h2>Không có đơn hàng nào</h2>
           ) : (
             <div className="flex gap-2 items-center">

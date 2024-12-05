@@ -241,7 +241,7 @@ const App = () => {
           isLoading: loading,
         }}
       >
-        <CartProvider>
+        <CartProvider> 
           <Router>
             <div className="flex flex-col min-h-screen w-full">
               <Routes>

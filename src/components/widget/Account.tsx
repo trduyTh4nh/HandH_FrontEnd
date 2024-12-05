@@ -398,9 +398,11 @@ export const Account: React.FC = () => {
                       city: user.userAddress
                         ? user.userAddress.city.split(", ")[1]
                         : "",
-                      state: user.userAddress.state,
-                      country: user.userAddress.country,
-                      apartmentNumber: user.userAddress.apartmentNumber,
+                      state: user.userAddress ? user.userAddress.state : "",
+                      country: user.userAddress ? user.userAddress.country : "",
+                      apartmentNumber: user.userAddress
+                        ? user.userAddress.apartmentNumber
+                        : "",
                     }
                   : null,
                 profilePicture: user ? (user.avatar as string) : null,
