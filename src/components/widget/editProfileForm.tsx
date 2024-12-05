@@ -318,9 +318,9 @@ export default function EditProfileForm(props: EditProfileFormProps) {
               />
             </div>
           </div>
-          <DialogFooter>
+          <DialogFooter className="flex md:flex-row flex-col gap-2">
             <DialogClose>
-              <Button type="button" variant="secondary">
+              <Button type="button" className="w-full" variant="secondary">
                 Hủy
               </Button>
             </DialogClose>

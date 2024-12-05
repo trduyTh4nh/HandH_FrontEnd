@@ -221,15 +221,21 @@ export const Account: React.FC = () => {
               Hồ sơ khách hàng
             </h1>
             <div className="w-full">
-              <div className="flex items-center gap-2 mb-4">
-                <CircleUser className="text-black" />
-                <p className="text-gray-700 font-semibold">Họ tên:</p>
-                <p className="ml-auto text-gray-800 font-medium line-clamp-1 text-right">{user.name}</p>
+              <div className="flex flex-col md:flex-row md:items-center gap-2 mb-4">
+                <div className="flex items-center gap-2">
+                  <CircleUser className="text-black" />
+                  <p className="text-gray-700 font-semibold">Họ tên:</p>
+                </div>
+                <p className="md:ml-auto text-gray-800 font-medium line-clamp-1 md:text-right">
+                  {user.name}
+                </p>
               </div>
-              <div className="flex items-center gap-2 mb-4">
-                <Phone className="text-black" />
-                <p className="text-gray-700 font-semibold">Số điện thoại:</p>
-                <p className="ml-auto text-gray-800 font-medium">
+              <div className="flex flex-col md:flex-row md:items-center gap-2 mb-4">
+                <div className="flex items-center gap-2">
+                  <Phone className="text-black" />
+                  <p className="text-gray-700 font-semibold">Số điện thoại:</p>
+                </div>
+                <p className="md:ml-auto text-gray-800 font-medium">
                   {user.phone}
                 </p>
               </div>
@@ -238,26 +244,32 @@ export const Account: React.FC = () => {
               <p className="text-gray-700 font-semibold">Email:</p>
               <p className="ml-auto text-gray-800 font-medium">{email}</p>
               </div> */}
-              <div className="flex items-center gap-2 mb-4">
-                <Mail className="text-black" />
-                <p className="text-gray-700 font-semibold">Email:</p>
-                <p className="ml-auto text-gray-800 font-medium">
+              <div className="flex flex-col md:flex-row md:items-center gap-2 mb-4">
+                <div className="flex items-center gap-2">
+                  <Mail className="text-black" />
+                  <p className="text-gray-700 font-semibold">Email:</p>
+                </div>
+                <p className="md:ml-auto text-gray-800 font-medium">
                   {user.email}
                 </p>
               </div>
-              <div className="flex items-center gap-2 mb-4">
-                <Cake className="text-black" />
-                <p className="text-gray-700 font-semibold">Ngày sinh:</p>
-                <p className="ml-auto text-gray-800 font-medium">
+              <div className="flex flex-col md:flex-row md:items-center gap-2 mb-4">
+                <div className="flex items-center gap-2">
+                  <Cake className="text-black" />
+                  <p className="text-gray-700 font-semibold">Ngày sinh:</p>
+                </div>
+                <p className="md:ml-auto text-gray-800 font-medium">
                   {user.birthDay
                     ? new Date(user.birthDay as string).toLocaleDateString()
                     : "Không có ngày sinh"}
                 </p>
               </div>
-              <div className="flex items-center gap-2 mb-4">
-                <MapPin className="text-black" />
-                <p className="text-gray-700 font-semibold">Địa chỉ:</p>
-                <p className="ml-auto text-gray-800 font-medium">
+              <div className="flex flex-col md:flex-row md:items-center gap-2 mb-4">
+                <div className="flex items-center gap-2">
+                  <MapPin className="text-black" />
+                  <p className="text-gray-700 font-semibold">Địa chỉ:</p>
+                </div>
+                <p className="md:ml-auto text-gray-800 font-medium">
                   {user.userAddress
                     ? `${user.userAddress.street}, ${user.userAddress.city}, ${user.userAddress.state}`
                     : "Không có địa chỉ"}
@@ -271,10 +283,7 @@ export const Account: React.FC = () => {
                 >
                   Chỉnh sửa hồ sơ
                 </Button>
-                <Button
-                  variant="secondary"
-                  onClick={handleOpenPasswordDialog}
-                >
+                <Button variant="secondary" onClick={handleOpenPasswordDialog}>
                   Đổi mật khẩu
                 </Button>
               </div>
@@ -282,38 +291,38 @@ export const Account: React.FC = () => {
           </div>
         ) : (
           <div className="flex flex-col items-center gap-4">
-            <Skeleton className="w-24 h-24 rounded-full"/>
+            <Skeleton className="w-24 h-24 rounded-full" />
             <Skeleton className="w-[11.04125rem] h-9 rounded-full"></Skeleton>
             <hr className=" border-b-gray-100 w-full" />
-            <Skeleton className="w-56 h-9"/>
+            <Skeleton className="w-56 h-9" />
             <div className="w-full flex gap-2 items-center">
-              <Skeleton className="w-8 h-8"/>
-              <Skeleton className="w-36 h-9"/>
-              <Skeleton className="w-36 h-9 ml-auto"/>
+              <Skeleton className="w-8 h-8" />
+              <Skeleton className="w-36 h-9" />
+              <Skeleton className="w-36 h-9 ml-auto" />
             </div>
             <div className="w-full flex gap-2 items-center">
-              <Skeleton className="w-8 h-8"/>
-              <Skeleton className="w-48 h-9"/>
-              <Skeleton className="w-40 h-9 ml-auto"/>
+              <Skeleton className="w-8 h-8" />
+              <Skeleton className="w-48 h-9" />
+              <Skeleton className="w-40 h-9 ml-auto" />
             </div>
             <div className="w-full flex gap-2 items-center">
-              <Skeleton className="w-8 h-8"/>
-              <Skeleton className="w-28 h-9"/>
-              <Skeleton className="w-44 h-9 ml-auto"/>
+              <Skeleton className="w-8 h-8" />
+              <Skeleton className="w-28 h-9" />
+              <Skeleton className="w-44 h-9 ml-auto" />
             </div>
             <div className="w-full flex gap-2 items-center">
-              <Skeleton className="w-8 h-8"/>
-              <Skeleton className="w-36 h-9"/>
-              <Skeleton className="w-36 h-9 ml-auto"/>
+              <Skeleton className="w-8 h-8" />
+              <Skeleton className="w-36 h-9" />
+              <Skeleton className="w-36 h-9 ml-auto" />
             </div>
             <div className="w-full flex gap-2 items-center">
-              <Skeleton className="w-8 h-8"/>
-              <Skeleton className="w-36 h-9"/>
-              <Skeleton className="w-36 h-9 ml-auto"/>
+              <Skeleton className="w-8 h-8" />
+              <Skeleton className="w-36 h-9" />
+              <Skeleton className="w-36 h-9 ml-auto" />
             </div>
           </div>
         )}
-        
+
         {/* change pass */}
 
         <Dialog open={openPasswordDialog} onOpenChange={setOpenPasswordDialog}>
@@ -376,7 +385,24 @@ export const Account: React.FC = () => {
               loading={process.loading && process.where == "profile"}
               onSubmit={onSaveProfile}
               defaultValues={{
-                user: user ? { ...user, avatar: file, birthDay: user && user.birthDay ? new Date(user.birthDay) : null, street: user.userAddress ? user.userAddress.street : "", ward: user.userAddress ? user.userAddress.city.split(", ")[0] : "", city: user.userAddress ? user.userAddress.city.split(", ")[1] : "", state: user.userAddress.state, country: user.userAddress.country, apartmentNumber: user.userAddress.apartmentNumber } : null,
+                user: user
+                  ? {
+                      ...user,
+                      avatar: file,
+                      birthDay:
+                        user && user.birthDay ? new Date(user.birthDay) : null,
+                      street: user.userAddress ? user.userAddress.street : "",
+                      ward: user.userAddress
+                        ? user.userAddress.city.split(", ")[0]
+                        : "",
+                      city: user.userAddress
+                        ? user.userAddress.city.split(", ")[1]
+                        : "",
+                      state: user.userAddress.state,
+                      country: user.userAddress.country,
+                      apartmentNumber: user.userAddress.apartmentNumber,
+                    }
+                  : null,
                 profilePicture: user ? (user.avatar as string) : null,
               }}
             />
