@@ -10,6 +10,8 @@ import { convertMoney } from "@/utils";
 import { Loader, CircleX } from "lucide-react";
 import { CSSTransition } from "react-transition-group";
 import "../../styles/search.css";
+import { CommandDialog, CommandInput } from "../ui/command";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog";
 const HeaderComponentSearch = () => {
   const navigate = useNavigate();
   const [searchResults, setSearchResults] = useState([]);
@@ -19,6 +21,7 @@ const HeaderComponentSearch = () => {
   const [dataLoaded, setDataLoaded] = useState(false);
   const [searchValue, setSearchValue] = useState("");
   const [loadingSearch, setLoadingSearch] = useState(false);
+  const [openSearchDialog, setOpenSearchDialog] = useState(false);
   function debounce(func, wait) {
     let timeout;
     return function (...args) {
@@ -52,6 +55,7 @@ const HeaderComponentSearch = () => {
   const handleResultClick = (id) => {
     navigate(`/product/${id}`);
     setShowResults(false);
+    setOpenSearchDialog(false);
   };
 
   useEffect(() => {
@@ -68,6 +72,59 @@ const HeaderComponentSearch = () => {
 
   return (
     <div className="flex gap-4 items-center">
+      <Dialog open={openSearchDialog} onOpenChange={setOpenSearchDialog}>
+        <DialogContent className="max-h-screen overflow-auto">
+          <DialogHeader>
+            <DialogTitle>Tìm kiếm sản phẩm</DialogTitle>
+          </DialogHeader>
+          <Input
+            placeholder="Tìm kiếm"
+            onChange={(e) => {
+              searchHandle(e);
+            }}
+          />
+          {loadingSearch ? (
+            <div className="w-full flex justify-center items-center gap-2">
+              <Loader />
+              <p>Đang tải</p>
+            </div>
+          ) : searchResults.length > 0 ? (
+            showResults &&
+            searchResults.length > 0 && (
+              <div className="wrap-card-search">
+                {/* <CircleX
+                className="hover:cursor-pointer hover:bg-slate-300 rounded-full"
+                onClick={() => setShowResults(false)}
+              ></CircleX> */}
+
+                {searchResults.map((result) => (
+                  <div
+                    key={result._id}
+                    className="px-4 py-2 hover:bg-accent cursor-pointer"
+                    onClick={() => handleResultClick(result._id)}
+                  >
+                    <div className="flex items-center space-x-2">
+                      <img
+                        src={result.product_thumb}
+                        alt={result.product_name}
+                        className="w-10 h-10 object-cover rounded"
+                      />
+                      <div>
+                        <p className="font-medium">{result.product_name}</p>
+                        <p className="text-sm text-muted-foreground">
+                          {convertMoney(result.product_price)}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )
+          ) : (
+            <p>Không tìm thấy kết quả</p>
+          )}
+        </DialogContent>
+      </Dialog>
       <Button onClick={() => navigate("/cart")} className="h-full relative">
         <ShoppingCartOutlined className="text-color-primary size-3"></ShoppingCartOutlined>
         <div className="badge flex items-center justify-between rounded-full bg-red-400 w-5 h-5">
@@ -80,7 +137,7 @@ const HeaderComponentSearch = () => {
           </span>
         </div>
       </Button>
-      <Button className="md:hidden h-full" variant="secondary">
+      <Button onClick={() => {setOpenSearchDialog(true)}} className="md:hidden h-full" variant="secondary">
         <SearchOutlined className="text-black"></SearchOutlined>
       </Button>
       <div className="hidden md:flex bg-search-field items-center gap-0 md:gap-2 px-3 py-1 rounded-full">

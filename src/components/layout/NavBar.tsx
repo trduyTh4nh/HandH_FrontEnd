@@ -61,6 +61,7 @@ import {
 } from "../ui/sheet";
 import { Link } from "react-router-dom";
 import { Separator } from "../ui/separator";
+import { CommandDialog, CommandInput } from "../ui/command";
 // import { duration } from "@mui/material";
 const navLinks = [
   {
@@ -489,6 +490,7 @@ const Navbar: React.FC = () => {
             </animated.div>
           )
       )}
+      
     </nav>
   );
 };

@@ -61,3 +61,18 @@ export async function getAllOrderAdmin() {
     return null;
   }
 }
+export async function updateOrderStatus(id: string, status: string) {
+  try {
+    const res = await api.put(`order/updateStatusOrder`, {
+      status: status,
+      idOrder: id,
+    });
+    return res;
+  } catch (e) {
+    if (e instanceof AxiosError) {
+      return e;
+    }
+    console.error(e);
+    return null;
+  }
+}

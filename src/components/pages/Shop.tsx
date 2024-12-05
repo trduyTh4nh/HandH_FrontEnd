@@ -405,11 +405,6 @@ const Shop: React.FC = () => {
                             ></SizeWidget>
                           ))}
                         </div>
-
-                        <div className="child-title text-[1.2rem] font-bold">
-                          <p>Màu sắc</p>
-                        </div>
-
                         {/* <div className="pick-color flex gap-4 flex-wrap">
                           {colors.map((e: any) => (
                             <ColorChip

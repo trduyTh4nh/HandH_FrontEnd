@@ -8,12 +8,23 @@ export interface IUserAddress {
   zipcode?: string;
   apartmentNumber?: string;
 }
-
-export interface IProductInOrder {
-  id: string;
-  name: string;
-  price: number;
-  quantity: number;
+export const orderStatus = {
+  pending: "Đang chờ",
+  completed: "Đã hoàn thành",
+  failed: "Đã huỷ",
+  packing: "Đang xử lý"
+}
+export const orderStatusClass = {
+  pending: "bg-gray-100",
+  completed: "bg-green-200",
+  failed: "bg-red-200",
+  packing: "bg-primary"
+}
+export interface IProductInOrder extends IProduct {
+  _id: string;
+  priceAtPurchase?: number;
+  productId?: string;  
+  quantity?: number;
 }
 export interface IOrder {
   _id: string;
