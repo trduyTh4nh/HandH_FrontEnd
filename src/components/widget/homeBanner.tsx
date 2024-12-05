@@ -1,6 +1,7 @@
 import { useMediaQuery } from "react-responsive";
 import { AspectRatio } from "../ui/aspect-ratio";
 import { Button } from "../ui/button";
+import { Link } from "react-router-dom";
 
 type HomeBannerProps = {
   title: string;
@@ -21,9 +22,11 @@ export default function HomeBanner(props: HomeBannerProps) {
             {props.title}
           </h1>
           <p>{props.description}</p>
-          <Button variant="ghost" className="w-fit px-12">
-            Mua ngay
-          </Button>
+          <Link to={props.link}>
+            <Button variant="ghost" className="w-fit px-12">
+              Mua ngay
+            </Button>
+          </Link>
         </div>
         <div className="w-full h-full absolute bg-white-transparent z-10"></div>
         <img

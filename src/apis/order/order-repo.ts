@@ -49,3 +49,15 @@ export async function generageQRCode(idOrder: string, amount: number) {
     return null;
   }
 }
+export async function getAllOrderAdmin() {
+  try {
+    const res = await api.get("order/getAllOrder");
+    return res;
+  } catch (e) {
+    if (e instanceof AxiosError) {
+      return e;
+    }
+    console.error(e);
+    return null;
+  }
+}

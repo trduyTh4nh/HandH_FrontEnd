@@ -1,7 +1,7 @@
 import { IProduct } from "./product.type";
 
 export interface IBanner {
-  id?: string;
+  _id?: string;
   title?: string;
   url?: string;
   content?: string;
