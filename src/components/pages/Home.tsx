@@ -44,8 +44,11 @@ import { getNewestProduct } from "@/apis/products/product-repo";
 import { IBanner } from "@/types/banner.type";
 import { getAllBanner } from "@/apis/banner/banner-repo";
 import SkeletonLoadingProductGrid from "../widget/SkeletonGridLoading";
-
+import {useMediaQuery} from 'react-responsive'
 const Home: React.FC = () => {
+  const isMobile = useMediaQuery({
+    query: "(max-width: 768px)",
+  })
   const [cateList, setCateList] = useState<ICategory[]>(null);
   const [prodList, setProdList] = useState<IProduct[]>(null);
   const [bannerList, setBannerList] = useState<IBanner[]>(null);
@@ -97,9 +100,9 @@ const Home: React.FC = () => {
             <Skeleton className="w-full h-full" />
           </AspectRatio>
         )}
-        <div className="flex flex-col gap-8 px-20">
+        <div className="flex flex-col gap-8 px-10 md:px-20">
           <h2 className="text-center">Tại sao chọn chúng tôi?</h2>
-          <div className="flex w-full gap-20">
+          <div className="md:flex-row flex-col flex w-full gap-4 md:gap-20">
             <HomeIntroduction
               className="flex-1"
               icon={<DiamondOutlined fontSize="large" />}
@@ -114,23 +117,24 @@ const Home: React.FC = () => {
             />
           </div>
           <h2 className="text-center">Bắt đầu mua sắm</h2>
-            <div className="flex gap-4 overflow-x-auto">
+            <div className="grid grid-cols-2 md:flex gap-4 overflow-x-auto">
             {cateList
               ? cateList.map((category: ICategory, index: number) => (
                 <div
                 key={index}
-                className="flex-1 min-w-[2.5%] max-w-[25%] flex-shrink-0"
+                className="flex-1 flex-shrink-0"
                 >
                 <HomeCategory
+                  id={category._id}
                   name={category.category_name}
                   image={category.category_image}
                 />
                 </div>
               ))
-              : [1, 2, 3, 4].map((e, index) => (
+              : [1,2,3,4,5,6,7,8].map((e, index) => (
                 <div
                 key={index}
-                className="flex-1 min-w-[25%] max-w-[25%] flex-shrink-0"
+                className="flex-1"
                 >
                 <AspectRatio ratio={2 / 3}>
                   <Skeleton className="w-full h-full" />
@@ -146,11 +150,11 @@ const Home: React.FC = () => {
                     <ProductItem key={index} {...product} />
                   </div>
                 ))
-              : [1, 2, 3, 4].map((e) => {
+              : (isMobile ? [1] : [1]).map((_) => {
                   return <SkeletonLoadingProductGrid />;
                 })}
           </div>
-          <div className="flex gap-4 w-full justify-center">
+          <div className="flex flex-col items-center md:flex-row gap-4 w-full justify-center">
             <Link to={"/shop"}>
               <Button className="font-bold text-xl px-8">
                 Khám phá cửa hàng
@@ -201,15 +205,14 @@ const Home: React.FC = () => {
             </Dialog>
           </div>
           <h2 className="text-center">Sự kiện nổi bật</h2>
-          <div className="banner-event p-8 w-full flex justify-center">
+          
             {bannerList ? (
               <CarouselBanner banners={bannerList}></CarouselBanner>
             ) : (
               <Skeleton />
             )}
-          </div>
           <h2 className="text-center">Liên hệ với chúng tôi</h2>
-          <div className="flex gap-8 w-full justify-center">
+          <div className="flex flex-col md:flex-row gap-8 w-full justify-center">
             <Contacts
               title="Số điện thoại / Zalo"
               subtitle="0909893395"
@@ -230,7 +233,7 @@ const Home: React.FC = () => {
             <Contacts
               title="Địa chỉ"
               subtitle="K20, Cư Xã Vĩnh Hội, Phường 6, Quận 4, TP. Hồ Chí Minh, Việt Nam"
-              url="https://maps.app.goo.gl/s3e5Dzzh8ziZwAAaA"
+              url="https://maps.app.goo.gl/EN3oGMgFuMvfyJX78"
               icon={<StoreOutlined fontSize="large" />}
             />
           </div>

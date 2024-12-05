@@ -85,10 +85,8 @@ export default function Test() {
       </div>
       <div>
         <h2>UserContext</h2>
-        <p>User: {user ? user._id : ""}</p>
-        <Button onClick={() => {
-          setUser({_id: "1"})
-        }}>Set User</Button>
+        <p>User: {user ? JSON.stringify(user) : ""}</p>
+        
       </div> 
     </div>
   );

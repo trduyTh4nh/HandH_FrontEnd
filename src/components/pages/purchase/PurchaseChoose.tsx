@@ -12,12 +12,12 @@ export default function PurchaseChoose() {
           <p>0 sản phẩm</p>
         </div>
         <b>Phương thức thanh toán</b>
-        <SelectionButton onClick={() => {}}>
+        {/* <SelectionButton onClick={() => {}}>
             <>
                 <img src="/momo_square_pinkbg.svg" alt="Momo" className="w-8 h-8" />
                 <b>MoMo E-Wallet</b>
             </>
-        </SelectionButton>
+        </SelectionButton> */}
         <SelectionButton onClick={() => {}}>
             <>
                 <div className="w-8 h-8 flex justify-center items-center">

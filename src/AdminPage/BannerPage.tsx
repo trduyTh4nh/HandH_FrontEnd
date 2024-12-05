@@ -33,6 +33,9 @@ import {
   AwardIcon,
   Loader,
   AlertTriangle,
+  Image,
+  ImageUp,
+  Info,
 } from "lucide-react";
 import { IBanner } from "@/types/banner.type";
 import HomeBanner from "@/components/widget/homeBanner";
@@ -47,6 +50,32 @@ import {
 } from "@/apis/banner/banner-repo";
 import { AxiosError } from "axios";
 import { IProduct } from "@/types/product.type";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormMessage,
+} from "@/components/ui/form";
+import { z } from "zod";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { AspectRatio } from "@/components/ui/aspect-ratio";
+import { convertMoney } from "@/utils";
+import { TooltipProvider } from "@radix-ui/react-tooltip";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { Badge } from "@/components/ui/badge";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { getProduct } from "@/apis/products/product-repo";
+import { Checkbox } from "@/components/ui/checkbox";
 
 type togglePublish = {
   loading?: boolean;
@@ -73,6 +102,7 @@ const BannerPage: React.FC = () => {
       id: null,
     });
   const [banner, setBanner] = React.useState([]);
+  const [mainBanner, setMainBanner] = React.useState(null);
   const [stateIdDelete, setStateIdDelete] = React.useState("");
   const [checkMain, setCheckMain] = React.useState(false);
   const [togglePublish, setTogglePublish] = useState<togglePublish>({
@@ -97,7 +127,9 @@ const BannerPage: React.FC = () => {
   useEffect(() => {
     fetch();
   }, []);
-
+  useEffect(() => {
+    setMainBanner(banner.find((ban) => ban.isMain));
+  }, [banner]);
   const handleAddBanner = (newBanner: IBanner) => {
     console.log("add banner new", newBanner);
 
@@ -155,7 +187,7 @@ const BannerPage: React.FC = () => {
     return (
       <form onSubmit={handleConfirmDelete} className="space-y-4">
         <div className="space-y-2">
-          <Label>Mày có chắc muốn xóa?</Label>
+          <Label>Bạn có chắc muốn xóa?</Label>
         </div>
         <div className=" flex justify-end gap-4">
           <Button
@@ -191,65 +223,15 @@ const BannerPage: React.FC = () => {
               <CardTitle>Banner chính</CardTitle>
             </CardHeader>
             <CardContent>
-              {/* {banners
-                .filter((banner) => banner.type === "main")
-                .map((banner) => (
-                  <div key={banner.id} className="space-y-4">
-                    <p>Xem trước banner</p>
-                    <HomeBanner
-                      image={banner.imageUrl}
-                      title={banner.title}
-                      description={banner.title}
-                      link={banner.link}
-                      button="Mua ngay"
-                    />
-                    <div className="flex justify-between items-center">
-                      <h3 className="text-lg font-semibold">{banner.title}</h3>
-                      <div className="flex space-x-2">
-                        <Dialog>
-                          <DialogTrigger asChild>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => setEditingBanner(banner)}
-                            >
-                              <Pencil className="h-4 w-4 mr-1" />
-                              Edit
-                            </Button>
-                          </DialogTrigger>
-                          <DialogContent>
-                            <DialogHeader>
-                              <DialogTitle>Chỉnh sửa banner</DialogTitle>
-                            </DialogHeader>
-                            <BannerForm
-                              banner={banner}
-                              onSubmit={handleEditBanner}
-                            />
-                          </DialogContent>
-                        </Dialog>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() =>
-                            handleTogglePublish(banner.id, banner.isPublished)
-                          }
-                        >
-                          {banner.isPublished ? (
-                            <>
-                              <EyeOff className="h-4 w-4 mr-1" />
-                              Unpublish
-                            </>
-                          ) : (
-                            <>
-                              <Eye className="h-4 w-4 mr-1" />
-                              Publish
-                            </>
-                          )}
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-                ))} */}
+              {mainBanner && (
+                <HomeBanner
+                  title={mainBanner.title}
+                  description={mainBanner.content}
+                  image={mainBanner.url}
+                  link=""
+                  button=""
+                />
+              )}
             </CardContent>
           </Card>
         </TabsContent>
@@ -264,7 +246,7 @@ const BannerPage: React.FC = () => {
                     Thêm banner
                   </Button>
                 </DialogTrigger>
-                <DialogContent>
+                <DialogContent className="min-w-[50%]">
                   <DialogHeader>
                     <DialogTitle>Thêm banner</DialogTitle>
                   </DialogHeader>
@@ -455,101 +437,401 @@ const BannerPage: React.FC = () => {
   );
 };
 
+const bannerSchema = z.object({
+  title: z.string({ required_error: "Tiêu đề không được để trống" }),
+  content: z.string({ required_error: "Nội dung không được để trống" }),
+  file: z
+    .instanceof(File, { message: "Hình ảnh không được để trống" })
+    .refine((x) => x.size < 104857600, {
+      message: "kích cỡ file không được vượt quá 100MB",
+    }),
+});
+
 interface BannerFormProps {
   banner?: IBanner;
   onSubmit: (banner: IBanner) => void;
 }
 
 function BannerForm({ banner, onSubmit }: BannerFormProps) {
-  const [formData, setFormData] = useState<any>({
-    title: banner?.title || "",
-    imageUrl: banner?.imageUrl || "",
-    link: banner?.link || "",
-    isPublished: banner?.isPublished || false,
-    type: banner?.type || "sub",
-  });
-
   const [image, setImage] = useState<File | null>(null);
   const [loadingUpload, setLoadingUpload] = React.useState(false);
-
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    const { name, value, files } = e.target as HTMLInputElement;
-    console.log("name", name);
-    if (name === "imageUrl" && files && files.length > 0) {
-      setImage(files[0]);
-      setFormData((prev) => ({ ...prev, [name]: value }));
-    } else {
-      setFormData((prev) => ({ ...prev, [name]: value }));
-    }
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    console.log("Data update: ", formData);
+  const [bannerProducts, setBannerProducts] = React.useState<IProduct[]>([]);
+  async function handleSubmit(e: z.infer<typeof bannerSchema>) {
+    console.log("Data update: ", e);
     console.log("Image update", image);
     setLoadingUpload(true);
-    const response = await createBanner(formData, image);
+    const { file, ...rest } = e;
+    const response = await createBanner(
+      {
+        ...rest,
+        type: "sub",
+      },
+      file
+    );
     setLoadingUpload(false);
     console.log("CHECK DONE: ", response);
-    onSubmit(banner ? { ...formData, id: banner.id } : formData);
-  };
-
+    onSubmit(
+      banner
+        ? { ...e, id: banner.id, type: "sub" }
+        : { ...e, type: "sub", imageUrl: URL.createObjectURL(file) }
+    );
+  }
+  // const handleSubmit = async (e: React.FormEvent) => {
+  //   e.preventDefault();
+  //   console.log("Data update: ", formData);
+  //   console.log("Image update", image);
+  //   setLoadingUpload(true);
+  //   const response = await createBanner(formData, image);
+  //   setLoadingUpload(false);
+  //   console.log("CHECK DONE: ", response);
+  //   onSubmit(banner ? { ...formData, id: banner.id } : formData);
+  // };
+  const form = useForm({
+    resolver: zodResolver(bannerSchema),
+  });
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <div className="space-y-2">
-        <Label htmlFor="title">Nội dung</Label>
-        <Input
-          id="title"
+    <Form {...form}>
+      <form
+        onSubmit={form.handleSubmit(handleSubmit)}
+        className="w-full flex flex-col gap-2"
+      >
+        <FormField
+          control={form.control}
+          name="file"
+          render={({ field }) => (
+            <>
+              <AspectRatio ratio={3}>
+                <Label
+                  className="cursor-pointer w-full h-full relative group"
+                  htmlFor="avatar-input"
+                >
+                  {field.value ? (
+                    <>
+                      <div className="absolute left-[50%] top-[50%] -translate-x-[50%] -translate-y-[50%] p-4 scale-100 bg-white/85 backdrop-blur-lg opacity-1 rounded-2xl group-hover:opacity-0 group-hover:scale-90 group-hover:blur-sm transition-all flex flex-col gap-2 items-center">
+                        <ImageUp />
+                        <p>Ấn vào để thay đổi hình ảnh</p>
+                      </div>
+                      <img
+                        src={URL.createObjectURL(field.value)}
+                        className="w-full h-full object-cover rounded-lg shadow-lg"
+                      />
+                    </>
+                  ) : (
+                    <Card className="flex flex-col justify-center p-4 items-center gap-2 w-full h-full">
+                      <Image />
+                      <p className="text-sm">
+                        Đăng tải hình ảnh cho bảng quảng cáo{" "}
+                        <span className="text-red-400">*</span>
+                      </p>
+                    </Card>
+                  )}
+                </Label>
+              </AspectRatio>
+              <FormControl>
+                <Input
+                  id="avatar-input"
+                  type="file"
+                  className="hidden"
+                  accept="image/*"
+                  onChange={(e) => {
+                    if (e.target.files[0]) {
+                      field.onChange(e.target.files[0]);
+                    }
+                  }}
+                />
+              </FormControl>
+              <FormMessage />
+            </>
+          )}
+        />
+        <FormField
+          control={form.control}
           name="title"
-          value={formData.title}
-          onChange={handleChange}
-          required
+          render={({ field }) => (
+            <FormItem>
+              <Label>
+                Tiêu đề <span className="text-red-400">*</span>
+              </Label>
+              <FormControl>
+                <Input {...field} placeholder="Bắt buộc" />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
         />
-      </div>
-      <div className="space-y-2">
-        <Label htmlFor="imageUrl">URL hình ảnh</Label>
-        <Input
-          type="file"
-          id="imageUrl"
-          name="imageUrl"
-          value={formData.imageUrl}
-          onChange={handleChange}
-          required
+        <FormField
+          control={form.control}
+          name="content"
+          render={({ field }) => (
+            <FormItem>
+              <Label>
+                Nội dung <span className="text-red-400">*</span>
+              </Label>
+              <FormControl>
+                <Textarea {...field} placeholder="Bắt buộc" />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
         />
-      </div>
-      <div className="space-y-2">
-        {/* <Label htmlFor="link">Link</Label>
-        <Input
-          id="link"
-          name="link"
-          value={formData.link}
-          onChange={handleChange}
-          required
-        /> */}
-      </div>
-      {/* <div className="flex items-center space-x-2">
-        <Switch
-          id="isPublished"
-          checked={formData.isPublished}
-          onCheckedChange={(checked) =>
-            setFormData((prev) => ({ ...prev, isPublished: checked }))
-          }
-        />
-        <Label htmlFor="isPublished">Bạn có muốn </Label>
-      </div> */}
-      <Button type="submit">
-        {loadingUpload ? (
-          <Loader className="animate-spin" />
-        ) : banner ? (
-          "Update Banner"
-        ) : (
-          "Add Banner"
-        )}
-      </Button>
-    </form>
+        <Button type="submit">
+          {loadingUpload ? (
+            <Loader className="animate-spin" />
+          ) : banner ? (
+            "Update Banner"
+          ) : (
+            "Thêm Bảng quảng cáo"
+          )}
+        </Button>
+        <b className="text-sm">Danh sách sản phẩm</b>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Hình ảnh</TableHead>
+              <TableHead>Tên SP</TableHead>
+              <TableHead>Giá sàn</TableHead>
+              <TableHead>Trạng thái</TableHead>
+              <TableHead>Hành động</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {bannerProducts.map((e) => (
+              <TableRow>
+                <TableCell>
+                  <img
+                    src={e.product_thumb as string}
+                    alt={e.product_name}
+                    className="w-20 h-auto"
+                  />
+                </TableCell>
+                <TableCell>{e.product_name}</TableCell>
+                <TableCell>{convertMoney(e.product_price)}</TableCell>
+                <TableCell>
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger className="w-full">
+                        <div className="flex items-center gap-2 w-full">
+                          <div className="flex items-center gap-2 flex-1">
+                            <Badge variant="secondary">
+                              {e.isDraft ? "Bản nháp" : "Bản chính"}
+                            </Badge>
+                            <Badge variant="secondary">
+                              {e.isPublished ? "Hiển thị" : "Không hiển thị"}
+                            </Badge>
+                          </div>
+                          <Info width={16} height={16} />
+                        </div>
+                      </TooltipTrigger>
+                      <TooltipContent className="max-w-44 bg-background shadow-lg">
+                        <b>Chế độ hiển thị</b>
+                        <p>
+                          Đây là trạng thái hiển thị sản phẩm của bạn trên trang
+                          của khách hàng, với trạng thái "Hiển thị" là sản phẩm
+                          đang được hiển thị trên cửa hàng và khách hàng có thể
+                          mua, "Đã ẩn" là ngược lại.
+                        </p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                </TableCell>
+                <TableCell>
+                  <Button variant="outline" size="sm">
+                    Xóa
+                  </Button>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+        <Dialog>
+          <DialogTrigger className="w-full">
+            <Button type="button" className="w-full" variant="outline">
+              Thêm sản phẩm
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="max-w-[75%] max-h-screen overflow-auto">
+            <DialogHeader className="bg-background">
+              <DialogTitle>Thêm sản phẩm vào miêu bảng quảng cáo</DialogTitle>
+            </DialogHeader>
+            <ProductAddForm />
+          </DialogContent>
+        </Dialog>
+      </form>
+    </Form>
+
+    // <form onSubmit={handleSubmit} className="space-y-4">
+    //   <div className="space-y-2">
+    //     <Label htmlFor="title">Nội dung</Label>
+    //     <Input
+    //       id="title"
+    //       name="title"
+    //       value={formData.title}
+    //       onChange={handleChange}
+    //       required
+    //     />
+    //   </div>
+    //   <div className="space-y-2">
+    //     <Label htmlFor="imageUrl">URL hình ảnh</Label>
+    //     <Input
+    //       type="file"
+    //       id="imageUrl"
+    //       name="imageUrl"
+    //       value={formData.imageUrl}
+    //       onChange={handleChange}
+    //       required
+    //     />
+    //   </div>
+    //   <div className="space-y-2">
+    //     {/* <Label htmlFor="link">Link</Label>
+    //     <Input
+    //       id="link"
+    //       name="link"
+    //       value={formData.link}
+    //       onChange={handleChange}
+    //       required
+    //     /> */}
+    //   </div>
+    //   {/* <div className="flex items-center space-x-2">
+    //     <Switch
+    //       id="isPublished"
+    //       checked={formData.isPublished}
+    //       onCheckedChange={(checked) =>
+    //         setFormData((prev) => ({ ...prev, isPublished: checked }))
+    //       }
+    //     />
+    //     <Label htmlFor="isPublished">Bạn có muốn </Label>
+    //   </div> */}
+    //   <Button type="submit">
+    //     {loadingUpload ? (
+    //       <Loader className="animate-spin" />
+    //     ) : banner ? (
+    //       "Update Banner"
+    //     ) : (
+    //       "Add Banner"
+    //     )}
+    //   </Button>
+    // </form>
   );
 }
-
+function ProductAddForm() {
+  const [products, setProducts] = useState<IProduct[]>(null);
+  const [queryProducts, setQueryProducts] = useState<IProduct[]>(null);
+  const [selectedProducts, setSelectedProducts] = useState<IProduct[]>([]);
+  const [loading, setLoading] = useState(false);
+  function editProduct(add: boolean, product: IProduct) {
+    if (add) {
+      setSelectedProducts([...selectedProducts, product]);
+    } else {
+      setSelectedProducts(selectedProducts.filter((e) => e._id !== product._id));
+    }
+  }
+  function addAll(add: boolean) {
+    if (add) {
+      setSelectedProducts(products);
+    } else {
+      setSelectedProducts([]);
+    }
+  }
+  async function getAllProducts() {
+    setLoading(true);
+    const data = await getProduct();
+    if (data instanceof AxiosError) {
+      console.log(data.message);
+    } else {
+      setQueryProducts(data.metadata);
+      setProducts(data.metadata)
+    }
+    setLoading(false);
+  }
+  useEffect(() => {
+    getAllProducts();
+  }, []);
+  function searchProduct(query: string) {
+    if (query == "") {
+      setProducts(products);
+    } else {
+      setProducts(
+        queryProducts.filter((e) =>
+          e.product_name.toLowerCase().includes(query.toLowerCase())
+        )
+      );
+    }
+  }
+  return (
+    <>
+      <Input placeholder="Tìm kiếm sản phẩm" onChange={(e) => {searchProduct(e.target.value)}}/>
+      <div className="flex flex-col gap-2 w-full h-full">
+        <Table className="flex-1">
+          <TableHeader className="sticky top-0">
+            <TableRow>
+              <TableHead>
+                <Checkbox checked={products && products.length == selectedProducts.length} onCheckedChange={addAll} />
+              </TableHead>
+              <TableHead>Hình ảnh</TableHead>
+              <TableHead>Tên SP</TableHead>
+              <TableHead>Giá sàn</TableHead>
+              <TableHead>Trạng thái</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {products &&
+              products.map((e) => (
+                <TableRow key={e._id}>
+                  <TableCell>
+                    <Checkbox
+                      id={e._id}
+                      checked={selectedProducts.some(
+                        (selectedProduct) => selectedProduct._id === e._id
+                      )}
+                      onCheckedChange={(checked) =>
+                        editProduct(checked as boolean, e)
+                      }
+                    />
+                  </TableCell>
+                  <TableCell>
+                    <img
+                      src={e.product_thumb as string}
+                      alt={e.product_name}
+                      className="w-20 h-auto"
+                    />
+                  </TableCell>
+                  <TableCell>{e.product_name}</TableCell>
+                  <TableCell>{convertMoney(e.product_price)}</TableCell>
+                  <TableCell>
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger className="w-full">
+                          <div className="flex items-center gap-2 w-full">
+                            <div className="flex items-center gap-2 flex-1">
+                              <Badge variant="secondary">
+                                {e.isDraft ? "Bản nháp" : "Bản chính"}
+                              </Badge>
+                              <Badge variant="secondary">
+                                {e.isPublished ? "Hiển thị" : "Không hiển thị"}
+                              </Badge>
+                            </div>
+                            <Info width={16} height={16} />
+                          </div>
+                        </TooltipTrigger>
+                        <TooltipContent className="max-w-44 bg-background shadow-lg">
+                          <b>Chế độ hiển thị</b>
+                          <p>
+                            Đây là trạng thái hiển thị sản phẩm của bạn trên
+                            trang của khách hàng, với trạng thái "Hiển thị" là
+                            sản phẩm đang được hiển thị trên cửa hàng và khách
+                            hàng có thể mua, "Đã ẩn" là ngược lại.
+                          </p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  </TableCell>
+                </TableRow>
+              ))}
+          </TableBody>
+        </Table>
+      </div>
+      <Button className="sticky w-full bottom-0">Thêm các sản phẩm</Button>
+    </>
+  );
+}
 export default BannerPage;

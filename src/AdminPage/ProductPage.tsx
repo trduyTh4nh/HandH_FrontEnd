@@ -35,6 +35,7 @@ import {
   MoreHorizontalIcon,
   Pencil,
   Plus,
+  RefreshCcw,
   Search,
   TextSearch,
   Trash2,
@@ -58,6 +59,7 @@ import { convertMoney } from "@/utils";
 import {
   addColorsToProduct,
   addImageToProduct,
+  changeVisibility,
   createProduct,
   deleteProduct,
   getProduct,
@@ -99,6 +101,8 @@ const ProductPage: React.FC = () => {
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState<AxiosError>(null);
   const [isEditing, setEditing] = React.useState(false);
+  const [curProduct, setCurProduct] = React.useState<IProduct | null>();
+  const [productReadOnly, setProductReadOnly] = React.useState(false);
   async function fetch() {
     setLoading(true);
     const data = await getProduct();
@@ -136,7 +140,7 @@ const ProductPage: React.FC = () => {
     }
   };
 
-  const handleRemove = async (productSlug: string) => {
+  const handleRemove = async (productSlug: string, index: number) => {
     setProcess({
       message: "Đang xoá sản phẩm",
       isRunning: true,
@@ -162,11 +166,43 @@ const ProductPage: React.FC = () => {
     setProducts(products.filter((p) => p._id !== productSlug));
   };
 
-  const handleTogglePublish = (productSlug: string) => {
+  const handleToggleVisibility = async (
+    id: string,
+    action: { key: "isDraft" | "isPublished" }
+  ) => {
+    let res;
+    setProcess({
+      message: "Đang thay đổi trạng thái hiển thị sản phẩm",
+      isRunning: true,
+    });
+    if (action.key === "isDraft") {
+      if (!products.find((p) => p._id === id)?.isDraft) {
+        res = await changeVisibility("draftProduct", id);
+      } else {
+        res = await changeVisibility("unDaftProduct", id);
+      }
+    } else {
+      if (!products.find((p) => p._id === id)?.isPublished) {
+        res = await changeVisibility("publicProduct", id);
+      } else {
+        res = await changeVisibility("unPublicProduct", id);
+      }
+    }
+    if (res instanceof AxiosError) {
+      setProcess({
+        ...process,
+        isRunning: false,
+      });
+      return;
+    }
+    setProcess({
+      ...process,
+      isRunning: false,
+    });
     setProducts(
       products.map((p) => {
-        if (p.product_slug === productSlug) {
-          return { ...p, isPublished: !p.isPublished, isDraft: p.isPublished };
+        if (p._id === id) {
+          return { ...p, [action.key]: !p[action.key] };
         }
         return p;
       })
@@ -210,7 +246,7 @@ const ProductPage: React.FC = () => {
         setProcess({
           message: "Đang đăng tải sản phẩm...",
           isRunning: false,
-          progress: 5
+          progress: 5,
         });
         return;
       }
@@ -218,7 +254,7 @@ const ProductPage: React.FC = () => {
       setProcess({
         message: "Đang đăng tải hình ảnh của sản phẩm...",
         isRunning: true,
-        progress: 25
+        progress: 25,
       });
       const res2 = await updateImageToProduct(id, product_thumb as File);
       if (res2 instanceof AxiosError) {
@@ -226,7 +262,7 @@ const ProductPage: React.FC = () => {
         setProcess({
           message: "Đang đăng tải hình ảnh của sản phẩm...",
           isRunning: false,
-          progress: 25
+          progress: 25,
         });
         return;
       }
@@ -234,21 +270,25 @@ const ProductPage: React.FC = () => {
         setProcess({
           message: "Đang đăng tải hình ảnh của sản phẩm...",
           isRunning: true,
-          progress: 50
+          progress: 50,
         });
-        const res3 = await addImageToProduct(id, product_images as File[], (n) => {
-          setProcess({
-            message: "Đang đăng tải hình ảnh của sản phẩm...",
-            isRunning: true,
-            progress: process.progress + n / 50
-          });
-        });
+        const res3 = await addImageToProduct(
+          id,
+          product_images as File[],
+          (n) => {
+            setProcess({
+              message: "Đang đăng tải hình ảnh của sản phẩm...",
+              isRunning: true,
+              progress: process.progress + n / 50,
+            });
+          }
+        );
         if (res3 instanceof AxiosError) {
           setError(res3);
           setProcess({
             message: "Đang đăng tải hình ảnh của sản phẩm...",
             isRunning: false,
-            progress: 50
+            progress: 50,
           });
           return;
         }
@@ -256,28 +296,32 @@ const ProductPage: React.FC = () => {
       setProcess({
         message: "Đang đăng tải hình ảnh của sản phẩm...",
         isRunning: true,
-        progress: 75
+        progress: 75,
       });
-      const res4 = await addColorsToProduct(id, product_colors as IColorProductVariation[], (progress) => {
-        setProcess({
-          message: "Đang đăng tải hình ảnh của sản phẩm...",
-          isRunning: true,
-          progress: process.progress + progress / 75
-        });
-      })
-      if(res4 instanceof AxiosError) {
+      const res4 = await addColorsToProduct(
+        id,
+        product_colors as IColorProductVariation[],
+        (progress) => {
+          setProcess({
+            message: "Đang đăng tải hình ảnh của sản phẩm...",
+            isRunning: true,
+            progress: process.progress + progress / 75,
+          });
+        }
+      );
+      if (res4 instanceof AxiosError) {
         setError(res4);
         setProcess({
           message: "Đang đăng tải hình ảnh của sản phẩm...",
           isRunning: false,
-          progress: 0
+          progress: 0,
         });
         return;
       }
       setProcess({
         message: "Đang đăng tải hình ảnh của sản phẩm...",
         isRunning: false,
-        progress: 0
+        progress: 0,
       });
     } catch (e) {
       console.error(e);
@@ -360,7 +404,7 @@ const ProductPage: React.FC = () => {
                   : "text-primary"
               }}`}
             >
-              {error &&
+              {error && error.response &&
               error.response.data &&
               //@ts-ignore
               errorIndexes[error.response.data.message] == null ? (
@@ -396,19 +440,27 @@ const ProductPage: React.FC = () => {
             </DialogFooter>
           </DialogContent>
         </Dialog>
-        <Dialog open={isAddProductOpen} onOpenChange={setIsAddProductOpen}>
-          <DialogTrigger asChild>
-            <Button>
-              <Plus className="mr-2 h-4 w-4" /> Thêm sản phẩm
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="sm:max-w-[85%] max-h-full overflow-auto">
-            <DialogHeader>
-              <DialogTitle>Thêm sản phẩm mới</DialogTitle>
-            </DialogHeader>
-            <ProductUploadForm onSubmit={uploadProduct} />
-          </DialogContent>
-        </Dialog>
+        <div className="flex gap-2">
+          <Button variant="secondary" onClick={() => {
+            setProduct(null)
+            fetch()
+          }}>
+            <RefreshCcw className="h-4 w-4" />
+          </Button>
+          <Dialog open={isAddProductOpen} onOpenChange={setIsAddProductOpen}>
+            <DialogTrigger asChild>
+              <Button>
+                <Plus className="mr-2 h-4 w-4" /> Thêm sản phẩm
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[85%] max-h-full overflow-auto">
+              <DialogHeader>
+                <DialogTitle>Thêm sản phẩm mới</DialogTitle>
+              </DialogHeader>
+              <ProductUploadForm onSubmit={uploadProduct} />
+            </DialogContent>
+          </Dialog>
+        </div>
       </div>
 
       <Card>
@@ -431,7 +483,7 @@ const ProductPage: React.FC = () => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {products.map((product) => (
+                {products.map((product, index) => (
                   <TableRow key={product.product_slug}>
                     <TableCell>
                       {!product.product_thumb || product.product_thumb == "" ? (
@@ -512,7 +564,7 @@ const ProductPage: React.FC = () => {
                               </DialogClose>
                               <DialogClose>
                                 <Button
-                                  onClick={() => handleRemove(product._id!)}
+                                  onClick={() => handleRemove(product._id!, index)}
                                 >
                                   Xóa
                                 </Button>
@@ -530,6 +582,11 @@ const ProductPage: React.FC = () => {
                             <DropdownMenuItem
                               disabled={product.isDraft}
                               className="flex gap-2"
+                              onClick={() => {
+                                handleToggleVisibility(product._id, {
+                                  key: "isPublished",
+                                });
+                              }}
                             >
                               {product.isPublished ? (
                                 <EyeOff width={16} height={16}></EyeOff>
@@ -542,7 +599,14 @@ const ProductPage: React.FC = () => {
                                   : "Hiển thị sản phẩm"}
                               </p>
                             </DropdownMenuItem>
-                            <DropdownMenuItem className="flex gap-2">
+                            <DropdownMenuItem
+                              onClick={() => {
+                                handleToggleVisibility(product._id, {
+                                  key: "isDraft",
+                                });
+                              }}
+                              className="flex gap-2"
+                            >
                               {product.isDraft ? (
                                 <File width={16} height={16}></File>
                               ) : (
@@ -554,7 +618,14 @@ const ProductPage: React.FC = () => {
                                   : "Chuyển thành nháp"}
                               </p>
                             </DropdownMenuItem>
-                            <DropdownMenuItem className="flex gap-2">
+                            <DropdownMenuItem
+                              className="flex gap-2"
+                              onClick={() => {
+                                setEditing(true);
+                                setEditingProduct(product);
+                                setProductReadOnly(true);
+                              }}
+                            >
                               <TextSearch width={16} height={16}></TextSearch>
                               <p>Xem chi tiết</p>
                             </DropdownMenuItem>
@@ -574,13 +645,24 @@ const ProductPage: React.FC = () => {
           open={isEditing}
           onOpenChange={(o) => {
             setEditing(o);
+            if (productReadOnly && !o) {
+              setProductReadOnly(false);
+            }
           }}
         >
           <DialogHeader>
             <DialogTitle>Chỉnh sửa</DialogTitle>
           </DialogHeader>
-          <DialogContent className="min-w-[75%]">
-            <h1>Coming soon...</h1>
+          <DialogContent className="min-w-[75%] max-h-full overflow-auto">
+            {isEditing && editingProduct ? (
+              <ProductUploadForm
+                onSubmit={(e) => {}}
+                defaultValue={editingProduct}
+                readOnly={productReadOnly}
+              />
+            ) : (
+              <h1>tại thằng quang</h1>
+            )}
           </DialogContent>
         </Dialog>
       )}

@@ -10,7 +10,7 @@ type ProductErrorViewProps = {
 };
 export default function ProductErrorView(props: ProductErrorViewProps) {
     const arr = Array.from(Array(props.count).keys());
-    return <div className="relative grid grid-cols-4 gap-4">
+    return <div className={"relative grid grid-cols-4 gap-4 " + props.className}>
         {
             arr.map((e) => {
                 return <div className="bg-gray-300 w-full h-[480px] rounded-2xl" />
