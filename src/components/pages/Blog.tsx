@@ -149,11 +149,11 @@ const Blog: React.FC = () => {
 
   return (
     <div className="entire-page">
-      <div className="header px-[210px]">
-        <div className="flex gap-2 items-center">
+      <div className="header px-[210px] header-blog-parent">
+        <div className="flex gap-2 items-center header-blog">
           <h2 className="text-3xl font-bold">Hoạt động cửa hàng</h2>
           <p>•</p>
-          <p>{posts.length} bài đăng</p>
+          <p className="quanity-name">{posts.length} bài đăng</p>
         </div>
         <div className="divider"></div>
       </div>
