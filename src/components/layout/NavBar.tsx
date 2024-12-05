@@ -206,7 +206,24 @@ const Navbar: React.FC = () => {
                   <Menu></Menu>
                 </Button>
               </SheetTrigger>
-              <SheetContent side="left" className="space-y-4 flex flex-col h-screen box-border">
+              <SheetContent
+                side="left"
+                className="space-y-4 flex flex-col h-screen box-border"
+              >
+                <SheetHeader>
+                  <div className="flex gap-4 items-center p-2 hover:bg-gray-100 rounded-2xl transition-all">
+                    <Avatar>
+                      <AvatarImage src={user && user.avatar as string}></AvatarImage>
+                      <AvatarFallback>
+                        <UserCircle width={16} height={16} />
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="flex flex-col items-start">
+                      <b>{user.name}</b>
+                      <a className="text-sm">Ấn để xem hồ sơ cá nhân</a>
+                    </div>
+                  </div>
+                </SheetHeader>
                 <div className="flex flex-col gap-2">
                   {navLinks.map((e, index) => (
                     <SheetClose>
@@ -230,12 +247,6 @@ const Navbar: React.FC = () => {
                       cates.map((category: ICategory, index) => (
                         <div key={index}>{boxCategory(category)}</div>
                       ))}
-                  </div>
-                  <div className="flex gap-2">
-                    <Avatar>
-                      <AvatarImage src={user.avatar as string}></AvatarImage>
-                      <AvatarFallback>U</AvatarFallback>
-                    </Avatar>
                   </div>
                 </div>
               </SheetContent>
