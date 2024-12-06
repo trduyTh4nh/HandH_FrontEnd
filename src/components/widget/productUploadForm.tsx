@@ -830,7 +830,7 @@ export default function ProductUploadForm(props: ProductUploadFormProps) {
                 </TableBody>
               </Table>
             ) : null}
-            {!props.readOnly || props.defaultValue && (
+            {(!props.readOnly || !props.defaultValue) && (
               <Button
                 type="button"
                 variant="outline"

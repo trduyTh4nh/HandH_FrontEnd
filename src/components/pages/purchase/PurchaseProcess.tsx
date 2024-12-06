@@ -13,8 +13,8 @@ export default function PurchaseProcess() {
   const { orderId, paymentProducts } = useCart();
   const navigate = useNavigate();
   async function getQRCode() {
-    if(!orderId) {
-        return;
+    if (!orderId) {
+      return;
     }
     const res = await generageQRCode(
       orderId,
@@ -33,12 +33,14 @@ export default function PurchaseProcess() {
   useEffect(() => {
     getQRCode();
   }, []);
+
   const cart = useCart();
+
   return orderId ? (
-    <div className="w-1/2 self-center h-full content-center">
-      <div className="flex flex-row p-5">
-        <div className="w-7/12 flex flex-col">
-          <p className="text-opacity-[0.55] text-black">
+    <div className="w-full h-full p-4 md:w-2/3 md:self-center md:h-auto">
+      <div className="flex flex-col md:flex-row gap-4 p-5">
+        <div className="flex flex-col w-full md:w-7/12">
+          <p className="text-sm text-gray-500">
             Bạn đang thanh toán bằng hình thức{" "}
             <span className="font-bold text-black">“Chuyển khoản”</span>, vui
             lòng quét mã QR ở dưới bằng{" "}
@@ -50,8 +52,8 @@ export default function PurchaseProcess() {
               vui lòng ấn “Hoàn tất” để hoàn thành đơn hàng.
             </span>
           </p>
-          <h2 className="font-bold py-3">Tổng tiền</h2>
-          <h2 className="font-bold text-4xl">
+          <h2 className="font-bold py-2 text-lg md:text-xl">Tổng tiền</h2>
+          <h2 className="font-bold text-2xl md:text-4xl">
             {convertMoney(
               cart.paymentProducts.reduce(
                 (acc, cur) => (cur.isPicked ? acc + cur.priceCartDetail : acc),
@@ -59,37 +61,42 @@ export default function PurchaseProcess() {
               )
             )}
           </h2>
-          <div className="flex flex-row items-center py-3">
-            <p>
-              {paymentProducts.reduce((acc, cur) => acc + cur.quantity, 0)} sản
-              phẩm
-            </p>
-          </div>
-          <p className="font-bold underline cursor-pointer">
+          <p className="py-2">
+            {paymentProducts.reduce((acc, cur) => acc + cur.quantity, 0)} sản
+            phẩm
+          </p>
+          <p className="font-bold underline cursor-pointer text-sm md:text-base">
             Hướng dẫn thanh toán
           </p>
         </div>
-        <div className="w-2/5">
+        <div className="w-full md:w-5/12 flex justify-center">
           {imgQR ? (
-            <img src={imgQR} alt="Mã QR" />
+            <img src={imgQR} alt="Mã QR" className="w-full max-w-xs md:max-w-sm" />
           ) : (
-            <div className="w-72 h-72 flex items-center justify-center">
+            <div className="w-48 h-48 flex items-center justify-center">
               <Loader className="animate-spin" />
             </div>
           )}
         </div>
       </div>
-      <div className="flex flex-row w-full justify-between gap-x-4">
-        <div className="flex gap-x-4 w-full">
-          <Button onClick={() => navigate("/payment/status")} className="font-bold w-full" type="submit">
+      <div className="flex flex-col gap-4 md:flex-row md:justify-between">
+        <div className="flex flex-col gap-2 md:flex-row md:gap-4 w-full">
+          <Button
+            onClick={() => navigate("/payment/status")}
+            className="font-bold w-full"
+          >
             Hoàn thành
           </Button>
-          <Button onClick={() => navigate("/payment/status")} variant={"secondary"} className="transition-all w-full">
+          <Button variant={"secondary"} onClick={() => navigate("/payment/status")} className="transition-all w-full">
             Tôi muốn thanh toán sau
           </Button>
         </div>
-        <div className="flex gap-x-4 w-full">
-          <Button onClick={() => navigate("/payment")} variant={"secondary"} className="transition-all w-full">
+        <div onClick={() => navigate("/payment")} className="flex flex-col gap-2 md:flex-row md:gap-4 w-full">
+          <Button
+            variant={"secondary"}
+            className="transition-all w-full"
+            onClick={() => navigate("/")}
+          >
             Quay lại
           </Button>
           <Button onClick={() => navigate("/cart")} variant={"secondary"} className="transition-all w-full">
@@ -98,5 +105,11 @@ export default function PurchaseProcess() {
         </div>
       </div>
     </div>
-  ) : <ErrorView title="Hành động không hợp lệ!" message="Vui lòng không tự ý vào trang thanh toán." icon="error" />;
+  ) : (
+    <ErrorView
+      title="Hành động không hợp lệ!"
+      message="Vui lòng không tự ý vào trang thanh toán."
+      icon="error"
+    />
+  );
 }
