@@ -4,6 +4,7 @@ import { Input } from "../ui/input";
 import axios from "axios";
 import useAddressPicker from "@/hooks/use-address-picker";
 import { UserContext } from "../contexts/UserContext";
+import { useCart } from "@/providers/CartContext";
 
 export default function Test() {
   const [localStorageKey, setLocalStorageKey] = React.useState<string>("");
@@ -11,6 +12,7 @@ export default function Test() {
   const [file, setFile] = React.useState<File>(null);
   const [url, setUrl] = React.useState<string>("");
   const {user, setUser} = useContext(UserContext);
+  const cart = useCart()
   function handleSaveLocalStorage() {
     const ls = localStorage.getItem(localStorageKey);
     setLocalStorageValue(ls || "Không tìm thấy");
@@ -86,8 +88,11 @@ export default function Test() {
       <div>
         <h2>UserContext</h2>
         <p>User: {user ? JSON.stringify(user) : ""}</p>
-        
       </div> 
+      <div>
+        <h2>CartContext</h2>
+        <p>Cart: {cart ? JSON.stringify(cart) : ""}</p>
+      </div>
     </div>
   );
 }

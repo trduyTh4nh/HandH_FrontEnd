@@ -58,8 +58,8 @@ const CartPage: React.FC = () => {
       <Helmet>
         <title>Giỏ hàng - Áo dài hồng đức</title>
       </Helmet>
-      <div className="cart-page w-full py-4 flex-grow max-sm:pb-[220px]">
-        <div className="cart-page_wrap flex flex-col w-full px-4 md:px-20 min-h-full">
+      <div className="cart-page w-full py-4 flex-grow max-md:pb-[220px]">
+        <div className="cart-page_wrap flex flex-col w-full px-4 lg:px-20 min-h-full">
           <div className="flex flex-col gap-0 w-full">
             <div className="z-10 bg-white w-full py-3 top-40 flex gap-2 items-center">
               <h2 className="font-bold text-3xl">Giỏ hàng</h2>
@@ -75,7 +75,7 @@ const CartPage: React.FC = () => {
               </p>
             </div>
           </div>
-          <div className="cart-body h-full flex flex-col-reverse md:flex-row w-full md:gap-8 flex-grow">
+          <div className="cart-body h-full flex flex-col-reverse lg:flex-row w-full lg:gap-8 flex-grow">
             <div className="cart-body_left w-full mt-6">
               <div className=" h-px bg-[#E8E8E8]"></div>
               {!user && !isLoading ? (
@@ -167,9 +167,9 @@ const CartPage: React.FC = () => {
                 : null}
             </div>
             <div className="w-px bg-black"></div>
-            <div className="cart-body_right max-sm:h-0 w-full relative md:w-1/3">
-              <div className="cart-body_right_wrap fixed w-full max-sm:bottom-0 max-sm:left-0 max-sm:p-4 max-sm:bg-background/95 backdrop-blur-lg md:w-1/3 flex flex-col gap-2 md:pr-20">
-                <div className="policy-payment flex gap-2 w-full md:w-[100%] items-center">
+            <div className="cart-body_right max-sm:h-0 w-full relative lg:w-1/3">
+              <div className="cart-body_right_wrap fixed w-full max-sm:bottom-0 max-md:left-0 max-md:p-4 max-sm:bg-background/95 backdrop-blur-lg lg:w-1/3 flex flex-col gap-2 lg:pr-20">
+                <div className="policy-payment flex gap-2 w-full lg:w-[100%] items-center">
                   <Checkbox
                     checked={
                       cart.cart_products &&

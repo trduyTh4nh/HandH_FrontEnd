@@ -1,11 +1,11 @@
 import { IProduct } from "./product.type";
 
 export interface IBanner {
-  id?: string;
+  _id?: string;
   title?: string;
   url?: string;
   content?: string;
-  products?: IProduct[]
+  products?: string[];
   isActive?: boolean;
   isPublished?: boolean;
   imageUrl?: string;

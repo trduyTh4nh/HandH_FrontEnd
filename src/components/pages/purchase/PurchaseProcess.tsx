@@ -84,15 +84,15 @@ export default function PurchaseProcess() {
           <Button onClick={() => navigate("/payment/status")} className="font-bold w-full" type="submit">
             Hoàn thành
           </Button>
-          <Button variant={"secondary"} className="transition-all w-full">
+          <Button onClick={() => navigate("/payment/status")} variant={"secondary"} className="transition-all w-full">
             Tôi muốn thanh toán sau
           </Button>
         </div>
         <div className="flex gap-x-4 w-full">
-          <Button variant={"secondary"} className="transition-all w-full">
+          <Button onClick={() => navigate("/payment")} variant={"secondary"} className="transition-all w-full">
             Quay lại
           </Button>
-          <Button variant={"secondary"} className="transition-all w-full">
+          <Button onClick={() => navigate("/cart")} variant={"secondary"} className="transition-all w-full">
             Huỷ
           </Button>
         </div>

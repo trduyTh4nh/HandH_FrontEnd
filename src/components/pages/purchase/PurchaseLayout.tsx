@@ -49,7 +49,7 @@ export default function PurchaseLayout() {
         <title>Thanh toán {orderId ? `- ${orderId}` : ""}</title>
       </Helmet>
       <div className="w-full flex flex-col gap-4 min-h-full">
-        <div className="bg-gray-100 w-full flex items-center justify-center px-20">
+        <div className="bg-gray-100 w-full flex items-center justify-center px-12">
           {steps.map((e, i) => (
             <StepNumber
               disabled={
@@ -64,7 +64,7 @@ export default function PurchaseLayout() {
             ></StepNumber>
           ))}
         </div>
-        <div className="px-20 flex-1 flex flex-col">
+        <div className="px-10 flex-1 flex flex-col">
           <p>{steps[currentStep].guide}</p>
           <Outlet />
         </div>

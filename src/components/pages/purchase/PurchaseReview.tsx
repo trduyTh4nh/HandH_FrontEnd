@@ -20,29 +20,31 @@ import CustomerInformationPayment from "@/components/widget/customerInformation.
 
 export default function PurchaseReview() {
   const { toast } = useToast();
-  const navigate = useNavigate()
-  //DEBUG
+  const navigate = useNavigate();
   const [formMode, setFormMode] = useState(0);
   const { user } = useUser();
   const cart = useCart();
+
   return (
-    <div className="flex h-full">
-      <div className="flex justify-center w-2/3 flex-1 overflow-y-auto max-h-[80vh]">
-        <div className="w-full mt-6">
-          {cart.paymentProducts.map((item, index) => (
-            <CartItemPayment
-              key={index}
-              {...item}
-              colorPicked={item.color}
-              sizePicked={item.size}
-            />
-          ))}
-        </div>
+    <div className="flex flex-col h-full w-full md:flex-row">
+      {/* Danh sách sản phẩm */}
+      <div className="flex flex-col flex-1 overflow-y-auto max-h-[70vh] px-4 py-4">
+        <h3 className="text-xl font-bold mb-4">Danh sách sản phẩm</h3>
+        {cart.paymentProducts.map((item, index) => (
+          <CartItemPayment
+            key={index}
+            {...item}
+            colorPicked={item.color}
+            sizePicked={item.size}
+          />
+        ))}
       </div>
-      <hr className="h-full border-black border-[1px]"></hr>
-      <div className="flex flex-col w-1/3 px-8 gap-2 py-4">
-        <h3 className="text-2xl font-bold">Tổng tiền</h3>
-        <h2 className="font-bold text-4xl">
+
+      <hr className="hidden md:block border-black border-[1px]" />
+
+      <div className="flex flex-col w-full md:w-1/3 px-4 py-4 gap-4">
+        <h3 className="text-lg font-bold">Tổng tiền</h3>
+        <h2 className="font-bold text-2xl md:text-3xl">
           {convertMoney(
             cart.paymentProducts.reduce(
               (acc, cur) => (cur.isPicked ? acc + cur.priceCartDetail : acc),
@@ -50,12 +52,11 @@ export default function PurchaseReview() {
             )
           )}
         </h2>
-        <div className="flex flex-row items-center">
-          <p>
-            {cart.paymentProducts.reduce((acc, cur) => acc + cur.quantity, 0)}{" "}
-            sản phẩm
-          </p>
-        </div>
+        <p>
+          {cart.paymentProducts.reduce((acc, cur) => acc + cur.quantity, 0)} sản phẩm
+        </p>
+
+        {/* Thông tin cá nhân */}
         {user ? (
           <CustomerInformationPayment />
         ) : (
@@ -66,7 +67,7 @@ export default function PurchaseReview() {
                 description: JSON.stringify(e),
               });
             }}
-          ></GuestPurchaseForm>
+          />
         )}
         <Button onClick={() => navigate("/cart")} variant={"secondary"} className="transition-all">
           Huỷ
@@ -75,3 +76,5 @@ export default function PurchaseReview() {
     </div>
   );
 }
+
+

@@ -21,6 +21,7 @@ export async function register(data) {
       ...rest,
       name: fullName,
     });
+    //@ts-ignore
     return res;
   } catch (error) {
     const e = error as AxiosError;

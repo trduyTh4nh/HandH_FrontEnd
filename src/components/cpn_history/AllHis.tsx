@@ -8,6 +8,20 @@ import ErrorView from "../widget/Error.widget";
 import { Input } from "../ui/input";
 import { getProduct } from "@/apis/products/product-repo";
 import { AxiosError } from "axios";
+import { convertMoney } from "@/utils";
+import { orderStatus, orderStatusClass } from "@/types/order.type";
+import { updateOrderStatus } from "@/apis/order/order-repo";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "../ui/dialog";
+import { Button } from "../ui/button";
 
 interface Product {
   name: string;
@@ -38,13 +52,26 @@ const AllHis = () => {
   const parsedUser = JSON.parse(user || "{}");
   const userId = parsedUser._id;
   console.log(userId);
+  async function cancelOrder(orderId: string) {
+    const res = await updateOrderStatus(orderId, "failed");
+    if (res instanceof AxiosError) {
+      return;
+    }
+    if (res) {
+      setOrders(
+        orders.map((order) =>
+          order._id === orderId ? { ...order, orderStatus: "failed" } : order
+        )
+      );
+    }
+  }
   async function getProducts() {
     const res = await getProduct();
     if (res instanceof AxiosError) {
       console.warn(res);
       return;
     }
-    console.log(res.metadata)
+    console.log(res.metadata);
     setProducts(res.metadata);
   }
   const [orders, setOrders] = useState<any[]>([]);
@@ -68,10 +95,9 @@ const AllHis = () => {
   };
 
   const calculateItemsCount = (products: Product[]) => {
-    console.log(products)
-    return products.reduce((total, product) =>  {
-      if(product)
-        return total + product.quantity
+    console.log(products);
+    return products.reduce((total, product) => {
+      if (product) return total + product.quantity;
     }, 0);
   };
 
@@ -121,7 +147,7 @@ const AllHis = () => {
           key={index}
           className="border rounded-lg mb-4 p-4 shadow-sm w-full"
         >
-          <div className="flex justify-between items-center">
+          <div className="flex md:justify-between gap-2 items-center flex-col md:flex-row">
             <div>
               <h2 className="text-lg font-semibold">
                 Đơn hàng ngày {new Date(order.createdAt).toLocaleDateString()}
@@ -132,7 +158,15 @@ const AllHis = () => {
               </p>
             </div>
             <div>
-              <p className="text-lg font-semibold">{order.totalPrice} đồng</p>
+              <p className="text-lg font-semibold">
+                {convertMoney(
+                  order.products.reduce(
+                    (acc, product) =>
+                      product ? acc + product.priceAtPurchase : acc,
+                    0
+                  )
+                )}
+              </p>
             </div>
             <div>
               <p className="text-sm text-gray-500">
@@ -140,14 +174,43 @@ const AllHis = () => {
               </p>
             </div>
             <div>
-              <p className="bg-[#FFECC4] text-black rounded-full px-4 py-1 text-sm">
-                {order.orderStatus}
+              <p
+                className={`${
+                  orderStatusClass[order.orderStatus]
+                } text-black rounded-full px-4 py-1 text-sm`}
+              >
+                {orderStatus[order.orderStatus]}
               </p>
             </div>
             <div>
-              <button className="bg-gray-200 text-black rounded-full px-4 py-1 text-sm">
-                Hủy đơn hàng
-              </button>
+              <Dialog>
+                <DialogTrigger>
+                  <button
+                    disabled={order.orderStatus != "pending"}
+                    className="bg-gray-200 text-black rounded-full px-4 py-1 text-sm disabled:opacity-50"
+                  >
+                    Hủy đơn hàng
+                  </button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>
+                      Bạn có chắc chắn muốn hủy đơn hàng {order._id}?
+                    </DialogTitle>
+                  </DialogHeader>
+                  <DialogDescription>
+                    Hành động này không thể được hoàn tác.
+                  </DialogDescription>
+                  <DialogFooter>
+                    <DialogClose>
+                      <Button onClick={() => {cancelOrder(order._id)}}>Huỷ đơn hàng</Button>
+                    </DialogClose>
+                    <DialogClose>
+                      <Button variant="secondary">Huỷ</Button>
+                    </DialogClose>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
             </div>
             <button onClick={() => toggleExpand(index)}>
               {expandedOrderIndex === index ? (
@@ -160,46 +223,58 @@ const AllHis = () => {
 
           {expandedOrderIndex === index && (
             <div className="mt-4">
-              {order.products.map((product, index) => product && (
-                <div key={index} className="flex items-center border-t py-2">
-                  <img
-                    className="w-16 h-28 bg-gray-300 rounded-lg object-cover"
-                    src={product.product_thumb}
-                    alt=""
-                  />
-                  <div className="ml-4">
-                    <p className="font-semibold">{product.product_name}</p>
-                    <div className="flex items-center gap-2">
-                      {product.size && (
-                        <span className="flex justify-center items-center bg-black rounded-full px-4 py-2 h-8 text-sm text-white">
-                          {product.size ? product.size.size : "    "}
-                        </span>
-                      )}
-                      {product.color && (
-                        <div className="flex bg-gray-200 rounded-full px-4 py-2 h-8 text-sm items-center font-bold gap-2">
-                          {product.color && (
-                            <div
-                              style={{
-                                backgroundColor: product.color
-                                  ? product.color.color
-                                  : "",
-                              }}
-                              className="w-4 h-4 rounded-lg"
-                            ></div>
-                          )}
-                          <span>
-                            {product.color ? product.color.color : ""}
-                          </span>
+              {order.products.map(
+                (product, index) =>
+                  product && (
+                    <div
+                      key={index}
+                      className="flex md:flex-row flex-col items-center border-t py-2"
+                    >
+                      <div className="flex gap-2 items-center w-full">
+                        <img
+                          className="w-16 h-28 bg-gray-300 rounded-lg object-cover"
+                          src={product.product_thumb}
+                          alt=""
+                        />
+                        <div className="ml-4">
+                          <p className="font-semibold">
+                            {product.product_name}
+                          </p>
+                          <div className="flex items-center gap-2">
+                            {product.size && (
+                              <span className="flex justify-center items-center bg-black rounded-full px-4 py-2 h-8 text-sm text-white">
+                                {product.size ? product.size.size : "    "}
+                              </span>
+                            )}
+                            {product.color && (
+                              <div className="flex bg-gray-200 rounded-full px-4 py-2 h-8 text-sm items-center font-bold gap-2">
+                                {product.color && (
+                                  <div
+                                    style={{
+                                      backgroundColor: product.color
+                                        ? product.color.color
+                                        : "",
+                                    }}
+                                    className="w-4 h-4 rounded-lg"
+                                  ></div>
+                                )}
+                                <span>
+                                  {product.color ? product.color.color : ""}
+                                </span>
+                              </div>
+                            )}
+                          </div>
                         </div>
-                      )}
+                      </div>
+                      <div className="flex items-center gap-8">
+                        <div className="ml-auto">x{product.quantity}</div>
+                        <div className="ml-auto font-bold text-xl">
+                          {convertMoney(product.priceAtPurchase)}
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                  <div className="ml-auto">x{product.quantity}</div>
-                  <div className="ml-auto font-bold text-xl">
-                    {product.priceAtPurchase} đồng
-                  </div>
-                </div>
-              ))}
+                  )
+              )}
             </div>
           )}
         </div>

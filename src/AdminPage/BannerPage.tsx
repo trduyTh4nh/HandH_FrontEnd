@@ -246,7 +246,7 @@ const BannerPage: React.FC = () => {
                     Thêm banner
                   </Button>
                 </DialogTrigger>
-                <DialogContent className="min-w-[50%]">
+                <DialogContent className="min-w-[50%] max-h-screen overflow-auto">
                   <DialogHeader>
                     <DialogTitle>Thêm banner</DialogTitle>
                   </DialogHeader>
@@ -456,6 +456,7 @@ function BannerForm({ banner, onSubmit }: BannerFormProps) {
   const [image, setImage] = useState<File | null>(null);
   const [loadingUpload, setLoadingUpload] = React.useState(false);
   const [bannerProducts, setBannerProducts] = React.useState<IProduct[]>([]);
+  const [showAddProduct, setShowAddProduct] = React.useState(false);
   async function handleSubmit(e: z.infer<typeof bannerSchema>) {
     console.log("Data update: ", e);
     console.log("Image update", image);
@@ -466,13 +467,14 @@ function BannerForm({ banner, onSubmit }: BannerFormProps) {
         ...rest,
         type: "sub",
       },
-      file
+      file,
+      bannerProducts.map((e) => e._id)
     );
     setLoadingUpload(false);
     console.log("CHECK DONE: ", response);
     onSubmit(
       banner
-        ? { ...e, id: banner.id, type: "sub" }
+        ? { ...e, _id: banner._id, type: "sub" }
         : { ...e, type: "sub", imageUrl: URL.createObjectURL(file) }
     );
   }
@@ -574,15 +576,7 @@ function BannerForm({ banner, onSubmit }: BannerFormProps) {
             </FormItem>
           )}
         />
-        <Button type="submit">
-          {loadingUpload ? (
-            <Loader className="animate-spin" />
-          ) : banner ? (
-            "Update Banner"
-          ) : (
-            "Thêm Bảng quảng cáo"
-          )}
-        </Button>
+
         <b className="text-sm">Danh sách sản phẩm</b>
         <Table>
           <TableHeader>
@@ -635,7 +629,16 @@ function BannerForm({ banner, onSubmit }: BannerFormProps) {
                   </TooltipProvider>
                 </TableCell>
                 <TableCell>
-                  <Button variant="outline" size="sm">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      setBannerProducts(
+                        bannerProducts.filter((p) => p._id !== e._id)
+                      );
+                    }}
+                  >
                     Xóa
                   </Button>
                 </TableCell>
@@ -643,7 +646,7 @@ function BannerForm({ banner, onSubmit }: BannerFormProps) {
             ))}
           </TableBody>
         </Table>
-        <Dialog>
+        <Dialog open={showAddProduct} onOpenChange={setShowAddProduct}>
           <DialogTrigger className="w-full">
             <Button type="button" className="w-full" variant="outline">
               Thêm sản phẩm
@@ -653,9 +656,32 @@ function BannerForm({ banner, onSubmit }: BannerFormProps) {
             <DialogHeader className="bg-background">
               <DialogTitle>Thêm sản phẩm vào miêu bảng quảng cáo</DialogTitle>
             </DialogHeader>
-            <ProductAddForm />
+            <ProductAddForm
+              availableProducts={bannerProducts}
+              onSubmit={(e) => {
+                if (
+                  !e.some((product) =>
+                    bannerProducts.some(
+                      (bannerProduct) => bannerProduct._id === product._id
+                    )
+                  )
+                ) {
+                  setBannerProducts([...bannerProducts, ...e]);
+                  setShowAddProduct(false);
+                }
+              }}
+            />
           </DialogContent>
         </Dialog>
+        <Button type="submit">
+          {loadingUpload ? (
+            <Loader className="animate-spin" />
+          ) : banner ? (
+            "Update Banner"
+          ) : (
+            "Thêm Bảng quảng cáo"
+          )}
+        </Button>
       </form>
     </Form>
 
@@ -713,21 +739,36 @@ function BannerForm({ banner, onSubmit }: BannerFormProps) {
     // </form>
   );
 }
-function ProductAddForm() {
+type ProductAddFormProps = {
+  onSubmit?: (prods: IProduct[]) => void;
+  availableProducts?: IProduct[];
+};
+function ProductAddForm(props: ProductAddFormProps) {
   const [products, setProducts] = useState<IProduct[]>(null);
   const [queryProducts, setQueryProducts] = useState<IProduct[]>(null);
   const [selectedProducts, setSelectedProducts] = useState<IProduct[]>([]);
   const [loading, setLoading] = useState(false);
+  const [filterMode, setFilterMode] = useState(false);
+  const [searchQueryProduct, setSearchQueryProduct] = useState("");
   function editProduct(add: boolean, product: IProduct) {
     if (add) {
+      if (props.availableProducts.some((p) => p._id == product._id)) {
+        return;
+      }
       setSelectedProducts([...selectedProducts, product]);
     } else {
-      setSelectedProducts(selectedProducts.filter((e) => e._id !== product._id));
+      setSelectedProducts(
+        selectedProducts.filter((e) => e._id !== product._id)
+      );
     }
   }
   function addAll(add: boolean) {
     if (add) {
-      setSelectedProducts(products);
+      setSelectedProducts(
+        products.filter(
+          (e) => !props.availableProducts.some((p) => p._id == e._id)
+        )
+      );
     } else {
       setSelectedProducts([]);
     }
@@ -739,33 +780,84 @@ function ProductAddForm() {
       console.log(data.message);
     } else {
       setQueryProducts(data.metadata);
-      setProducts(data.metadata)
+      setProducts(data.metadata.filter((e) => e.isPublished));
     }
+    setFilterMode(true);
     setLoading(false);
   }
   useEffect(() => {
-    getAllProducts();
-  }, []);
-  function searchProduct(query: string) {
-    if (query == "") {
-      setProducts(products);
-    } else {
-      setProducts(
-        queryProducts.filter((e) =>
-          e.product_name.toLowerCase().includes(query.toLowerCase())
-        )
-      );
+    if (!products) {
+      getAllProducts();
     }
+  });
+  function changeFilterMode(val: boolean) {
+    if (searchQueryProduct != "") {
+      setFilterMode(val);
+      return;
+    }
+    setProducts(
+      val ? queryProducts.filter((e) => e.isPublished) : queryProducts
+    );
+    setFilterMode(val);
+  }
+  useEffect(() => {
+    if (searchQueryProduct != "") {
+      searchProduct(searchQueryProduct);
+    }
+  }, [filterMode]);
+  function searchProduct(query: string, filter?: boolean) {
+    if (query == "") {
+      setProducts(
+        filterMode || filter
+          ? queryProducts.filter((e) => e.isPublished)
+          : queryProducts
+      );
+    } else {
+      const filteredProducts = queryProducts.filter((e) =>
+        e.product_name.toLowerCase().includes(query.toLowerCase())
+      );
+      if (filterMode) {
+        setProducts(filteredProducts.filter((e) => e.isPublished));
+      } else {
+        setProducts(filteredProducts);
+      }
+    }
+    setSearchQueryProduct(query);
   }
   return (
     <>
-      <Input placeholder="Tìm kiếm sản phẩm" onChange={(e) => {searchProduct(e.target.value)}}/>
+      <Input
+        placeholder="Tìm kiếm sản phẩm"
+        onChange={(e) => {
+          searchProduct(e.target.value);
+        }}
+      />
+      <div className="flex gap-2 items-center">
+        <Switch
+          checked={filterMode}
+          disabled={loading}
+          onCheckedChange={changeFilterMode}
+          id="switch"
+        ></Switch>
+        <Label htmlFor="switch">
+          Chỉ hiện sản phẩm đã được hiển thị trên trang chủ
+        </Label>
+      </div>
       <div className="flex flex-col gap-2 w-full h-full">
         <Table className="flex-1">
           <TableHeader className="sticky top-0">
             <TableRow>
               <TableHead>
-                <Checkbox checked={products && products.length == selectedProducts.length} onCheckedChange={addAll} />
+                <Checkbox
+                  checked={
+                    products &&
+                    products.filter(
+                      (e) =>
+                        !props.availableProducts.some((p) => p._id == e._id)
+                    ).length == selectedProducts.length
+                  }
+                  onCheckedChange={addAll}
+                />
               </TableHead>
               <TableHead>Hình ảnh</TableHead>
               <TableHead>Tên SP</TableHead>
@@ -779,6 +871,9 @@ function ProductAddForm() {
                 <TableRow key={e._id}>
                   <TableCell>
                     <Checkbox
+                      disabled={props.availableProducts.some(
+                        (p) => p._id == e._id
+                      )}
                       id={e._id}
                       checked={selectedProducts.some(
                         (selectedProduct) => selectedProduct._id === e._id
@@ -830,7 +925,14 @@ function ProductAddForm() {
           </TableBody>
         </Table>
       </div>
-      <Button className="sticky w-full bottom-0">Thêm các sản phẩm</Button>
+      <Button
+        onClick={() => {
+          props.onSubmit(selectedProducts);
+        }}
+        className="sticky w-full bottom-0"
+      >
+        Thêm các sản phẩm
+      </Button>
     </>
   );
 }

@@ -89,10 +89,10 @@ const Home: React.FC = () => {
       <div id="" className="home-page flex flex-col gap-8 w-full">
         {bannerList ? (
           <HomeBanner
-            title={bannerList[0].title}
-            description={bannerList[0].content}
-            image={bannerList[0].url}
-            link=""
+            title={bannerList.find(e => e.isMain).title}
+            description={bannerList.find(e => e.isMain).content}
+            image={bannerList.find(e => e.isMain).url}
+            link={`/shop/event/${bannerList.find(e => e.isMain)._id}`}
             button=""
           />
         ) : (
@@ -143,10 +143,10 @@ const Home: React.FC = () => {
               ))}
             </div>
           <h2 className="text-center">Hàng mới</h2>
-          <div className="home-new-list-product flex flex-wrap">
+          <div className="grid grid-cols-2 md:grid-cols-4">
             {prodList
               ? prodList.map((product: IProduct, index: number) => (
-                  <div className="wrap-product">
+                  <div>
                     <ProductItem key={index} {...product} />
                   </div>
                 ))
@@ -239,7 +239,7 @@ const Home: React.FC = () => {
           </div>
           <div className="flex justify-center">
             <iframe
-              src="https://www.google.com/maps/embed?pb=!1m17!1m12!1m3!1d1183.2701956956064!2d106.6994168288345!3d10.760924365071583!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m2!1m1!2s!5e1!3m2!1svi!2s!4v1728117283615!5m2!1svi!2s"
+              src="https://www.google.com/maps/embed?pb=!1m17!1m12!1m3!1d656.8361251764034!2d106.69957624298158!3d10.7611373305696!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m2!1m1!2zMTDCsDQ1JzQwLjMiTiAxMDbCsDQxJzU4LjkiRQ!5e1!3m2!1svi!2s!4v1733406886368!5m2!1svi!2s"
               width="600"
               height="450"
               allowFullScreen

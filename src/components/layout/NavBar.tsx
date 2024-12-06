@@ -56,11 +56,13 @@ import {
   Sheet,
   SheetClose,
   SheetContent,
+  SheetFooter,
   SheetHeader,
   SheetTrigger,
 } from "../ui/sheet";
 import { Link } from "react-router-dom";
 import { Separator } from "../ui/separator";
+import { CommandDialog, CommandInput } from "../ui/command";
 // import { duration } from "@mui/material";
 const navLinks = [
   {
@@ -190,7 +192,7 @@ const Navbar: React.FC = () => {
   return (
     <nav
       id="nav-main"
-      className=" bg-white/90 backdrop-blur-xl fixed w-full top-0 z-30 rounded-b-3xl shadow-md"
+      className=" bg-white/90 backdrop-blur-xl fixed w-screen box-border top-0 z-30 rounded-b-3xl shadow-md"
     >
       <div className="flex mx-auto px-10 md:px-20 py-4 justify-between items-center">
         <div className="flex justify-start gap-4 items-center">
@@ -204,7 +206,97 @@ const Navbar: React.FC = () => {
                   <Menu></Menu>
                 </Button>
               </SheetTrigger>
-              <SheetContent side="left" className="space-y-4">
+              <SheetContent
+                side="left"
+                className="space-y-4 flex flex-col h-screen box-border"
+              >
+                <SheetHeader>
+
+                  {isLoading ? <p>Đang tải...</p> : !user ? <div className="flex flex-col gap-2">
+                    
+                  </div> : (
+                    <DropdownMenu>
+                      <DropdownMenuTrigger>
+                        <div className="flex gap-4 items-center p-2 hover:bg-gray-100 rounded-2xl transition-all">
+                          <Avatar>
+                            <AvatarImage
+                              src={user && (user.avatar as string)}
+                            ></AvatarImage>
+                            <AvatarFallback>
+                              <UserCircle width={16} height={16} />
+                            </AvatarFallback>
+                          </Avatar>
+                          <div className="flex flex-col items-start">
+                            <b>{user.name}</b>
+                            <a className="text-sm">Ấn để xem hồ sơ cá nhân</a>
+                          </div>
+                        </div>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent>
+                        <DropdownMenuLabel>Tuỳ chọn</DropdownMenuLabel>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuGroup>
+                          <DropdownMenuItem
+                            className="flex gap-2"
+                            onClick={() => {
+                              setShowSheet(false);
+                              navigate("/user/account");
+                            }}
+                          >
+                            <User className="w-4 h-4" />
+                            <p className="flex-1">Hồ sơ</p>
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            className="flex gap-2"
+                            onClick={() => {
+                              setShowSheet(false);
+                              navigate("/user/favoriteProduct");
+                            }}
+                          >
+                            <Heart className="w-4 h-4" />
+                            <p className="flex-1">Sản phẩm yêu thích</p>
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            className="flex gap-2"
+                            onClick={() => {
+                              setShowSheet(false);
+                              navigate("/user/paymentHistory");
+                            }}
+                          >
+                            <ReceiptText className="w-4 h-4" />
+                            <p className="flex-1">Lịch sử mua hàng</p>
+                          </DropdownMenuItem>
+                          {user.role == "3107" ? (
+                            <DropdownMenuItem
+                              className="flex gap-2"
+                              onClick={() => {
+                                setShowSheet(false);
+                                navigate("/admin");
+                              }}
+                            >
+                              <Shield className="w-4 h-4" />
+                              <p className="flex-1">Quản lý</p>
+                            </DropdownMenuItem>
+                          ) : null}
+                        </DropdownMenuGroup>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuGroup>
+                          <DropdownMenuItem
+                            className="flex gap-2"
+                            onClick={() => {
+                              setShowLogoutConfirm(true);
+                            }}
+                          >
+                            <LogOut className="w-4 h-4" />
+                            <p className="flex-1">Đăng xuất</p>
+                          </DropdownMenuItem>
+                        </DropdownMenuGroup>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  )}
+                </SheetHeader>
+
+                <Separator />
                 <div className="flex flex-col gap-2">
                   {navLinks.map((e, index) => (
                     <SheetClose>
@@ -222,11 +314,13 @@ const Navbar: React.FC = () => {
                   ))}
                 </div>
                 <Separator className="w-full" />
-                <div>
-                  {cates &&
-                    cates.map((category: ICategory, index) => (
-                      <div key={index}>{boxCategory(category)}</div>
-                    ))}
+                <div className="flex flex-col justify-between flex-1">
+                  <div>
+                    {cates &&
+                      cates.map((category: ICategory, index) => (
+                        <div key={index}>{boxCategory(category)}</div>
+                      ))}
+                  </div>
                 </div>
               </SheetContent>
             </Sheet>

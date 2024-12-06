@@ -130,6 +130,16 @@ export async function addToWishlish(idProd: string) {
     return error;
   }
 }
+export async function removeFromWishList(idProd: string) {
+  try {
+    const response = await api.delete(`wishlist/deleteProductInWishlist/${idProd}`);
+    return response;
+  } catch (error) {
+    const e = error as AxiosError;
+    console.log(e);
+    return error;
+  }
+}
 export async function unPublishProduct(id: string) {
   try {
     const response = await api.patch(`product/unPublicProduct/${id}`);
@@ -175,7 +185,7 @@ export async function addColorsToProduct(
       const formData = new FormData();
       formData.append("file", color.color_image as File);
       formData.append("idProduct", id);
-      formData.append("color_code", `#${colorInt.toString()}`);
+      formData.append("color_code", `#${color.color_code}`);
       formData.append("color_price", color.color_price.toString());
       formData.append(
         "color_isPicked",

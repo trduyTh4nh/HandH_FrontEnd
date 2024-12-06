@@ -13,13 +13,21 @@ import {
   decreaseQuantityCartDetail,
   createCartUser,
   increaseQuantityCartDetail,
+  deleteMultipleItemsinCart,
 } from "@/apis/cart/cart-repo";
 import { IUserAddress } from "@/types/user.type";
 import { createOrderFromCart } from "@/apis/order/order-repo";
 import { AxiosError } from "axios";
 import { set } from "date-fns";
+import { IProduct } from "@/types/product.type";
+import { addToWishlish, getAllProInWishList, removeFromWishList } from "@/apis/products/product-repo";
 
 interface CartContextType {
+  favoriteProducts: IProduct[];
+  setFavoriteProducts: React.Dispatch<React.SetStateAction<IProduct[]>>;
+  addToFavoriteProduct: (product: IProduct) => Promise<void>;
+  removeFromFavoriteProduct: (idProduct: string) => Promise<void>;
+  getFavoriteProducts: () => Promise<void>;
   cart: any;
   paymentProducts: any[];
   setCart: React.Dispatch<React.SetStateAction<any>>;
@@ -45,12 +53,43 @@ const CartContext = createContext<CartContextType | undefined>(undefined);
 export const CartProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
+  const [favoriteProducts, setFavoriteProducts] = useState<IProduct[]>([]);
   const [paymentProducts, setPaymentProducts] = useState<any[]>([]);
   const [orderId, setOrderId] = useState<string>("");
   const [cart, setCart] = useState<any>({});
+  const getFavoriteProducts = async () => {
+    try {
+      const response = await getAllProInWishList();
+      setFavoriteProducts(response.metadata[0].products);
+    } catch (error) {
+      console.error("Failed to fetch favorite products:", error);
+    }
+  }
+  const addToFavoriteProduct = async (product: IProduct) => {
+    try {
+      const res = await addToWishlish(product._id);
+      if(res instanceof AxiosError){
+        return
+      }
+      setFavoriteProducts([...favoriteProducts, product]);
+    } catch (error) {
+      console.error("Failed to fetch favorite products:", error);
+    }
+  }
   const getCart = async (userId: string) => {
     try {
       const response = await getAllCartOfUser(userId);
+      if(response.metadata.cart === null){
+        const res = await createCartUser(userId)
+        setCart({
+          ...(res.metadata || { items: [] }),
+          cart_products: res.metadata.cart_products.map((e) => ({
+            ...e,
+            isPicked: false,
+          })),
+        });
+        return
+      }
       setCart({
         ...(response.metadata.cart || { items: [] }),
         cart_products: response.metadata.cart.cart_products.map((e) => ({
@@ -117,6 +156,7 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({
       .map((e) => e._id);
     console.log(products);
     const res = await createOrderFromCart(products, cart._id, idUser, address);
+    const res2 = await deleteMultipleItemsinCart(cart._id, cart.cart_products.filter((e) => e.isPicked).map((e) => e._id));
     console.log(res);
     //@ts-ignore
     setOrderId(res.metadata._id);
@@ -124,6 +164,9 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({
     if (res instanceof AxiosError) {
       console.log("Failed to create order:", res);
       return res;
+    } else if (res2 instanceof AxiosError) {
+      console.log("Failed to delete items in cart:", res2);
+      return res2;
     }
     setCart({
       ...cart,
@@ -140,9 +183,21 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({
     setPaymentProducts(products);
     setOrderId(null);
   };
+  const removeFromFavoriteProduct = async (idProduct: string) => {
+    const res = await removeFromWishList(idProduct);
+    if(res instanceof AxiosError){
+      return
+    }
+    setFavoriteProducts(favoriteProducts.filter((e) => e._id !== idProduct));
+  }
   return (
     <CartContext.Provider
       value={{
+        getFavoriteProducts,
+        setFavoriteProducts,
+        removeFromFavoriteProduct,
+        addToFavoriteProduct,
+        favoriteProducts,
         proceedToPayment,
         paymentProducts,
         cart,

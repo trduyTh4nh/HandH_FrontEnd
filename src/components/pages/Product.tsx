@@ -20,7 +20,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "../ui/accordion";
-import { Heart, Loader, ShoppingCart } from "lucide-react";
+import { Heart, HeartOff, Loader, ShoppingCart } from "lucide-react";
 import SkeletonLoadingProduct from "../widget/skeletonLoadingProduct";
 import Recommendations from "../widget/recommendations";
 import { useToast } from "@/hooks/use-toast";
@@ -33,6 +33,8 @@ export default function Product() {
   const [error, setError] = useState<AxiosError>(null);
   const [productImages, setProductImages] = useState([]);
   const [price, setPrice] = useState<number>(0);
+  const { favoriteProducts, addToFavoriteProduct, removeFromFavoriteProduct } =
+    useCart();
   async function getProduct() {
     console.log(id);
     const response = await getProductById(decodeURI(id));
@@ -47,16 +49,19 @@ export default function Product() {
     setCateId(response.metadata.product_category);
   }
   async function addFavorite() {
-    const res = await addToWishlish(id);
-    if (res instanceof AxiosError) {
-      console.log(res);
-      return;
+    if(favoriteProducts.some((e) => e._id == product._id)) {
+      await removeFromFavoriteProduct(product._id);
+      toast({
+        title: "Đã xoá sản phẩm khỏi mục yêu thích.",
+        description: `Đã xoá sản phẩm ${product.product_name} khỏi mục yêu thích. Vui lòng truy cập 'Hồ Sơ > Mục Yêu Thích' để xem.`,
+      });
+      return
     }
+    await addToFavoriteProduct(product);
     toast({
       title: "Đã thêm sản phẩm vào mục yêu thích.",
       description: `Đã thêm sản phẩm ${product.product_name} vào mục yêu thích. Vui lòng truy cập 'Hồ Sơ > Mục Yêu Thích' để xem.`,
     });
-    return res;
   }
   useEffect(() => {
     setProduct(null);
@@ -229,7 +234,7 @@ export default function Product() {
                         setPrice(
                           (prev) =>
                             (product.product_price +
-                            (selectedPrice ? selectedPrice.price : 0) +
+                              (selectedPrice ? selectedPrice.price : 0) +
                               e.price) *
                             quantity
                         );
@@ -256,10 +261,9 @@ export default function Product() {
                           setColors(() => changeSelected(e, colors, selected));
                           setPrice(
                             (prev) =>
-                              (product.product_price +
-                                e.price +
-                               selectedSize ? selectedSize.price : 0) *
-                              quantity
+                              (product.product_price + e.price + selectedSize
+                                ? selectedSize.price
+                                : 0) * quantity
                           );
                           if (e.image) {
                             setProduct({
@@ -298,7 +302,11 @@ export default function Product() {
                 variant="secondary"
                 onClick={addFavorite}
               >
-                <Heart width={16} height={16} />
+                {favoriteProducts.some((e) => e._id == product._id) ? (
+                  <Heart strokeWidth={0} fill="red" width={16} height={16} />
+                ) : (
+                  <Heart width={16} height={16} />
+                )}
               </Button>
             </div>
           </div>

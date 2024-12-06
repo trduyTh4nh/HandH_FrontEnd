@@ -7,33 +7,18 @@ import SkeletonLoadingProductGrid from "./SkeletonGridLoading";
 import ProductErrorView from "./productError.widget";
 import { Link } from "react-router-dom";
 import { Button } from "../ui/button";
+import { useCart } from "@/providers/CartContext";
 
 export const FavoriteProduct: React.FC = () => {
-  const [products, setProducts] = useState<IProduct[]>(null);
-  const [loading, setLoading] = useState(true);
-  async function getFavoriteProduct() {
-    const res = await getAllProInWishList();
-    if (res instanceof AxiosError) {
-      console.log(res);
-      setLoading(false);
-      return;
-    }
-    console.log(res);
-    setLoading(false);
-    if (res.metadata[0]) {
-      setProducts(res.metadata[0].products);
-    }
-  }
-  useEffect(() => {
-    getFavoriteProduct();
-  }, []);
+  const {favoriteProducts} = useCart();
+  const [loading, setLoading] = useState(false);
   return (
     <div className="w-full p-4">
       <h2 className="text-4xl font-bold">Sản phẩm yêu thích</h2>
-      {!loading ? (
-        <div className={`w-full ${products ? "grid" : ""} grid-cols-3`}>
-          {products ? products ? (
-            products.map((product) => {
+      {favoriteProducts ? (
+        <div className={`w-full ${favoriteProducts ? "grid" : ""} grid-cols-3`}>
+          {favoriteProducts ? favoriteProducts ? (
+            favoriteProducts.map((product) => {
               return <ProductItem {...product} />;
             })
           ) : (
