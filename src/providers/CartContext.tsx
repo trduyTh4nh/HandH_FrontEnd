@@ -13,6 +13,7 @@ import {
   decreaseQuantityCartDetail,
   createCartUser,
   increaseQuantityCartDetail,
+  deleteMultipleItemsinCart,
 } from "@/apis/cart/cart-repo";
 import { IUserAddress } from "@/types/user.type";
 import { createOrderFromCart } from "@/apis/order/order-repo";
@@ -79,7 +80,14 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({
     try {
       const response = await getAllCartOfUser(userId);
       if(response.metadata.cart === null){
-        await createCartUser(userId)
+        const res = await createCartUser(userId)
+        setCart({
+          ...(res.metadata || { items: [] }),
+          cart_products: res.metadata.cart_products.map((e) => ({
+            ...e,
+            isPicked: false,
+          })),
+        });
         return
       }
       setCart({
@@ -148,6 +156,7 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({
       .map((e) => e._id);
     console.log(products);
     const res = await createOrderFromCart(products, cart._id, idUser, address);
+    const res2 = await deleteMultipleItemsinCart(cart._id, cart.cart_products.filter((e) => e.isPicked).map((e) => e._id));
     console.log(res);
     //@ts-ignore
     setOrderId(res.metadata._id);
@@ -155,6 +164,9 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({
     if (res instanceof AxiosError) {
       console.log("Failed to create order:", res);
       return res;
+    } else if (res2 instanceof AxiosError) {
+      console.log("Failed to delete items in cart:", res2);
+      return res2;
     }
     setCart({
       ...cart,

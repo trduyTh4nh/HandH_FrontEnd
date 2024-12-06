@@ -135,6 +135,22 @@ export async function GetAllOrderOfUser(idUser: string) {
     return null;
   }
 }
+export async function deleteMultipleItemsinCart(idCart: string, products: string[]) {
+  try {
+    const response = await api.post(`cart/deleteManyCartDetail`, {
+      cart: idCart,
+      cartDetails: products
+    });
+    return response;
+  } catch (e) {
+    if (e instanceof AxiosError) {
+      console.warn(e);
+      return e;
+    }
+    console.error(e);
+    return null;
+  }
+}
 export async function bulkRemoveProductIncart(idCart: string, products: string[]) {
   try {
     const payload = {

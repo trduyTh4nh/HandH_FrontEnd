@@ -39,9 +39,9 @@ export default function CustomerInformationPayment() {
       country: "Việt Nam",
     },
   });
-  async function nextStep() {
+  async function nextStep(data?: z.infer<typeof addressSchema>) {
     setLoading(true)
-    const res = await createPendingOrder(user._id, user.userAddress)
+    const res = await createPendingOrder(user._id, data || user.userAddress)
     if(res instanceof Error) {
       console.error(res);
       return;
@@ -56,7 +56,7 @@ export default function CustomerInformationPayment() {
       console.error(res);
       return;
     }
-    await nextStep();
+    await nextStep(data);
     setLoading(false);
   }
   const addressPicker = useAddressPicker({});
@@ -100,7 +100,7 @@ export default function CustomerInformationPayment() {
               {user.userAddress.state}
             </p>
           </div>
-          <Button onClick={nextStep}>
+          <Button onClick={() => {nextStep()}}>
             {loading ? <Loader className="animate-spin" /> : "Tiếp theo"}
           </Button>
         </>

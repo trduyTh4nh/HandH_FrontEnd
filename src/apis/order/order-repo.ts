@@ -70,6 +70,7 @@ export async function updateOrderStatus(id: string, status: string) {
     return res;
   } catch (e) {
     if (e instanceof AxiosError) {
+      console.warn(e);
       return e;
     }
     console.error(e);

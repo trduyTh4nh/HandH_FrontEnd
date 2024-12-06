@@ -129,10 +129,13 @@ const OrderPage: React.FC = () => {
       )
       .sort((a, b) => {
         const statusOrder = ["pending", "packing", "completed", "failed"];
-        return (
+        const statusComparison =
           statusOrder.indexOf(a.orderStatus) -
-          statusOrder.indexOf(b.orderStatus)
-        );
+          statusOrder.indexOf(b.orderStatus);
+        if (statusComparison !== 0) {
+          return statusComparison;
+        }
+        return new Date(b.orderDate).getTime() - new Date(a.orderDate).getTime();
       });
 
   return (
