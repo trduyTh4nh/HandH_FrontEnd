@@ -4,7 +4,7 @@ import { UserContext } from "../contexts/UserContext";
 
 function Footer() {
   const { user, setUser } = useContext(UserContext);
-  
+
   return (
     <div className="relative z-30 px-10 md:px-20 py-4 bg-primary-light flex flex-col gap-4">
       <div className="w-full flex justify-between">
@@ -46,10 +46,10 @@ function Footer() {
           Liên hệ:{" "}
           <span>
             <a
-              href="https://zaloapp.com/qr/p/1utkheobwdyv8"
+              href="tel:0909893395"
               className="text-black"
             >
-              0981734937
+              0909893395
             </a>
           </span>
         </span>
