@@ -213,7 +213,8 @@ const Navbar: React.FC = () => {
                 <SheetHeader>
 
                   {isLoading ? <p>Đang tải...</p> : !user ? <div className="flex flex-col gap-2">
-                    
+                    <Button variant="outline" onClick={() => {setLogin(true)}}>Đăng nhập</Button>
+                    <Button variant="outline" onClick={() => {setRegister(true)}}>Đăng ký</Button>
                   </div> : (
                     <DropdownMenu>
                       <DropdownMenuTrigger>
@@ -327,7 +328,7 @@ const Navbar: React.FC = () => {
             <NavLink to="/">
               <img
                 className="w-auto h-10 md:h-12"
-                src="/src/assets/image/logo_header.svg"
+                src="/logo_header.svg"
                 alt="Logo"
               />
             </NavLink>

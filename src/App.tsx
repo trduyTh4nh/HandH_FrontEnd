@@ -142,7 +142,7 @@ const UserRoute: React.FC = () => {
         onClick={() => (window.location.href = "https://zalo.me/0909893395")}
       >
         <img
-          src="/src/assets/image/icon_zalo.png"
+          src="/icon_zalo.png"
           className="w-full h-full object-cover transition-transform duration-200 transform group-hover:scale-110"
           alt="Zalo Icon"
         />

@@ -177,7 +177,7 @@ const CartItem: React.FC<ICartItemProps> = (props) => {
             <div className="cart-item_wrap-image py-4 ">
               <img
                 src={product.thumb_product as string}
-                className=" md:w-40 "
+                className="md:w-40 "
                 alt=""
               />
             </div>
@@ -195,12 +195,12 @@ const CartItem: React.FC<ICartItemProps> = (props) => {
                   {sizePicked.size}
                 </div>
                 <div className="bg-[#E8E8E8] flex flex-row items-center py-2 px-5 rounded-3xl ">
-                  <div
+                    <div
                     className="variant-color w-4 h-4  rounded-full"
-                    style={{ backgroundColor: colorPicked.color }}
-                  ></div>
+                    style={{ backgroundColor: colorPicked.color.replace(/#+/g, '#') }}
+                    ></div>
                   <p className="font-bold ml-2">
-                    {convertHextoColorName(colorPicked.color)}
+                    {convertHextoColorName(colorPicked.color.replace(/#+/g, '#'))}
                   </p>
                 </div>
               </div>

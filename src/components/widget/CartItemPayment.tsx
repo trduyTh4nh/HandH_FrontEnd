@@ -24,10 +24,10 @@ const CartItemPayMent: React.FC<ICartDetail> = (props) => {
                             <div className="flex items-center bg-gray-200 px-4 py-1 rounded-full">
                                 <div
                                     className="w-4 h-4 rounded-full"
-                                    style={{ backgroundColor: colorPicked.color }}
+                                    style={{ backgroundColor: colorPicked.color.replace(/#+/g, '#') }}
                                 />
                                 <p className="ml-2 text-sm font-bold">
-                                    {convertHextoColorName(colorPicked.color)}
+                                    {convertHextoColorName(colorPicked.color.replace(/#+/g, '#'))}
                                 </p>
                             </div>
                         </div>

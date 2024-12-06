@@ -54,7 +54,7 @@ const AboutUs: React.FC = () => {
         <div className="body flex flex-col">
           <img
             className="w-full imageAbout px-10 py-10"
-            src="https://lavenderstudio.com.vn/wp-content/uploads/2022/12/chup-hinh-ao-dai-uy-tin-10.jpg"
+            src="/banner-prod-min.png"
             alt=""
           />
           <div className="post-end px-10 md:px-20">

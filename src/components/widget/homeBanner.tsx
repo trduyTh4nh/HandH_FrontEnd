@@ -24,7 +24,7 @@ export default function HomeBanner(props: HomeBannerProps) {
           <p>{props.description}</p>
           <Link to={props.link}>
             <Button variant="ghost" className="w-fit px-12">
-              Mua ngay
+              Bắt đầu mua sắm
             </Button>
           </Link>
         </div>

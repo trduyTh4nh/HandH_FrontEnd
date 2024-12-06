@@ -14,13 +14,14 @@ import { IColorProductVariation, IProduct } from "@/types/product.type";
 import { AxiosError } from "axios";
 import ErrorView from "../widget/Error.widget";
 import { Link } from "react-router-dom";
+import { Helmet } from "react-helmet";
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from "../ui/accordion";
-import { Heart, HeartOff, Loader, ShoppingCart } from "lucide-react";
+import { Heart, HeartOff, Loader, Phone, ShoppingCart } from "lucide-react";
 import SkeletonLoadingProduct from "../widget/skeletonLoadingProduct";
 import Recommendations from "../widget/recommendations";
 import { useToast } from "@/hooks/use-toast";
@@ -49,13 +50,13 @@ export default function Product() {
     setCateId(response.metadata.product_category);
   }
   async function addFavorite() {
-    if(favoriteProducts.some((e) => e._id == product._id)) {
+    if (favoriteProducts.some((e) => e._id == product._id)) {
       await removeFromFavoriteProduct(product._id);
       toast({
         title: "Đã xoá sản phẩm khỏi mục yêu thích.",
         description: `Đã xoá sản phẩm ${product.product_name} khỏi mục yêu thích. Vui lòng truy cập 'Hồ Sơ > Mục Yêu Thích' để xem.`,
       });
-      return
+      return;
     }
     await addToFavoriteProduct(product);
     toast({
@@ -203,6 +204,9 @@ export default function Product() {
     <SkeletonLoadingProduct />
   ) : (
     <div className={`pt-4 transition-all w-full`}>
+      <Helmet>
+        <title>{product.product_name} - Áo dài Hồng Đức</title>
+      </Helmet>
       <div className="product_main flex flex-col md:flex-row flex-1 gap-8 px-10 md:px-48 pb-10 justify-stretch relative box-border">
         <div className="w-full md:w-1/2">
           <ImagesProduct
@@ -261,9 +265,10 @@ export default function Product() {
                           setColors(() => changeSelected(e, colors, selected));
                           setPrice(
                             (prev) =>
-                              (product.product_price + e.price + selectedSize
-                                ? selectedSize.price
-                                : 0) * quantity
+                              (product.product_price +
+                                e.price +
+                                (selectedSize ? selectedSize.price : 0)) *
+                              quantity
                           );
                           if (e.image) {
                             setProduct({
@@ -281,8 +286,16 @@ export default function Product() {
             </div>
             <div className="flex gap-2">
               <Button
-                disabled={loadingCart}
+                disabled={
+                  loadingCart
+                }
                 onClick={() => {
+                  if(product.product_name
+                    .toUpperCase()
+                    .includes("[HÀNG ĐẶT TRƯỚC]")) {
+                      window.location.href = "https://zalo.me/0909893395";
+                      return;
+                    }
                   if (!user) {
                     toast({
                       title: "Vui lòng đăng nhập",
@@ -294,8 +307,19 @@ export default function Product() {
                 }}
                 className="flex items-center gap-4"
               >
-                <ShoppingCart width={18} height={18} />
-                Thêm vào giỏ hàng
+                {product.product_name
+                  .toUpperCase()
+                  .includes("[HÀNG ĐẶT TRƯỚC]") ? (
+                  <>
+                    <Phone width={18} height={18} />
+                    Liên hệ để đặt trước
+                  </>
+                ) : (
+                  <>
+                    <ShoppingCart width={18} height={18} />
+                    Thêm vào giỏ hàng
+                  </>
+                )}
               </Button>
               <Button
                 disabled={!user}

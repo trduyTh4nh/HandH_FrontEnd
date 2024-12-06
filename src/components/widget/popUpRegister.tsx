@@ -61,14 +61,14 @@ function PopupRegister({ handleChange, switchToLogin }: any) {
   }
   return (
     <div className="flex gap-4 w-full">
-      <div className="flex-1">
+      <div className="flex-1 md:block hidden">
         <img
-          src="src/assets/image/imglogin.jpg"
+          src="/imglogin.jpg"
           alt="login"
           className="w-full rounded-2xl object-cover h-full"
         />
       </div>
-      <div className="flex flex-col items-center w-1/2 justify-center gap-4">
+      <div className="flex flex-col items-center w-full md:w-1/2 justify-center gap-4">
         <img src="src/assets/image/logo_header.svg" />
         <h2 style={{ fontWeight: "bold" }}>Đăng ký</h2>
         {
