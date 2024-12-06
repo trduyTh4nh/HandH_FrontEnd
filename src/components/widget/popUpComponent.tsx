@@ -76,13 +76,13 @@ function PopupComponent({ handleChange, switchToRegister }: any) {
     <div className="flex gap-4 items-center w-full">
       <div className="flex-1 h-full hidden md:block">
         <img
-          src="src/assets/image/imglogin.jpg"
+          src="/imglogin.jpg"
           alt="login"
           className="w-full rounded-2xl object-contain h-full"
         />
       </div>
       <div className="flex flex-col items-center gap-4 w-full md:w-1/2">
-        <img src="src/assets/image/logo_header.svg" />
+        <img src="/logo_header.svg" />
         <h2 style={{ fontWeight: "bold" }}>Đăng nhập</h2>
         <p className="text-center">
           Chào mừng quay lại, hãy tiếp tục mua sắm với chúng tôi nào.

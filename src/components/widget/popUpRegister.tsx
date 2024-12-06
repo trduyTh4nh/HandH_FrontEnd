@@ -69,7 +69,7 @@ function PopupRegister({ handleChange, switchToLogin }: any) {
         />
       </div>
       <div className="flex flex-col items-center w-full md:w-1/2 justify-center gap-4">
-        <img src="src/assets/image/logo_header.svg" />
+        <img src="/logo_header.svg" />
         <h2 style={{ fontWeight: "bold" }}>Đăng ký</h2>
         {
           steps[currentStep]
